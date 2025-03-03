@@ -1,0 +1,20 @@
+# Wisdom Bites Dental Clinic
+# robots.txt
+
+User-agent: *
+Allow: /
+
+# Don't allow crawling of admin pages if they existed
+Disallow: /admin/
+Disallow: /private/
+Disallow: /wp-admin/
+Disallow: /wp-login.php
+
+# Disallow temporary pages
+Disallow: /temp/
+Disallow: /test/
+Disallow: /dev/
+Disallow: /staging/
+
+# Sitemap location
+Sitemap: https://www.wisdombites-dental.com/sitemap.xml 

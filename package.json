@@ -1,0 +1,19 @@
+{
+  "name": "wisdom-bites-dental",
+  "version": "1.0.0",
+  "description": "Wisdom Bites Dental Clinic Website",
+  "main": "index.html",
+  "scripts": {
+    "watch": "node watch-media.js",
+    "update": "powershell -ExecutionPolicy Bypass -File .\\update-site.ps1",
+    "start": "serve ."
+  },
+  "dependencies": {
+    "chokidar": "^3.5.3",
+    "serve": "^14.2.1"
+  },
+  "devDependencies": {},
+  "author": "Wisdom Bites Dental Clinic",
+  "license": "UNLICENSED",
+  "private": true
+} 

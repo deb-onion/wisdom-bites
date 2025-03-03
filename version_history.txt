@@ -1,0 +1,3 @@
+# Wisdom Bites Dental Clinic - Version History
+
+v1.0.0 (2023-06-15): Initial website release with responsive design and core functionality 
