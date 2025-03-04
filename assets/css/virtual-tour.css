@@ -101,9 +101,13 @@ body.tour-active {
         transform: scale(1);
         opacity: 1;
     }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.8;
+    }
     100% {
-        transform: scale(2.5);
-        opacity: 0;
+        transform: scale(1);
+        opacity: 1;
     }
 }
 
@@ -119,7 +123,7 @@ body.tour-active {
     width: 220px;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.3s ease;
+    transition: opacity 0.3s ease, transform 0.3s ease;
     pointer-events: none;
     z-index: 2;
 }
@@ -128,6 +132,7 @@ body.tour-active {
     opacity: 1;
     visibility: visible;
     pointer-events: all;
+    transform: translateY(0);
 }
 
 .hotspot-tooltip::after {
