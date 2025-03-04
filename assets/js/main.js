@@ -1,656 +1,1590 @@
 /**
  * Wisdom Bites Dental Clinic
- * Main JavaScript
- * Version: 1.0
+ * Main JavaScript File
+ * Version: 3.0.0
+ * 
+ * This file contains core functionality for the website including:
+ * - Navigation handling
+ * - Scroll effects
+ * - Animation triggers
+ * - Interactive components
+ * - Form validation
  */
 
-document.addEventListener('DOMContentLoaded', function() {
-    'use strict';
+"use strict";
 
-    // Initialize all components
-    initNavigation();
-    initScrollEffects();
-    initAnimations();
-    initTooltips();
-    initModals();
-    initLazyLoading();
-    initSmoothScroll();
-    initBackToTop();
+// Main application object
+const WisdomBites = {
+    // Configuration options
+    config: {
+        scrollOffset: 100, // Pixel offset when header changes style
+        scrollAnimationOffset: 150, // Offset for scroll animations
+        mobileBreakpoint: 991, // Mobile menu breakpoint
+        scrollDuration: 800, // Duration of smooth scrolling
+        swiperAutoplayDelay: 5000, // Delay between slides in milliseconds
+    },
     
-    // Custom components for specific pages
-    if (document.querySelector('.testimonials-slider')) {
-        initTestimonialsSlider();
-    }
-
-    if (document.querySelector('.booking-form')) {
-        initBookingForm();
-    }
-
-    if (document.querySelector('.contact-form')) {
-        initContactForm();
-    }
-});
-
-/**
- * Navigation functionality
- */
-function initNavigation() {
-    const header = document.querySelector('.site-header');
-    const menuToggle = document.querySelector('.menu-toggle');
-    const navList = document.querySelector('.nav-list');
-    const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+    // DOM elements cache
+    elements: {},
     
-    // Scroll header effect
-    window.addEventListener('scroll', function() {
-        if (window.scrollY > 50) {
-            header.classList.add('scrolled');
-        } else {
-            header.classList.remove('scrolled');
+    // State variables
+    state: {
+        isMenuOpen: false,
+        isPageLoaded: false,
+        lastScrollPosition: 0,
+        isScrollingDown: false,
+    },
+    
+    /**
+     * Initialize the application
+     */
+    init: function() {
+        // Cache DOM elements
+        this.cacheElements();
+        
+        // Initialize components
+        this.initNavigation();
+        this.initScrollEffects();
+        this.initAnimations();
+        this.initStickyElements();
+        this.initSmoothScroll();
+        
+        // Initialize page-specific components
+        this.initSliders();
+        this.initAccordions();
+        this.initTabs();
+        this.initCounters();
+        this.initLightbox();
+        this.initForms();
+        
+        // Set initial states
+        this.setInitialStates();
+        
+        // Bind events
+        this.bindEvents();
+        
+        // Mark initialization as complete
+        this.state.isPageLoaded = true;
+        console.log('Wisdom Bites website initialized');
+    },
+    
+    /**
+     * Cache DOM elements for better performance
+     */
+    cacheElements: function() {
+        // Header elements
+        this.elements.header = document.querySelector('.site-header');
+        this.elements.menuToggle = document.querySelector('.menu-toggle');
+        this.elements.navContainer = document.querySelector('.nav-container');
+        this.elements.navList = document.querySelector('.nav-list');
+        this.elements.dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+        
+        // Scroll elements
+        this.elements.backToTop = document.querySelector('.back-to-top');
+        this.elements.bookingSticky = document.querySelector('.booking-sticky');
+        
+        // Animation elements
+        this.elements.animatedElements = document.querySelectorAll('[data-animation]');
+        
+        // Interactive components
+        this.elements.accordionItems = document.querySelectorAll('.accordion-item');
+        this.elements.tabButtons = document.querySelectorAll('.tab-button');
+        this.elements.counterElements = document.querySelectorAll('.counter');
+        
+        // Forms
+        this.elements.forms = document.querySelectorAll('form');
+        this.elements.bookingForm = document.querySelector('#booking-form');
+        this.elements.contactForm = document.querySelector('#contact-form');
+    },
+    
+    /**
+     * Set initial states
+     */
+    setInitialStates: function() {
+        // Check initial scroll position
+        this.handleScroll();
+        
+        // Set year in copyright notice
+        const yearElement = document.getElementById('current-year');
+        if (yearElement) {
+            yearElement.textContent = new Date().getFullYear();
         }
-    });
+    },
     
-    // Mobile menu toggle
-    if (menuToggle) {
-        menuToggle.addEventListener('click', function() {
-            navList.classList.toggle('active');
-            document.body.classList.toggle('menu-open');
-            
-            // Transform hamburger to X
-            this.classList.toggle('active');
-        });
-    }
+    /**
+     * Bind global events
+     */
+    bindEvents: function() {
+        // Window events
+        window.addEventListener('scroll', this.handleScroll.bind(this));
+        window.addEventListener('resize', this.handleResize.bind(this));
+        window.addEventListener('load', this.handlePageLoad.bind(this));
+        
+        // Document events
+        document.addEventListener('click', this.handleDocumentClick.bind(this));
+        document.addEventListener('keydown', this.handleKeyDown.bind(this));
+    },
     
-    // Dropdown menus for mobile
-    if (window.innerWidth < 768) {
-        dropdownToggles.forEach(toggle => {
-            toggle.addEventListener('click', function(e) {
-                e.preventDefault();
-                const parent = this.parentElement;
-                const dropdown = parent.querySelector('.dropdown-menu');
-                
-                // Close other dropdowns
-                document.querySelectorAll('.dropdown-menu.active').forEach(menu => {
-                    if (menu !== dropdown) {
-                        menu.classList.remove('active');
+    /**
+     * Handle window scroll event
+     */
+    handleScroll: function() {
+        const scrollPosition = window.scrollY;
+        
+        // Update scroll direction state
+        this.state.isScrollingDown = scrollPosition > this.state.lastScrollPosition;
+        this.state.lastScrollPosition = scrollPosition;
+        
+        // Handle header state
+        this.updateHeaderOnScroll(scrollPosition);
+        
+        // Handle back to top button visibility
+        this.updateBackToTopButton(scrollPosition);
+        
+        // Handle booking sticky visibility
+        this.updateBookingSticky(scrollPosition);
+        
+        // Handle scroll animations
+        this.updateScrollAnimations(scrollPosition);
+    },
+    
+    /**
+     * Handle window resize event
+     */
+    handleResize: function() {
+        // Reset mobile menu on larger screens
+        if (window.innerWidth > this.config.mobileBreakpoint && this.state.isMenuOpen) {
+            this.closeMenu();
+        }
+        
+        // Recalculate slider dimensions if needed
+        if (window.Swiper && this.swipers) {
+            Object.values(this.swipers).forEach(swiper => {
+                swiper.update();
+            });
+        }
+    },
+    
+    /**
+     * Handle page load event
+     */
+    handlePageLoad: function() {
+        // Hide loading screen
+        const loadingScreen = document.querySelector('.loading-screen');
+        if (loadingScreen) {
+            setTimeout(() => {
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                }, 500);
+            }, 500);
+        }
+        
+        // Add loaded class to body
+        document.body.classList.add('loaded');
+        
+        // Initialize any components that need the page to be fully loaded
+        this.initLazyLoading();
+    },
+    
+    /**
+     * Handle document click event
+     */
+    handleDocumentClick: function(event) {
+        // Close mobile menu when clicking outside
+        if (this.state.isMenuOpen && !event.target.closest('.nav-container') && !event.target.closest('.menu-toggle')) {
+            this.closeMenu();
+        }
+    },
+    
+    /**
+     * Handle document keydown event
+     */
+    handleKeyDown: function(event) {
+        // Close mobile menu on Escape key
+        if (event.key === 'Escape' && this.state.isMenuOpen) {
+            this.closeMenu();
+        }
+    },
+    
+    /**
+     * Initialize navigation functionality
+     */
+    initNavigation: function() {
+        // Toggle mobile menu
+        if (this.elements.menuToggle) {
+            this.elements.menuToggle.addEventListener('click', () => {
+                if (this.state.isMenuOpen) {
+                    this.closeMenu();
+                } else {
+                    this.openMenu();
+                }
+            });
+        }
+        
+        // Dropdown menus for mobile view
+        if (this.elements.dropdownToggles) {
+            this.elements.dropdownToggles.forEach(toggle => {
+                toggle.addEventListener('click', (e) => {
+                    // Prevent default only in mobile view
+                    if (window.innerWidth <= this.config.mobileBreakpoint) {
+                        e.preventDefault();
+                        const parent = toggle.parentElement;
+                        
+                        // Toggle active class
+                        if (parent.classList.contains('active')) {
+                            parent.classList.remove('active');
+                        } else {
+                            // Close other dropdowns
+                            document.querySelectorAll('.has-dropdown.active').forEach(item => {
+                                if (item !== parent) {
+                                    item.classList.remove('active');
+                                }
+                            });
+                            
+                            parent.classList.add('active');
+                        }
                     }
                 });
-                
-                dropdown.classList.toggle('active');
             });
-        });
-    }
-    
-    // Close mobile menu when clicking outside
-    document.addEventListener('click', function(e) {
-        if (navList.classList.contains('active') && !e.target.closest('.main-nav') && !e.target.closest('.menu-toggle')) {
-            navList.classList.remove('active');
-            menuToggle.classList.remove('active');
-            document.body.classList.remove('menu-open');
         }
-    });
+    },
     
-    // Set active menu item based on current page
-    const currentPage = window.location.pathname;
-    const navLinks = document.querySelectorAll('.nav-list a');
+    /**
+     * Open mobile menu
+     */
+    openMenu: function() {
+        // Set aria attributes
+        this.elements.menuToggle.setAttribute('aria-expanded', 'true');
+        
+        // Add active classes
+        this.elements.menuToggle.classList.add('active');
+        this.elements.navContainer.classList.add('active');
+        
+        // Prevent body scrolling
+        document.body.classList.add('menu-open');
+        
+        // Update state
+        this.state.isMenuOpen = true;
+    },
     
-    navLinks.forEach(link => {
-        const href = link.getAttribute('href');
-        if (href === currentPage || href === currentPage.substring(currentPage.lastIndexOf('/') + 1)) {
-            link.classList.add('active');
-            // If in dropdown, also set parent as active
-            const parent = link.closest('.has-dropdown');
-            if (parent) {
-                parent.querySelector('.dropdown-toggle').classList.add('active');
+    /**
+     * Close mobile menu
+     */
+    closeMenu: function() {
+        // Set aria attributes
+        this.elements.menuToggle.setAttribute('aria-expanded', 'false');
+        
+        // Remove active classes
+        this.elements.menuToggle.classList.remove('active');
+        this.elements.navContainer.classList.remove('active');
+        
+        // Allow body scrolling
+        document.body.classList.remove('menu-open');
+        
+        // Close any open dropdowns
+        document.querySelectorAll('.has-dropdown.active').forEach(item => {
+            item.classList.remove('active');
+        });
+        
+        // Update state
+        this.state.isMenuOpen = false;
+    },
+    
+    /**
+     * Initialize scroll effects
+     */
+    initScrollEffects: function() {
+        // Initial call to set correct state
+        this.handleScroll();
+    },
+    
+    /**
+     * Update header state on scroll
+     */
+    updateHeaderOnScroll: function(scrollPosition) {
+        if (this.elements.header) {
+            if (scrollPosition > this.config.scrollOffset) {
+                this.elements.header.classList.add('scrolled');
+            } else {
+                this.elements.header.classList.remove('scrolled');
             }
         }
-    });
-}
-
-/**
- * Scroll effects
- */
-function initScrollEffects() {
-    const elements = document.querySelectorAll('.scroll-reveal');
+    },
     
-    // Initial check for elements in view
-    checkElementsInView();
+    /**
+     * Update back to top button visibility
+     */
+    updateBackToTopButton: function(scrollPosition) {
+        if (this.elements.backToTop) {
+            if (scrollPosition > window.innerHeight / 2) {
+                this.elements.backToTop.classList.add('visible');
+            } else {
+                this.elements.backToTop.classList.remove('visible');
+            }
+        }
+    },
     
-    // Check on scroll
-    window.addEventListener('scroll', checkElementsInView);
-    
-    function checkElementsInView() {
-        const windowHeight = window.innerHeight;
-        const windowTop = window.scrollY;
-        const windowBottom = windowTop + windowHeight;
-        
-        elements.forEach(element => {
-            const elementTop = element.getBoundingClientRect().top + windowTop;
-            const elementBottom = elementTop + element.offsetHeight;
+    /**
+     * Update booking sticky visibility
+     */
+    updateBookingSticky: function(scrollPosition) {
+        if (this.elements.bookingSticky) {
+            // Show sticky booking bar when scrolling past hero section and on specific pages
+            const shouldShow = scrollPosition > window.innerHeight && 
+                             !document.body.classList.contains('booking-page');
             
-            // If element is in viewport
-            if (elementTop <= windowBottom - 100 && elementBottom >= windowTop + 100) {
-                element.classList.add('revealed');
-            }
-        });
-    }
-}
-
-/**
- * Animation effects
- */
-function initAnimations() {
-    // Staggered animations for lists
-    const animatedLists = document.querySelectorAll('.animate-list');
-    
-    animatedLists.forEach(list => {
-        const items = list.children;
-        Array.from(items).forEach((item, index) => {
-            item.style.animationDelay = `${0.1 * index}s`;
-        });
-    });
-}
-
-/**
- * Tooltips
- */
-function initTooltips() {
-    const tooltipElements = document.querySelectorAll('[data-tooltip]');
-    
-    tooltipElements.forEach(element => {
-        const tooltipText = element.getAttribute('data-tooltip');
-        
-        // Create tooltip element
-        const tooltip = document.createElement('div');
-        tooltip.className = 'tooltip';
-        tooltip.textContent = tooltipText;
-        
-        // Events to show/hide tooltip
-        element.addEventListener('mouseenter', () => {
-            document.body.appendChild(tooltip);
-            const rect = element.getBoundingClientRect();
-            
-            tooltip.style.top = `${rect.top - tooltip.offsetHeight - 10 + window.scrollY}px`;
-            tooltip.style.left = `${rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2)}px`;
-            tooltip.classList.add('active');
-        });
-        
-        element.addEventListener('mouseleave', () => {
-            tooltip.classList.remove('active');
-            setTimeout(() => {
-                if (tooltip.parentNode) {
-                    tooltip.parentNode.removeChild(tooltip);
-                }
-            }, 300);
-        });
-    });
-}
-
-/**
- * Modal functionality
- */
-function initModals() {
-    const modalTriggers = document.querySelectorAll('[data-modal-target]');
-    const modalCloseButtons = document.querySelectorAll('.modal-close');
-    
-    modalTriggers.forEach(trigger => {
-        trigger.addEventListener('click', (e) => {
-            e.preventDefault();
-            const modalId = trigger.getAttribute('data-modal-target');
-            const modal = document.getElementById(modalId);
-            
-            if (modal) {
-                modal.classList.add('active');
-                document.body.classList.add('modal-open');
-            }
-        });
-    });
-    
-    modalCloseButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const modal = button.closest('.modal');
-            modal.classList.remove('active');
-            document.body.classList.remove('modal-open');
-        });
-    });
-    
-    // Close modal when clicking outside content
-    document.addEventListener('click', (e) => {
-        if (e.target.classList.contains('modal')) {
-            e.target.classList.remove('active');
-            document.body.classList.remove('modal-open');
-        }
-    });
-    
-    // Close modal with Escape key
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            const activeModal = document.querySelector('.modal.active');
-            if (activeModal) {
-                activeModal.classList.remove('active');
-                document.body.classList.remove('modal-open');
+            if (shouldShow) {
+                this.elements.bookingSticky.classList.add('visible');
+            } else {
+                this.elements.bookingSticky.classList.remove('visible');
             }
         }
-    });
-}
-
-/**
- * Lazy loading images
- */
-function initLazyLoading() {
-    const lazyImages = document.querySelectorAll('.lazy-load');
+    },
     
-    if ('IntersectionObserver' in window) {
-        const imageObserver = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const image = entry.target;
-                    image.src = image.dataset.src;
+    /**
+     * Initialize animations
+     */
+    initAnimations: function() {
+        // Use IntersectionObserver for scroll-triggered animations
+        if ('IntersectionObserver' in window) {
+            const animationObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const element = entry.target;
+                        const delay = element.dataset.delay || 0;
+                        
+                        // Add animated class after specified delay
+                        setTimeout(() => {
+                            element.classList.add('animated');
+                        }, delay * 1000);
+                        
+                        // Stop observing after animation is triggered
+                        animationObserver.unobserve(element);
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -100px 0px'
+            });
+            
+            // Observe all elements with animation data attribute
+            if (this.elements.animatedElements) {
+                this.elements.animatedElements.forEach(element => {
+                    animationObserver.observe(element);
+                });
+            }
+        } else {
+            // Fallback for browsers that don't support IntersectionObserver
+            this.elements.animatedElements.forEach(element => {
+                element.classList.add('animated');
+            });
+        }
+    },
+    
+    /**
+     * Update scroll animations
+     */
+    updateScrollAnimations: function(scrollPosition) {
+        // This is a fallback for browsers without IntersectionObserver
+        if (!('IntersectionObserver' in window) && this.elements.animatedElements) {
+            this.elements.animatedElements.forEach(element => {
+                const elementPosition = element.getBoundingClientRect().top + window.scrollY;
+                const windowHeight = window.innerHeight;
+                
+                if (scrollPosition + windowHeight - this.config.scrollAnimationOffset > elementPosition) {
+                    const delay = element.dataset.delay || 0;
                     
-                    image.addEventListener('load', () => {
-                        image.classList.add('loaded');
+                    setTimeout(() => {
+                        element.classList.add('animated');
+                    }, delay * 1000);
+                }
+            });
+        }
+    },
+    
+    /**
+     * Initialize sticky elements
+     */
+    initStickyElements: function() {
+        // Implementation depends on specific layout requirements
+        // Currently using CSS position: sticky for elements like the header
+    },
+    
+    /**
+     * Initialize smooth scrolling for anchor links
+     */
+    initSmoothScroll: function() {
+        const anchorLinks = document.querySelectorAll('a[href^="#"]:not([href="#"])');
+        
+        anchorLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                const targetId = link.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    // Close mobile menu if open
+                    if (this.state.isMenuOpen) {
+                        this.closeMenu();
+                    }
+                    
+                    // Calculate scroll position
+                    const headerHeight = this.elements.header ? this.elements.header.offsetHeight : 0;
+                    const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY - headerHeight;
+                    
+                    // Smooth scroll to target
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
                     });
                     
-                    imageObserver.unobserve(image);
+                    // Update URL hash without scrolling
+                    history.pushState(null, null, targetId);
                 }
             });
         });
         
-        lazyImages.forEach(image => {
-            imageObserver.observe(image);
-        });
-    } else {
-        // Fallback for browsers without IntersectionObserver
-        lazyImages.forEach(image => {
-            image.src = image.dataset.src;
-            image.classList.add('loaded');
-        });
-    }
-}
-
-/**
- * Smooth scrolling for anchor links
- */
-function initSmoothScroll() {
-    const anchorLinks = document.querySelectorAll('a[href^="#"]:not([href="#"])');
-    
-    anchorLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            const targetId = this.getAttribute('href');
-            const targetElement = document.querySelector(targetId);
-            
-            if (targetElement) {
-                const headerHeight = document.querySelector('.site-header').offsetHeight;
-                const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY - headerHeight;
-                
+        // Also bind event to back-to-top button
+        if (this.elements.backToTop) {
+            this.elements.backToTop.addEventListener('click', (e) => {
+                e.preventDefault();
                 window.scrollTo({
-                    top: targetPosition,
+                    top: 0,
                     behavior: 'smooth'
                 });
-                
-                // Update URL but don't scroll
-                history.pushState(null, null, targetId);
-            }
-        });
-    });
-}
-
-/**
- * Back to top button
- */
-function initBackToTop() {
-    const backToTopButton = document.querySelector('.back-to-top');
-    
-    if (backToTopButton) {
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 300) {
-                backToTopButton.classList.add('active');
-            } else {
-                backToTopButton.classList.remove('active');
-            }
-        });
-        
-        backToTopButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
             });
-        });
-    }
-}
-
-/**
- * Testimonials slider
- */
-function initTestimonialsSlider() {
-    const slider = document.querySelector('.testimonials-slider');
-    const slides = slider.querySelectorAll('.testimonial-slide');
-    const dotsContainer = slider.querySelector('.control-dots');
-    const prevButton = slider.querySelector('.control-prev');
-    const nextButton = slider.querySelector('.control-next');
-    
-    let currentSlide = 0;
-    const slideCount = slides.length;
-    
-    // Create dots
-    for (let i = 0; i < slideCount; i++) {
-        const dot = document.createElement('span');
-        dot.classList.add('dot');
-        if (i === 0) dot.classList.add('active');
-        dot.dataset.slide = i;
-        dotsContainer.appendChild(dot);
-        
-        dot.addEventListener('click', () => {
-            goToSlide(i);
-        });
-    }
-    
-    // Set initial slide
-    updateSlides();
-    
-    // Event listeners for controls
-    prevButton.addEventListener('click', () => {
-        currentSlide = (currentSlide - 1 + slideCount) % slideCount;
-        updateSlides();
-    });
-    
-    nextButton.addEventListener('click', () => {
-        currentSlide = (currentSlide + 1) % slideCount;
-        updateSlides();
-    });
-    
-    // Auto-advance slides
-    let slideInterval = setInterval(() => {
-        currentSlide = (currentSlide + 1) % slideCount;
-        updateSlides();
-    }, 5000);
-    
-    // Pause auto-advance on hover
-    slider.addEventListener('mouseenter', () => {
-        clearInterval(slideInterval);
-    });
-    
-    slider.addEventListener('mouseleave', () => {
-        clearInterval(slideInterval);
-        slideInterval = setInterval(() => {
-            currentSlide = (currentSlide + 1) % slideCount;
-            updateSlides();
-        }, 5000);
-    });
-    
-    function goToSlide(index) {
-        currentSlide = index;
-        updateSlides();
-    }
-    
-    function updateSlides() {
-        // Update slides
-        slides.forEach((slide, index) => {
-            slide.style.transform = `translateX(${100 * (index - currentSlide)}%)`;
-        });
-        
-        // Update dots
-        const dots = dotsContainer.querySelectorAll('.dot');
-        dots.forEach((dot, index) => {
-            if (index === currentSlide) {
-                dot.classList.add('active');
-            } else {
-                dot.classList.remove('active');
-            }
-        });
-    }
-}
-
-/**
- * Booking form functionality
- */
-function initBookingForm() {
-    const bookingForm = document.querySelector('.booking-form');
-    const dateInput = bookingForm.querySelector('[name="appointment-date"]');
-    const timeSelect = bookingForm.querySelector('[name="appointment-time"]');
-    const serviceSelect = bookingForm.querySelector('[name="service"]');
-    
-    // Set min date to tomorrow
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const tomorrowFormatted = tomorrow.toISOString().split('T')[0];
-    dateInput.min = tomorrowFormatted;
-    
-    // Form validation
-    bookingForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        let isValid = true;
-        const formData = new FormData(bookingForm);
-        
-        // Validate required fields
-        const requiredFields = bookingForm.querySelectorAll('[required]');
-        requiredFields.forEach(field => {
-            if (!field.value) {
-                isValid = false;
-                showError(field, 'This field is required');
-            } else {
-                clearError(field);
-            }
-        });
-        
-        // Validate email format
-        const emailInput = bookingForm.querySelector('[type="email"]');
-        if (emailInput && emailInput.value && !isValidEmail(emailInput.value)) {
-            isValid = false;
-            showError(emailInput, 'Please enter a valid email address');
         }
-        
-        // Validate phone format
-        const phoneInput = bookingForm.querySelector('[name="phone"]');
-        if (phoneInput && phoneInput.value && !isValidPhone(phoneInput.value)) {
-            isValid = false;
-            showError(phoneInput, 'Please enter a valid phone number');
-        }
-        
-        if (isValid) {
-            // Show success message (in a real app this would be an AJAX submission)
-            const successMessage = document.createElement('div');
-            successMessage.className = 'success-message';
-            successMessage.innerHTML = '<p>Thank you! Your appointment request has been submitted. We will contact you shortly to confirm your appointment.</p>';
+    },
+    
+    /**
+     * Initialize sliders
+     */
+    initSliders: function() {
+        // Initialize if Swiper is available and sliders exist
+        if (window.Swiper) {
+            // Store swiper instances
+            this.swipers = {};
             
-            bookingForm.innerHTML = '';
-            bookingForm.appendChild(successMessage);
-            
-            // In a real app, would submit the form data here
-            console.log('Form submitted successfully');
-            for (const [key, value] of formData.entries()) {
-                console.log(`${key}: ${value}`);
+            // Testimonials slider
+            const testimonialsSlider = document.querySelector('.testimonials-slider .swiper-container');
+            if (testimonialsSlider) {
+                this.swipers.testimonials = new Swiper(testimonialsSlider, {
+                    slidesPerView: 1,
+                    spaceBetween: 30,
+                    loop: true,
+                    autoplay: {
+                        delay: this.config.swiperAutoplayDelay,
+                        disableOnInteraction: false
+                    },
+                    pagination: {
+                        el: '.testimonials-slider .swiper-pagination',
+                        clickable: true
+                    },
+                    navigation: {
+                        nextEl: '.testimonials-slider .slider-button.next',
+                        prevEl: '.testimonials-slider .slider-button.prev'
+                    },
+                    breakpoints: {
+                        768: {
+                            slidesPerView: 2,
+                            spaceBetween: 30
+                        },
+                        1200: {
+                            slidesPerView: 3,
+                            spaceBetween: 30
+                        }
+                    }
+                });
             }
-        }
-    });
-    
-    // Dynamic time slots based on selected date
-    dateInput.addEventListener('change', function() {
-        // This would typically be populated with available time slots from a backend
-        // For demo purposes, we'll just add some sample times
-        timeSelect.innerHTML = '';
-        
-        const date = new Date(this.value);
-        const dayOfWeek = date.getDay();
-        
-        // Check if weekend
-        if (dayOfWeek === 0) { // Sunday
-            timeSelect.innerHTML = '<option value="">Closed on Sundays</option>';
-            timeSelect.disabled = true;
-        } else if (dayOfWeek === 6) { // Saturday
-            // Limited hours on Saturday
-            const saturdayTimes = ['09:00', '10:00', '11:00', '12:00'];
-            timeSelect.innerHTML = '<option value="">Select a time</option>';
-            saturdayTimes.forEach(time => {
-                const option = document.createElement('option');
-                option.value = time;
-                option.textContent = time;
-                timeSelect.appendChild(option);
-            });
-            timeSelect.disabled = false;
+            
+            // Before & After slider
+            const beforeAfterSlider = document.querySelector('.before-after-slider .swiper-container');
+            if (beforeAfterSlider) {
+                this.swipers.beforeAfter = new Swiper(beforeAfterSlider, {
+                    slidesPerView: 1,
+                    spaceBetween: 0,
+                    loop: true,
+                    navigation: {
+                        nextEl: '.before-after-slider .slider-button.next',
+                        prevEl: '.before-after-slider .slider-button.prev'
+                    },
+                    pagination: {
+                        el: '.before-after-slider .swiper-pagination',
+                        clickable: true
+                    }
+                });
+            }
+            
+            // Gallery slider
+            const gallerySlider = document.querySelector('.gallery-slider .swiper-container');
+            if (gallerySlider) {
+                this.swipers.gallery = new Swiper(gallerySlider, {
+                    slidesPerView: 1,
+                    spaceBetween: 10,
+                    loop: true,
+                    navigation: {
+                        nextEl: '.gallery-slider .slider-button.next',
+                        prevEl: '.gallery-slider .slider-button.prev'
+                    },
+                    pagination: {
+                        el: '.gallery-slider .swiper-pagination',
+                        clickable: true
+                    },
+                    breakpoints: {
+                        576: {
+                            slidesPerView: 2,
+                            spaceBetween: 20
+                        },
+                        992: {
+                            slidesPerView: 3,
+                            spaceBetween: 30
+                        }
+                    }
+                });
+            }
         } else {
-            // Weekday times
-            const weekdayTimes = ['09:00', '10:00', '11:00', '12:00', '14:00', '15:00', '16:00', '17:00'];
-            timeSelect.innerHTML = '<option value="">Select a time</option>';
-            weekdayTimes.forEach(time => {
-                const option = document.createElement('option');
-                option.value = time;
-                option.textContent = time;
-                timeSelect.appendChild(option);
-            });
-            timeSelect.disabled = false;
+            console.warn('Swiper is not available. Sliders will not be initialized.');
         }
-    });
+        
+        // Initialize image comparison sliders
+        this.initImageComparison();
+    },
     
-    // Dynamic doctor options based on selected service
-    if (serviceSelect) {
-        serviceSelect.addEventListener('change', function() {
-            const doctorSelect = bookingForm.querySelector('[name="doctor"]');
-            if (doctorSelect) {
-                // In a real app, this would come from the backend based on service
-                const service = this.value;
-                doctorSelect.innerHTML = '<option value="">Select a doctor</option>';
+    /**
+     * Initialize before/after image comparison sliders
+     */
+    initImageComparison: function() {
+        const comparisons = document.querySelectorAll('.image-comparison');
+        
+        comparisons.forEach(comparison => {
+            const slider = comparison.querySelector('.comparison-slider');
+            const before = comparison.querySelector('.before');
+            const after = comparison.querySelector('.after');
+            
+            if (!slider || !before || !after) return;
+            
+            let isActive = false;
+            
+            // Set initial position
+            const setInitialPosition = () => {
+                const initialPosition = 50; // 50%
+                before.style.width = `${initialPosition}%`;
+                slider.style.left = `${initialPosition}%`;
+            };
+            
+            setInitialPosition();
+            
+            // Handle slider movement
+            const moveSlider = (x) => {
+                const rect = comparison.getBoundingClientRect();
+                let position = ((x - rect.left) / rect.width) * 100;
                 
-                if (service === 'general-dentistry') {
-                    addDoctorOption(doctorSelect, 'dr-smith', 'Dr. Smith');
-                    addDoctorOption(doctorSelect, 'dr-johnson', 'Dr. Johnson');
-                } else if (service === 'cosmetic-dentistry') {
-                    addDoctorOption(doctorSelect, 'dr-williams', 'Dr. Williams');
-                    addDoctorOption(doctorSelect, 'dr-brown', 'Dr. Brown');
-                } else if (service === 'emergency-care') {
-                    addDoctorOption(doctorSelect, 'dr-emergency', 'Dr. Emergency');
+                // Constrain position within bounds
+                position = Math.max(0, Math.min(100, position));
+                
+                before.style.width = `${position}%`;
+                slider.style.left = `${position}%`;
+            };
+            
+            // Mouse events
+            slider.addEventListener('mousedown', () => {
+                isActive = true;
+                slider.classList.add('active');
+            });
+            
+            window.addEventListener('mouseup', () => {
+                isActive = false;
+                slider.classList.remove('active');
+            });
+            
+            window.addEventListener('mousemove', (e) => {
+                if (isActive) {
+                    moveSlider(e.clientX);
+                }
+            });
+            
+            // Touch events
+            slider.addEventListener('touchstart', () => {
+                isActive = true;
+                slider.classList.add('active');
+            });
+            
+            window.addEventListener('touchend', () => {
+                isActive = false;
+                slider.classList.remove('active');
+            });
+            
+            window.addEventListener('touchcancel', () => {
+                isActive = false;
+                slider.classList.remove('active');
+            });
+            
+            window.addEventListener('touchmove', (e) => {
+                if (isActive && e.touches[0]) {
+                    moveSlider(e.touches[0].clientX);
+                    // Prevent scrolling while dragging
+                    e.preventDefault();
+                }
+            });
+            
+            // Reset on window resize
+            window.addEventListener('resize', setInitialPosition);
+        });
+    },
+    
+    /**
+     * Initialize accordions
+     */
+    initAccordions: function() {
+        // FAQ accordions
+        const faqItems = document.querySelectorAll('.faq-item');
+        
+        faqItems.forEach(item => {
+            const question = item.querySelector('.faq-question');
+            
+            if (question) {
+                question.addEventListener('click', () => {
+                    // Toggle current item
+                    const isActive = item.classList.contains('active');
+                    
+                    // Optional: Close other items (comment out for multiple open items)
+                    // faqItems.forEach(otherItem => {
+                    //     if (otherItem !== item) {
+                    //         otherItem.classList.remove('active');
+                    //     }
+                    // });
+                    
+                    // Toggle current item
+                    if (isActive) {
+                        item.classList.remove('active');
+                    } else {
+                        item.classList.add('active');
+                    }
+                });
+            }
+        });
+        
+        // General accordions
+        if (this.elements.accordionItems) {
+            this.elements.accordionItems.forEach(item => {
+                const header = item.querySelector('.accordion-header');
+                
+                if (header) {
+                    header.addEventListener('click', () => {
+                        item.classList.toggle('active');
+                    });
+                }
+            });
+        }
+    },
+    
+    /**
+     * Initialize tabs
+     */
+    initTabs: function() {
+        if (this.elements.tabButtons) {
+            this.elements.tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.getAttribute('data-tab');
+                    const tabContainer = button.closest('.tabs-container');
+                    
+                    if (tabContainer) {
+                        // Deactivate all tabs and contents
+                        tabContainer.querySelectorAll('.tab-button').forEach(btn => {
+                            btn.classList.remove('active');
+                        });
+                        
+                        tabContainer.querySelectorAll('.tab-content').forEach(content => {
+                            content.classList.remove('active');
+                        });
+                        
+                        // Activate selected tab and content
+                        button.classList.add('active');
+                        
+                        const activeContent = tabContainer.querySelector(`.tab-content[data-tab="${tabId}"]`);
+                        if (activeContent) {
+                            activeContent.classList.add('active');
+                        }
+                    }
+                });
+            });
+        }
+    },
+    
+    /**
+     * Initialize counters
+     */
+    initCounters: function() {
+        if (!this.elements.counterElements.length) return;
+        
+        // Use IntersectionObserver to trigger counters when visible
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const counter = entry.target;
+                    const target = parseInt(counter.getAttribute('data-target'), 10);
+                    const duration = parseInt(counter.getAttribute('data-duration') || 2000, 10);
+                    const decimalPlaces = parseInt(counter.getAttribute('data-decimals') || 0, 10);
+                    
+                    let startTimestamp = null;
+                    const step = (timestamp) => {
+                        if (!startTimestamp) startTimestamp = timestamp;
+                        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                        const currentValue = progress * target;
+                        
+                        counter.textContent = currentValue.toFixed(decimalPlaces);
+                        
+                        if (progress < 1) {
+                            window.requestAnimationFrame(step);
+                        } else {
+                            // Ensure final value is exactly the target
+                            counter.textContent = target.toFixed(decimalPlaces);
+                        }
+                    };
+                    
+                    window.requestAnimationFrame(step);
+                    
+                    // Stop observing after animation is triggered
+                    counterObserver.unobserve(counter);
+                }
+            });
+        }, {
+            threshold: 0.5
+        });
+        
+        // Observe all counter elements
+        this.elements.counterElements.forEach(counter => {
+            counterObserver.observe(counter);
+        });
+    },
+    
+    /**
+     * Initialize lightbox functionality
+     */
+    initLightbox: function() {
+        const lightboxTriggers = document.querySelectorAll('[data-lightbox]');
+        
+        if (!lightboxTriggers.length) return;
+        
+        // Create lightbox container if it doesn't exist
+        let lightbox = document.querySelector('.lightbox');
+        
+        if (!lightbox) {
+            lightbox = document.createElement('div');
+            lightbox.className = 'lightbox';
+            lightbox.innerHTML = `
+                <div class="lightbox-overlay"></div>
+                <div class="lightbox-container">
+                    <div class="lightbox-content"></div>
+                    <button class="lightbox-close" aria-label="Close lightbox">&times;</button>
+                    <button class="lightbox-prev" aria-label="Previous image">&lsaquo;</button>
+                    <button class="lightbox-next" aria-label="Next image">&rsaquo;</button>
+                </div>
+            `;
+            document.body.appendChild(lightbox);
+        }
+        
+        // Cache lightbox elements
+        const lightboxOverlay = lightbox.querySelector('.lightbox-overlay');
+        const lightboxContent = lightbox.querySelector('.lightbox-content');
+        const lightboxClose = lightbox.querySelector('.lightbox-close');
+        const lightboxPrev = lightbox.querySelector('.lightbox-prev');
+        const lightboxNext = lightbox.querySelector('.lightbox-next');
+        
+        // Group lightbox items
+        const lightboxGroups = {};
+        
+        lightboxTriggers.forEach(trigger => {
+            const group = trigger.getAttribute('data-lightbox') || 'default';
+            
+            if (!lightboxGroups[group]) {
+                lightboxGroups[group] = [];
+            }
+            
+            lightboxGroups[group].push(trigger);
+        });
+        
+        // Track current lightbox state
+        let currentGroup = null;
+        let currentIndex = 0;
+        
+        // Open lightbox
+        const openLightbox = (group, index) => {
+            currentGroup = group;
+            currentIndex = index;
+            updateLightboxContent();
+            lightbox.classList.add('active');
+            document.body.classList.add('lightbox-open');
+        };
+        
+        // Close lightbox
+        const closeLightbox = () => {
+            lightbox.classList.remove('active');
+            document.body.classList.remove('lightbox-open');
+            setTimeout(() => {
+                lightboxContent.innerHTML = '';
+            }, 300);
+        };
+        
+        // Navigate to previous item
+        const prevItem = () => {
+            if (!currentGroup) return;
+            currentIndex = (currentIndex - 1 + lightboxGroups[currentGroup].length) % lightboxGroups[currentGroup].length;
+            updateLightboxContent();
+        };
+        
+        // Navigate to next item
+        const nextItem = () => {
+            if (!currentGroup) return;
+            currentIndex = (currentIndex + 1) % lightboxGroups[currentGroup].length;
+            updateLightboxContent();
+        };
+        
+        // Update lightbox content
+        const updateLightboxContent = () => {
+            if (!currentGroup || !lightboxGroups[currentGroup]) return;
+            
+            const triggers = lightboxGroups[currentGroup];
+            const currentTrigger = triggers[currentIndex];
+            
+            // Show/hide navigation buttons
+            if (triggers.length <= 1) {
+                lightboxPrev.style.display = 'none';
+                lightboxNext.style.display = 'none';
+            } else {
+                lightboxPrev.style.display = '';
+                lightboxNext.style.display = '';
+            }
+            
+            // Clear content
+            lightboxContent.innerHTML = '';
+            
+            // Get content based on type
+            const type = currentTrigger.getAttribute('data-type') || 'image';
+            
+            if (type === 'image') {
+                const imgSrc = currentTrigger.getAttribute('href') || currentTrigger.getAttribute('data-src');
+                const img = document.createElement('img');
+                img.src = imgSrc;
+                img.alt = currentTrigger.getAttribute('data-caption') || '';
+                
+                // Add loading state
+                lightboxContent.classList.add('loading');
+                
+                // Remove loading state when image is loaded
+                img.onload = () => {
+                    lightboxContent.classList.remove('loading');
+                };
+                
+                lightboxContent.appendChild(img);
+                
+                // Add caption if exists
+                const caption = currentTrigger.getAttribute('data-caption');
+                if (caption) {
+                    const captionElement = document.createElement('div');
+                    captionElement.className = 'lightbox-caption';
+                    captionElement.textContent = caption;
+                    lightboxContent.appendChild(captionElement);
+                }
+            } else if (type === 'video') {
+                const videoSrc = currentTrigger.getAttribute('href') || currentTrigger.getAttribute('data-src');
+                const video = document.createElement('video');
+                video.src = videoSrc;
+                video.controls = true;
+                video.autoplay = true;
+                lightboxContent.appendChild(video);
+            } else if (type === 'iframe') {
+                const iframeSrc = currentTrigger.getAttribute('href') || currentTrigger.getAttribute('data-src');
+                const iframe = document.createElement('iframe');
+                iframe.src = iframeSrc;
+                iframe.allowFullscreen = true;
+                lightboxContent.appendChild(iframe);
+            }
+        };
+        
+        // Bind lightbox events
+        lightboxClose.addEventListener('click', closeLightbox);
+        lightboxOverlay.addEventListener('click', closeLightbox);
+        lightboxPrev.addEventListener('click', prevItem);
+        lightboxNext.addEventListener('click', nextItem);
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (!lightbox.classList.contains('active')) return;
+            
+            if (e.key === 'Escape') {
+                closeLightbox();
+            } else if (e.key === 'ArrowLeft') {
+                prevItem();
+            } else if (e.key === 'ArrowRight') {
+                nextItem();
+            }
+        });
+        
+        // Attach click event to triggers
+        lightboxTriggers.forEach(trigger => {
+            trigger.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                const group = trigger.getAttribute('data-lightbox') || 'default';
+                const index = lightboxGroups[group].indexOf(trigger);
+                
+                openLightbox(group, index);
+            });
+        });
+    },
+    
+    /**
+     * Initialize forms
+     */
+    initForms: function() {
+        // Initialize all forms with validation
+        if (this.elements.forms) {
+            this.elements.forms.forEach(form => {
+                this.initFormValidation(form);
+            });
+        }
+        
+        // Special handling for booking form
+        if (this.elements.bookingForm) {
+            this.initBookingForm(this.elements.bookingForm);
+        }
+        
+        // Special handling for contact form
+        if (this.elements.contactForm) {
+            this.initContactForm(this.elements.contactForm);
+        }
+    },
+    
+    /**
+     * Initialize form validation
+     */
+    initFormValidation: function(form) {
+        const inputs = form.querySelectorAll('input, select, textarea');
+        
+        // Add validation to each input
+        inputs.forEach(input => {
+            // Validate on blur
+            input.addEventListener('blur', () => {
+                this.validateInput(input);
+            });
+            
+            // Validate on input, but only if previously blurred or submitted
+            input.addEventListener('input', () => {
+                if (input.dataset.blurred || form.dataset.submitted) {
+                    this.validateInput(input);
+                }
+            });
+            
+            // Mark as blurred after first blur
+            input.addEventListener('blur', () => {
+                input.dataset.blurred = 'true';
+            });
+        });
+        
+        // Validate form on submit
+        form.addEventListener('submit', (e) => {
+            let isValid = true;
+            
+            // Mark form as submitted
+            form.dataset.submitted = 'true';
+            
+            // Validate all inputs
+            inputs.forEach(input => {
+                if (!this.validateInput(input)) {
+                    isValid = false;
+                }
+            });
+            
+            // Prevent form submission if invalid
+            if (!isValid) {
+                e.preventDefault();
+                
+                // Scroll to first invalid input
+                const firstInvalid = form.querySelector('.is-invalid');
+                if (firstInvalid) {
+                    firstInvalid.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                    firstInvalid.focus();
                 }
             }
         });
-    }
+    },
     
-    function addDoctorOption(select, value, text) {
-        const option = document.createElement('option');
-        option.value = value;
-        option.textContent = text;
-        select.appendChild(option);
-    }
-    
-    function showError(field, message) {
-        // Clear any existing error
-        clearError(field);
-        
-        // Add error class to field
-        field.classList.add('error');
-        
-        // Create and append error message
-        const errorElement = document.createElement('div');
-        errorElement.className = 'error-message';
-        errorElement.textContent = message;
-        
-        const parent = field.parentElement;
-        parent.appendChild(errorElement);
-    }
-    
-    function clearError(field) {
-        field.classList.remove('error');
-        const parent = field.parentElement;
-        const errorElement = parent.querySelector('.error-message');
-        if (errorElement) {
-            parent.removeChild(errorElement);
+    /**
+     * Validate a single input
+     */
+    validateInput: function(input) {
+        // Skip disabled or hidden inputs
+        if (input.disabled || input.type === 'hidden') {
+            return true;
         }
-    }
-    
-    function isValidEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    }
-    
-    function isValidPhone(phone) {
-        const phoneRegex = /^[\d\+\-\(\) ]{10,15}$/;
-        return phoneRegex.test(phone);
-    }
-}
-
-/**
- * Contact form functionality
- */
-function initContactForm() {
-    const contactForm = document.querySelector('.contact-form');
-    
-    contactForm.addEventListener('submit', function(e) {
-        e.preventDefault();
         
         let isValid = true;
-        const formData = new FormData(contactForm);
+        let errorMessage = '';
         
-        // Validate required fields
-        const requiredFields = contactForm.querySelectorAll('[required]');
-        requiredFields.forEach(field => {
-            if (!field.value) {
+        // Get validation container
+        const formGroup = input.closest('.form-group');
+        if (!formGroup) return true;
+        
+        // Clear previous validation
+        formGroup.classList.remove('is-invalid', 'is-valid');
+        
+        // Get existing or create new feedback element
+        let feedback = formGroup.querySelector('.invalid-feedback');
+        if (!feedback) {
+            feedback = document.createElement('div');
+            feedback.className = 'invalid-feedback';
+            formGroup.appendChild(feedback);
+        }
+        
+        // Required validation
+        if (input.required && !input.value.trim()) {
+            isValid = false;
+            errorMessage = 'This field is required';
+        }
+        // Email validation
+        else if (input.type === 'email' && input.value.trim()) {
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(input.value.trim())) {
                 isValid = false;
-                showError(field, 'This field is required');
-            } else {
-                clearError(field);
+                errorMessage = 'Please enter a valid email address';
             }
+        }
+        // Phone validation
+        else if (input.type === 'tel' && input.value.trim()) {
+            const phonePattern = /^[\d\+\-\(\) ]{10,15}$/;
+            if (!phonePattern.test(input.value.trim())) {
+                isValid = false;
+                errorMessage = 'Please enter a valid phone number';
+            }
+        }
+        // Min length validation
+        else if (input.minLength && input.value.trim().length < input.minLength) {
+            isValid = false;
+            errorMessage = `Please enter at least ${input.minLength} characters`;
+        }
+        // Max length validation
+        else if (input.maxLength && input.value.trim().length > input.maxLength) {
+            isValid = false;
+            errorMessage = `Please enter no more than ${input.maxLength} characters`;
+        }
+        // Pattern validation
+        else if (input.pattern && input.value.trim()) {
+            const pattern = new RegExp(input.pattern);
+            if (!pattern.test(input.value.trim())) {
+                isValid = false;
+                errorMessage = input.title || 'Please match the requested format';
+            }
+        }
+        
+        // Set validation state
+        if (isValid) {
+            formGroup.classList.add('is-valid');
+            feedback.textContent = '';
+        } else {
+            formGroup.classList.add('is-invalid');
+            feedback.textContent = errorMessage;
+        }
+        
+        return isValid;
+    },
+    
+    /**
+     * Initialize booking form specific functionality
+     */
+    initBookingForm: function(form) {
+        // Form step navigation
+        const steps = form.querySelectorAll('.form-step');
+        const progressSteps = form.querySelectorAll('.progress-step');
+        const nextButtons = form.querySelectorAll('.next-step');
+        const prevButtons = form.querySelectorAll('.prev-step');
+        
+        let currentStep = 0;
+        
+        // Update the current step display
+        const updateStepDisplay = () => {
+            steps.forEach((step, index) => {
+                if (index === currentStep) {
+                    step.classList.remove('hidden');
+                } else {
+                    step.classList.add('hidden');
+                }
+            });
+            
+            progressSteps.forEach((step, index) => {
+                if (index <= currentStep) {
+                    step.classList.add('active');
+                } else {
+                    step.classList.remove('active');
+                }
+            });
+        };
+        
+        // Go to next step
+        const goToNextStep = () => {
+            // Validate current step
+            const currentStepElement = steps[currentStep];
+            const inputs = currentStepElement.querySelectorAll('input, select, textarea');
+            
+            let isStepValid = true;
+            
+            inputs.forEach(input => {
+                if (input.required && !this.validateInput(input)) {
+                    isStepValid = false;
+                }
+            });
+            
+            if (!isStepValid) {
+                // Focus first invalid input
+                const firstInvalid = currentStepElement.querySelector('.is-invalid');
+                if (firstInvalid) {
+                    firstInvalid.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                    firstInvalid.focus();
+                }
+                return;
+            }
+            
+            // Move to next step
+            if (currentStep < steps.length - 1) {
+                currentStep++;
+                updateStepDisplay();
+                
+                // Scroll to top of form
+                form.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        };
+        
+        // Go to previous step
+        const goToPrevStep = () => {
+            if (currentStep > 0) {
+                currentStep--;
+                updateStepDisplay();
+                
+                // Scroll to top of form
+                form.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        };
+        
+        // Bind events to step buttons
+        nextButtons.forEach(button => {
+            button.addEventListener('click', goToNextStep);
         });
         
-        // Validate email format
-        const emailInput = contactForm.querySelector('[type="email"]');
-        if (emailInput && emailInput.value && !isValidEmail(emailInput.value)) {
-            isValid = false;
-            showError(emailInput, 'Please enter a valid email address');
+        prevButtons.forEach(button => {
+            button.addEventListener('click', goToPrevStep);
+        });
+        
+        // Date and time selection
+        const dateInput = form.querySelector('#appointment-date');
+        const timeSlotContainer = form.querySelector('.time-slots');
+        
+        if (dateInput && timeSlotContainer) {
+            dateInput.addEventListener('change', () => {
+                // This would typically be an AJAX request to get available time slots
+                // For demo purposes, we'll just generate some sample time slots
+                const date = new Date(dateInput.value);
+                const dayOfWeek = date.getDay();
+                
+                // Clear existing time slots
+                timeSlotContainer.innerHTML = '';
+                
+                // Check if the selected date is valid
+                if (isNaN(date.getTime())) {
+                    timeSlotContainer.innerHTML = '<p class="no-slots-message">Please select a valid date.</p>';
+                    return;
+                }
+                
+                // Check if date is in the past
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                if (date < today) {
+                    timeSlotContainer.innerHTML = '<p class="no-slots-message">Please select a date in the future.</p>';
+                    return;
+                }
+                
+                // Check if it's a Sunday (closed)
+                if (dayOfWeek === 0) {
+                    timeSlotContainer.innerHTML = '<p class="no-slots-message">We are closed on Sundays. Please select another day.</p>';
+                    return;
+                }
+                
+                // Generate time slots based on day of week
+                const startHour = dayOfWeek === 6 ? 10 : 9; // 10 AM on Saturday, 9 AM on other days
+                const endHour = dayOfWeek === 6 ? 15 : 18; // 3 PM on Saturday, 6 PM on other days
+                
+                for (let hour = startHour; hour < endHour; hour++) {
+                    // Generate slots at :00 and :30
+                    [0, 30].forEach(minute => {
+                        const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+                        
+                        const timeSlot = document.createElement('div');
+                        timeSlot.className = 'time-slot';
+                        timeSlot.dataset.time = timeString;
+                        timeSlot.textContent = timeString;
+                        
+                        // Randomly mark some slots as unavailable for demo purposes
+                        if (Math.random() < 0.3) {
+                            timeSlot.classList.add('unavailable');
+                            timeSlot.setAttribute('disabled', 'disabled');
+                        } else {
+                            timeSlot.addEventListener('click', () => {
+                                // Deselect all other slots
+                                document.querySelectorAll('.time-slot.selected').forEach(slot => {
+                                    slot.classList.remove('selected');
+                                });
+                                
+                                // Select this slot
+                                timeSlot.classList.add('selected');
+                                
+                                // Update hidden input
+                                const timeInput = form.querySelector('#selected-time');
+                                if (timeInput) {
+                                    timeInput.value = timeString;
+                                }
+                                
+                                // Enable next button
+                                const nextButton = form.querySelector('.form-step[data-step="3"] .next-step');
+                                if (nextButton) {
+                                    nextButton.disabled = false;
+                                }
+                            });
+                        }
+                        
+                        timeSlotContainer.appendChild(timeSlot);
+                    });
+                }
+                
+                // Update selected date display
+                const selectedDateElement = form.querySelector('.selected-date');
+                if (selectedDateElement) {
+                    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                    selectedDateElement.textContent = date.toLocaleDateString('en-US', options);
+                }
+                
+                // Update hidden input
+                const dateInput = form.querySelector('#selected-date');
+                if (dateInput) {
+                    dateInput.value = dateInput.value;
+                }
+            });
         }
         
-        // Validate privacy checkbox
-        const privacyCheckbox = contactForm.querySelector('[name="privacy-policy"]');
-        if (privacyCheckbox && !privacyCheckbox.checked) {
-            isValid = false;
-            showError(privacyCheckbox, 'You must agree to the privacy policy');
+        // Service selection
+        const serviceCategory = form.querySelector('#service-category');
+        const specificService = form.querySelector('#specific-service');
+        
+        if (serviceCategory && specificService) {
+            serviceCategory.addEventListener('change', () => {
+                const category = serviceCategory.value;
+                
+                // Clear and disable the specific service dropdown if no category selected
+                if (!category) {
+                    specificService.innerHTML = '<option value="">Please select a category first</option>';
+                    specificService.disabled = true;
+                    return;
+                }
+                
+                // Enable the specific service dropdown
+                specificService.disabled = false;
+                
+                // Clear the current options
+                specificService.innerHTML = '<option value="">Select a service</option>';
+                
+                // Add options based on selected category
+                let services = [];
+                
+                if (category === 'general') {
+                    services = [
+                        { value: 'checkup', label: 'Dental Check-up & Cleaning' },
+                        { value: 'fillings', label: 'Dental Fillings' },
+                        { value: 'root-canal', label: 'Root Canal Therapy' },
+                        { value: 'extraction', label: 'Tooth Extraction' }
+                    ];
+                } else if (category === 'cosmetic') {
+                    services = [
+                        { value: 'whitening', label: 'Teeth Whitening' },
+                        { value: 'veneers', label: 'Porcelain Veneers' },
+                        { value: 'bonding', label: 'Dental Bonding' },
+                        { value: 'smile-makeover', label: 'Complete Smile Makeover' }
+                    ];
+                } else if (category === 'emergency') {
+                    services = [
+                        { value: 'toothache', label: 'Severe Toothache' },
+                        { value: 'broken-tooth', label: 'Broken or Chipped Tooth' },
+                        { value: 'lost-filling', label: 'Lost Filling or Crown' },
+                        { value: 'dental-abscess', label: 'Dental Abscess' }
+                    ];
+                }
+                
+                // Add the options to the dropdown
+                services.forEach(service => {
+                    const option = document.createElement('option');
+                    option.value = service.value;
+                    option.textContent = service.label;
+                    specificService.appendChild(option);
+                });
+            });
         }
         
-        if (isValid) {
-            // Show success message (in a real app this would be an AJAX submission)
-            const successMessage = document.createElement('div');
-            successMessage.className = 'success-message';
-            successMessage.innerHTML = '<p>Thank you for reaching out! Your message has been sent successfully. We will respond to your inquiry as soon as possible.</p>';
+        // Update confirmation summary
+        const updateSummary = () => {
+            // Get name
+            const firstName = form.querySelector('#first-name')?.value || '';
+            const lastName = form.querySelector('#last-name')?.value || '';
+            const fullName = `${firstName} ${lastName}`.trim();
             
-            contactForm.innerHTML = '';
-            contactForm.appendChild(successMessage);
+            // Get service
+            const serviceCategory = form.querySelector('#service-category');
+            const specificService = form.querySelector('#specific-service');
+            let serviceName = '';
             
-            // In a real app, would submit the form data here
-            console.log('Form submitted successfully');
-            for (const [key, value] of formData.entries()) {
-                console.log(`${key}: ${value}`);
+            if (serviceCategory && specificService && serviceCategory.value && specificService.value) {
+                const categoryText = serviceCategory.options[serviceCategory.selectedIndex].text;
+                const serviceText = specificService.options[specificService.selectedIndex].text;
+                serviceName = `${serviceText} (${categoryText})`;
             }
+            
+            // Get dentist
+            const dentist = form.querySelector('#preferred-dentist');
+            let dentistName = 'No preference';
+            
+            if (dentist && dentist.value) {
+                dentistName = dentist.options[dentist.selectedIndex].text;
+            }
+            
+            // Get date & time
+            const selectedDate = form.querySelector('#selected-date')?.value || '';
+            const selectedTime = form.querySelector('#selected-time')?.value || '';
+            let dateTimeText = '';
+            
+            if (selectedDate && selectedTime) {
+                const date = new Date(selectedDate);
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                dateTimeText = `${date.toLocaleDateString('en-US', options)} at ${selectedTime}`;
+            }
+            
+            // Update summary elements
+            const nameElement = document.getElementById('summary-name');
+            const serviceElement = document.getElementById('summary-service');
+            const dentistElement = document.getElementById('summary-dentist');
+            const dateTimeElement = document.getElementById('summary-datetime');
+            
+            if (nameElement) nameElement.textContent = fullName;
+            if (serviceElement) serviceElement.textContent = serviceName;
+            if (dentistElement) dentistElement.textContent = dentistName;
+            if (dateTimeElement) dateTimeElement.textContent = dateTimeText;
+        };
+        
+        // Update summary when moving to the confirmation step
+        const confirmationStepButton = form.querySelector('.form-step[data-step="3"] .next-step');
+        if (confirmationStepButton) {
+            confirmationStepButton.addEventListener('click', updateSummary);
         }
-    });
+        
+        // Initialize calendar if it exists
+        this.initCalendar(form.querySelector('.calendar-container'));
+    },
     
-    function showError(field, message) {
-        // Clear any existing error
-        clearError(field);
+    /**
+     * Initialize calendar functionality
+     */
+    initCalendar: function(calendarContainer) {
+        if (!calendarContainer) return;
         
-        // Add error class to field
-        field.classList.add('error');
+        const calendarGrid = calendarContainer.querySelector('.calendar-grid');
+        const calendarMonth = calendarContainer.querySelector('.calendar-month');
+        const prevMonth = calendarContainer.querySelector('.prev-month');
+        const nextMonth = calendarContainer.querySelector('.next-month');
         
-        // Create and append error message
-        const errorElement = document.createElement('div');
-        errorElement.className = 'error-message';
-        errorElement.textContent = message;
+        // Current date
+        const today = new Date();
+        let currentMonth = today.getMonth();
+        let currentYear = today.getFullYear();
         
-        const parent = field.parentElement;
-        parent.appendChild(errorElement);
-    }
+        // Min date (today)
+        const minDate = new Date();
+        minDate.setHours(0, 0, 0, 0);
+        
+        // Max date (1 year from now)
+        const maxDate = new Date();
+        maxDate.setFullYear(maxDate.getFullYear() + 1);
+        
+        // Generate calendar
+        const generateCalendar = () => {
+            // Clear grid
+            calendarGrid.innerHTML = '';
+            
+            // Update month header
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            calendarMonth.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+            
+            // Create day headers
+            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            
+            dayNames.forEach(day => {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day-header';
+                dayElement.textContent = day;
+                calendarGrid.appendChild(dayElement);
+            });
+            
+            // Get first day of month
+            const firstDay = new Date(currentYear, currentMonth, 1);
+            const startingDay = firstDay.getDay();
+            
+            // Get last day of month
+            const lastDay = new Date(currentYear, currentMonth + 1, 0);
+            const totalDays = lastDay.getDate();
+            
+            // Add empty cells for days before first day of month
+            for (let i = 0; i < startingDay; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'calendar-day empty';
+                calendarGrid.appendChild(emptyCell);
+            }
+            
+            // Add days of the month
+            for (let day = 1; day <= totalDays; day++) {
+                const date = new Date(currentYear, currentMonth, day);
+                
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.textContent = day;
+                dayElement.dataset.date = date.toISOString().split('T')[0];
+                
+                // Check if date is selectable
+                const isBeforeMin = date < minDate;
+                const isAfterMax = date > maxDate;
+                const isSunday = date.getDay() === 0;
+                
+                if (isBeforeMin || isAfterMax || isSunday) {
+                    dayElement.classList.add('disabled');
+                } else {
+                    dayElement.addEventListener('click', () => {
+                        // Deselect previous date
+                        const selectedDate = calendarGrid.querySelector('.calendar-day.selected');
+                        if (selectedDate) {
+                            selectedDate.classList.remove('selected');
+                        }
+                        
+                        // Select this date
+                        dayElement.classList.add('selected');
+                        
+                        // Update the date input
+                        const dateInput = document.getElementById('appointment-date');
+                        if (dateInput) {
+                            dateInput.value = dayElement.dataset.date;
+                            
+                            // Trigger change event to update time slots
+                            const event = new Event('change', { bubbles: true });
+                            dateInput.dispatchEvent(event);
+                        }
+                    });
+                }
+                
+                // Highlight today
+                if (date.toDateString() === today.toDateString()) {
+                    dayElement.classList.add('today');
+                }
+                
+                calendarGrid.appendChild(dayElement);
+            }
+        };
+        
+        // Go to previous month
+        const goToPrevMonth = () => {
+            currentMonth--;
+            
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            
+            generateCalendar();
+        };
+        
+        // Go to next month
+        const goToNextMonth = () => {
+            currentMonth++;
+            
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            
+            generateCalendar();
+        };
+        
+        // Bind events
+        prevMonth.addEventListener('click', goToPrevMonth);
+        nextMonth.addEventListener('click', goToNextMonth);
+        
+        // Initialize calendar
+        generateCalendar();
+    },
     
-    function clearError(field) {
-        field.classList.remove('error');
-        const parent = field.parentElement;
-        const errorElement = parent.querySelector('.error-message');
-        if (errorElement) {
-            parent.removeChild(errorElement);
+    /**
+     * Initialize contact form specific functionality
+     */
+    initContactForm: function(form) {
+        // This would typically handle contact form specific functionality
+        // such as AJAX submission, Google reCAPTCHA, etc.
+    },
+    
+    /**
+     * Initialize lazy loading
+     */
+    initLazyLoading: function() {
+        // Use IntersectionObserver for lazy loading
+        if ('IntersectionObserver' in window) {
+            const lazyImages = document.querySelectorAll('img[loading="lazy"]');
+            
+            const imageObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        
+                        // Set src from data-src if it exists
+                        if (img.dataset.src) {
+                            img.src = img.dataset.src;
+                            delete img.dataset.src;
+                        }
+                        
+                        // Set srcset from data-srcset if it exists
+                        if (img.dataset.srcset) {
+                            img.srcset = img.dataset.srcset;
+                            delete img.dataset.srcset;
+                        }
+                        
+                        img.classList.add('loaded');
+                        imageObserver.unobserve(img);
+                    }
+                });
+            });
+            
+            lazyImages.forEach(img => {
+                imageObserver.observe(img);
+            });
         }
     }
-    
-    function isValidEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    }
-} 
+};
+
+// Initialize application when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    WisdomBites.init();
+});

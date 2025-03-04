@@ -1,0 +1,720 @@
+/**
+ * Wisdom Bites Dental Clinic
+ * Virtual Tour Styles
+ */
+
+/* Virtual Tour Container */
+.virtual-tour-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.95);
+    z-index: 9999;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.virtual-tour-container.active {
+    display: flex;
+    opacity: 1;
+}
+
+/* When tour is active, prevent body scrolling */
+body.tour-active {
+    overflow: hidden;
+}
+
+/* Panorama View */
+.panorama-view {
+    width: 100%;
+    height: 85vh;
+    background-color: #000;
+    position: relative;
+}
+
+/* Interior panorama styling */
+.interior-panorama-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.interior-panorama-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Hotspots */
+.hotspot-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.hotspot {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    pointer-events: all;
+}
+
+.hotspot-point {
+    width: 24px;
+    height: 24px;
+    background-color: var(--primary);
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.hotspot-point:hover {
+    transform: scale(1.2);
+    background-color: var(--primary-dark);
+}
+
+.hotspot-point::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: rgba(74, 144, 226, 0.3);
+    animation: pulse 2s infinite;
+    z-index: -1;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(2.5);
+        opacity: 0;
+    }
+}
+
+.hotspot-tooltip {
+    position: absolute;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 12px;
+    width: 220px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.hotspot-tooltip.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+}
+
+.hotspot-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 8px;
+    border-style: solid;
+    border-color: white transparent transparent transparent;
+}
+
+.hotspot-tooltip h4 {
+    margin-top: 0;
+    margin-bottom: 8px;
+    color: var(--primary);
+    font-size: 16px;
+}
+
+.hotspot-tooltip p {
+    margin: 0 0 12px;
+    font-size: 14px;
+    color: var(--gray-700);
+}
+
+.hotspot-nav-btn {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background-color 0.3s ease;
+}
+
+.hotspot-nav-btn:hover {
+    background-color: var(--primary-dark);
+}
+
+/* Tour Controls */
+.tour-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 1rem 2rem;
+    background-color: var(--dark);
+    color: white;
+    box-sizing: border-box;
+}
+
+.tour-control-group {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+/* Tour Navigation */
+.tour-navigation {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.tour-btn {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+}
+
+.tour-btn:hover {
+    background-color: var(--primary-dark);
+}
+
+.tour-btn:disabled {
+    background-color: var(--gray-500);
+    cursor: not-allowed;
+}
+
+.tour-btn.close-btn {
+    background-color: transparent;
+    border: 1px solid white;
+}
+
+.tour-btn.close-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.tour-btn.complete-btn {
+    background-color: var(--secondary);
+}
+
+.tour-btn.complete-btn:hover {
+    background-color: var(--secondary-dark);
+}
+
+.tour-btn.info-btn {
+    background-color: var(--accent);
+}
+
+.tour-btn.info-btn:hover {
+    background-color: #e09213; /* Darker shade of accent */
+}
+
+/* Tour Indicators */
+.tour-indicators {
+    display: flex;
+    gap: 0.5rem;
+    margin: 0 1rem;
+}
+
+.indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: var(--gray-500);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.indicator:hover {
+    background-color: var(--gray-400);
+}
+
+.indicator.active {
+    background-color: var(--primary);
+    transform: scale(1.2);
+}
+
+/* Place Info Panel */
+.place-info-panel {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 300px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    padding: 16px;
+    z-index: 100;
+    display: none;
+}
+
+.place-info-panel.active {
+    display: block;
+}
+
+.place-info-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.place-info-header h3 {
+    margin: 0;
+    color: var(--primary);
+    font-size: 18px;
+}
+
+.place-rating {
+    background-color: var(--accent);
+    color: white;
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.place-info-content {
+    margin-bottom: 16px;
+}
+
+.place-address, .place-phone, .place-website {
+    margin: 8px 0;
+    font-size: 14px;
+    color: var(--gray-700);
+}
+
+.place-website a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.place-website a:hover {
+    text-decoration: underline;
+}
+
+.hours-list {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0;
+    font-size: 13px;
+}
+
+.hours-list li {
+    margin-bottom: 4px;
+}
+
+.place-reviews {
+    margin-top: 12px;
+}
+
+.place-review {
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.place-review:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.review-rating {
+    color: var(--accent);
+    margin-bottom: 4px;
+    font-size: 14px;
+}
+
+.place-review p {
+    margin: 4px 0;
+    font-size: 13px;
+    color: var(--gray-700);
+}
+
+.place-review span {
+    font-size: 12px;
+    color: var(--gray-600);
+    font-style: italic;
+}
+
+.place-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+}
+
+.place-action-btn {
+    flex: 1;
+    background-color: var(--gray-200);
+    color: var(--gray-800);
+    border: none;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.place-action-btn:hover {
+    background-color: var(--gray-300);
+}
+
+.place-action-btn.book-btn {
+    background-color: var(--primary);
+    color: white;
+}
+
+.place-action-btn.book-btn:hover {
+    background-color: var(--primary-dark);
+}
+
+/* Static Map Fallback */
+.static-map-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0;
+}
+
+.static-map-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.static-map-overlay {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.static-map-overlay p {
+    margin: 0 0 10px;
+}
+
+.static-map-btn {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.static-map-btn:hover {
+    background-color: var(--primary-dark);
+}
+
+/* Entrance Prompt */
+.entrance-prompt {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    z-index: 200;
+    animation: promptFadeIn 0.5s ease;
+}
+
+@keyframes promptFadeIn {
+    from { opacity: 0; transform: translate(-50%, 20px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.prompt-content h3 {
+    margin-top: 0;
+    color: var(--primary);
+    font-size: 18px;
+}
+
+.prompt-content p {
+    margin-bottom: 16px;
+    color: var(--gray-700);
+}
+
+.prompt-btn {
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    margin-right: 10px;
+}
+
+.prompt-btn.enter-btn {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+}
+
+.prompt-btn.enter-btn:hover {
+    background-color: var(--primary-dark);
+}
+
+.prompt-btn.cancel-btn {
+    background-color: transparent;
+    color: var(--gray-700);
+    border: 1px solid var(--gray-300);
+}
+
+.prompt-btn.cancel-btn:hover {
+    background-color: var(--gray-200);
+}
+
+/* Completion Dialog */
+.tour-completion-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 10000;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    display: none;
+}
+
+.tour-completion-dialog.active {
+    display: block;
+    animation: dialogFadeIn 0.3s ease-in-out;
+}
+
+@keyframes dialogFadeIn {
+    from { opacity: 0; transform: translate(-50%, -40%); }
+    to { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+.dialog-heading {
+    color: var(--primary);
+    margin-top: 0;
+    font-family: var(--font-heading);
+}
+
+.dialog-text {
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+    color: var(--gray-700);
+}
+
+.dialog-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.dialog-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.dialog-btn.book-btn {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+}
+
+.dialog-btn.book-btn:hover {
+    background-color: var(--primary-dark);
+}
+
+.dialog-btn.close-btn {
+    background-color: transparent;
+    color: var(--gray-700);
+    border: 1px solid var(--gray-300);
+}
+
+.dialog-btn.close-btn:hover {
+    background-color: var(--gray-200);
+}
+
+/* Virtual Tour Button on Homepage */
+.virtual-tour-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--accent);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    margin-top: 1rem;
+}
+
+.virtual-tour-button:hover {
+    background-color: #e09213; /* Darker shade of accent */
+    transform: translateY(-2px);
+}
+
+.virtual-tour-button i {
+    font-size: 1.2rem;
+}
+
+/* Panorama Loading Indicator */
+.panorama-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    text-align: center;
+}
+
+.panorama-loading .spinner {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto 1rem;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    border-top-color: var(--primary);
+    animation: spin 1s ease-in-out infinite;
+}
+
+/* Error notices */
+.maps-error-notice, .panorama-error-notice {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: opacity 0.5s ease;
+    z-index: 10;
+}
+
+.panorama-error-notice {
+    top: 20px;
+    bottom: auto;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .tour-controls {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .tour-control-group {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .tour-navigation {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .panorama-view {
+        height: 70vh;
+    }
+    
+    .tour-completion-dialog {
+        width: 85%;
+        padding: 1.5rem;
+    }
+    
+    .place-info-panel {
+        top: auto;
+        bottom: 70px;
+        right: 10px;
+        width: calc(100% - 20px);
+        max-width: 400px;
+    }
+    
+    .entrance-prompt {
+        width: calc(100% - 20px);
+        bottom: 80px;
+    }
+    
+    .hotspot-tooltip {
+        width: 180px;
+    }
+}
+
+@media (max-width: 480px) {
+    .tour-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
+    
+    .dialog-btn {
+        padding: 0.6rem 1.2rem;
+    }
+    
+    .place-info-panel {
+        position: fixed;
+        top: 60px;
+        right: 0;
+        left: 0;
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        max-height: 50vh;
+        overflow-y: auto;
+        border-radius: 0;
+    }
+} 

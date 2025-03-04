@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Frequently asked questions about Wisdom Bites Dental Clinic services, appointments, insurance, and dental care.">
+    <meta name="keywords" content="dental FAQ, dental questions, dental insurance, dental care, dentist appointment, Wisdom Bites Dental">
+    <title>Frequently Asked Questions | Wisdom Bites Dental Clinic</title>
+    <link rel="stylesheet" href="/assets/css/styles.css">
+    <link rel="stylesheet" href="/assets/css/responsive.css">
+    <link rel="icon" href="/assets/images/favicon.ico">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <a href="index.html">
+                    <img src="/assets/images/logo.svg" alt="Wisdom Bites Dental Clinic Logo">
+                </a>
+            </div>
+            <nav class="main-nav">
+                <button class="menu-toggle" aria-label="Toggle navigation menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle">Services</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="general-dentistry.html">General Dentistry</a></li>
+                            <li><a href="cosmetic-dentistry.html">Cosmetic Dentistry</a></li>
+                            <li><a href="emergency-care.html">Emergency Care</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="booking.html">Book Appointment</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li class="active"><a href="faq.html">FAQ</a></li>
+                </ul>
+            </nav>
+            <div class="header-contact">
+                <a href="tel:+15551234567" class="phone-link">
+                    <svg class="icon">
+                        <use xlink:href="#icon-phone"></use>
+                    </svg>
+                    (555) 123-4567
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section faq-hero">
+            <div class="container">
+                <h1>Frequently Asked Questions</h1>
+                <p>Find answers to the most common questions about our dental services and care</p>
+            </div>
+        </section>
+
+        <!-- FAQ Search Section -->
+        <section class="faq-search-section">
+            <div class="container">
+                <div class="search-container">
+                    <h2>Looking for something specific?</h2>
+                    <div class="search-box">
+                        <input type="text" id="faqSearch" placeholder="Search our FAQs...">
+                        <button type="button" id="searchBtn" aria-label="Search FAQs">
+                            <svg class="icon">
+                                <use xlink:href="#icon-search"></use>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Categories Section -->
+        <section class="faq-categories">
+            <div class="container">
+                <div class="category-tabs">
+                    <button class="category-tab active" data-category="all">All Questions</button>
+                    <button class="category-tab" data-category="services">Services</button>
+                    <button class="category-tab" data-category="appointments">Appointments</button>
+                    <button class="category-tab" data-category="insurance">Insurance & Payment</button>
+                    <button class="category-tab" data-category="care">Dental Care</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Content Section -->
+        <section class="faq-content">
+            <div class="container">
+                <div class="faq-list">
+                    <!-- Services FAQs -->
+                    <div class="faq-category" data-category="services">
+                        <h2>Services</h2>
+                        
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h3>What dental services do you offer?</h3>
+                                <span class="toggle-icon"></span>
+                            </div>
+                            <div class="faq-answer">
+                                <p>We offer a comprehensive range of dental services including general dentistry (checkups, cleanings, fillings), cosmetic dentistry (whitening, veneers, bonding), emergency dental care, orthodontics, periodontics, and pediatric dentistry. Our team is equipped to handle all your dental needs in one convenient location.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h3>Do you provide teeth whitening services?</h3>
+                                <span class="toggle-icon"></span>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Yes, we offer both in-office professional teeth whitening and take-home whitening kits. Our in-office treatment provides immediate results in just one visit, while our custom take-home trays allow you to whiten gradually at your convenience. During your consultation, we'll recommend the best option based on your specific needs and preferences.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h3>How often should I get a dental checkup?</h3>
+                                <span class="toggle-icon"></span>
+                            </div>
+                            <div class="faq-answer">
+                                <p>For most patients, we recommend a dental checkup and professional cleaning every six months. However, depending on your oral health status, we may suggest more frequent visits. Regular checkups are essential for preventing dental problems, detecting issues early, and maintaining optimal oral health.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Appointments FAQs -->
+                    <div class="faq-category" data-category="appointments">
+                        <h2>Appointments</h2>
+                        
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h3>How do I schedule an appointment?</h3>
+                                <span class="toggle-icon"></span>
+                            </div>
+                            <div class="faq-answer">
+                                <p>You can schedule an appointment in several ways:</p>
+                                <ul>
+                                    <li>Online through our <a href="booking.html">booking page</a></li>
+                                    <li>By calling our office at (555) 123-4567</li>
+                                    <li>By emailing us at appointments@wisdombites.com</li>
+                                    <li>In person at our front desk during office hours</li>
+                                </ul>
+                                <p>For your convenience, our online booking system is available 24/7.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h3>What if I need to cancel or reschedule my appointment?</h3>
+                                <span class="toggle-icon"></span>
+                            </div>
+                            <div class="faq-answer">
+                                <p>We understand that unexpected events can occur. We kindly request 24 hours' notice for cancellations or rescheduling. You can make these changes through our online portal or by calling our office. Late cancellations or missed appointments may incur a fee, as outlined in our office policies provided at your first visit.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h3>How long will my appointment take?</h3>
+                                <span class="toggle-icon"></span>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Appointment durations vary based on the type of service:</p>
+                                <ul>
+                                    <li>Regular checkups and cleanings: 45-60 minutes</li>
+                                    <li>Fillings: 30-60 minutes depending on complexity</li>
+                                    <li>Root canals: 60-90 minutes</li>
+                                    <li>Cosmetic consultations: 30-45 minutes</li>
+                                    <li>Emergency visits: Variable based on the situation</li>
+                                </ul>
+                                <p>When scheduling, our team will provide you with an estimated time frame for your specific procedure.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Insurance FAQs -->
+                    <div class="faq-category" data-category="insurance">
+                        <h2>Insurance & Payment</h2>
+                        
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h3>What insurance plans do you accept?</h3>
+                                <span class="toggle-icon"></span>
+                            </div>
+                            <div class="faq-answer">
+                                <p>We accept most major dental insurance plans, including:</p>
+                                <ul>
+                                    <li>Delta Dental</li>
+                                    <li>Cigna</li>
+                                    <li>Aetna</li>
+                                    <li>BlueCross BlueShield</li>
+                                    <li>MetLife</li>
+                                    <li>Guardian</li>
+                                    <li>United Healthcare</li>
+                                </ul>
+                                <p>Please contact our office to verify whether we accept your specific plan. Our staff will also help you understand your coverage and benefits.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h3>What payment methods do you accept?</h3>
+                                <span class="toggle-icon"></span>
+                            </div>
+                            <div class="faq-answer">
+                                <p>We accept various payment methods to accommodate your preferences:</p>
+                                <ul>
+                                    <li>Cash</li>
+                                    <li>Personal checks</li>
+                                    <li>Credit cards (Visa, MasterCard, American Express, Discover)</li>
+                                    <li>Health Savings Account (HSA) and Flexible Spending Account (FSA) cards</li>
+                                    <li>CareCredit dental financing</li>
+                                </ul>
+                                <p>Payment is expected at the time of service unless prior arrangements have been made.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h3>Do you offer payment plans?</h3>
+                                <span class="toggle-icon"></span>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Yes, we offer flexible payment plans to help make quality dental care affordable. We partner with CareCredit, which provides special financing options with deferred interest when paid in full within the promotional period. Our administrative team can help you apply and discuss which payment option would work best for your situation.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Dental Care FAQs -->
+                    <div class="faq-category" data-category="care">
+                        <h2>Dental Care</h2>
+                        
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h3>What's the best way to maintain oral health between visits?</h3>
+                                <span class="toggle-icon"></span>
+                            </div>
+                            <div class="faq-answer">
+                                <p>To maintain excellent oral health between dental visits:</p>
+                                <ul>
+                                    <li>Brush your teeth twice daily with fluoride toothpaste</li>
+                                    <li>Floss daily to clean between teeth</li>
+                                    <li>Use an antimicrobial or fluoride mouthwash</li>
+                                    <li>Maintain a balanced diet low in sugary foods and drinks</li>
+                                    <li>Drink plenty of water throughout the day</li>
+                                    <li>Replace your toothbrush every 3-4 months</li>
+                                    <li>Avoid tobacco products</li>
+                                </ul>
+                                <p>Following these practices will help prevent cavities, gum disease, and other oral health issues.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h3>When should I bring my child for their first dental visit?</h3>
+                                <span class="toggle-icon"></span>
+                            </div>
+                            <div class="faq-answer">
+                                <p>We recommend scheduling your child's first dental visit by their first birthday or within six months after their first tooth erupts. Early dental visits help establish a positive relationship with dental care, allow us to monitor development, and provide parents with guidance on proper oral hygiene techniques for children. These early visits are typically short and focus on making your child comfortable in the dental environment.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h3>What should I do in a dental emergency?</h3>
+                                <span class="toggle-icon"></span>
+                            </div>
+                            <div class="faq-answer">
+                                <p>In case of a dental emergency:</p>
+                                <ol>
+                                    <li><strong>Call our office immediately</strong> at (555) 123-4567. We reserve time in our schedule for emergency patients.</li>
+                                    <li>For a knocked-out tooth, gently rinse it without scrubbing, try to reinsert it, or place it in milk and seek care immediately.</li>
+                                    <li>For a cracked tooth, rinse with warm water and apply a cold compress to reduce swelling.</li>
+                                    <li>For toothaches, rinse with warm water, use dental floss to remove any debris, and take over-the-counter pain relievers as directed.</li>
+                                </ol>
+                                <p>Outside of business hours, our answering service will connect you with our on-call dentist for guidance.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- No Results Message -->
+                <div class="no-results-message" style="display: none;">
+                    <h3>No FAQ matches found</h3>
+                    <p>We couldn't find any FAQs matching your search. Please try different keywords or <a href="contact.html">contact us</a> directly with your question.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Still Have Questions Section -->
+        <section class="still-questions">
+            <div class="container">
+                <div class="questions-cta">
+                    <h2>Still Have Questions?</h2>
+                    <p>Our friendly team is here to help. Reach out to us through any of these channels:</p>
+                    <div class="contact-options">
+                        <a href="tel:+15551234567" class="contact-option">
+                            <div class="option-icon">
+                                <svg class="icon">
+                                    <use xlink:href="#icon-phone"></use>
+                                </svg>
+                            </div>
+                            <h3>Call Us</h3>
+                            <p>(555) 123-4567</p>
+                        </a>
+                        <a href="mailto:info@wisdombites.com" class="contact-option">
+                            <div class="option-icon">
+                                <svg class="icon">
+                                    <use xlink:href="#icon-email"></use>
+                                </svg>
+                            </div>
+                            <h3>Email Us</h3>
+                            <p>info@wisdombites.com</p>
+                        </a>
+                        <a href="contact.html" class="contact-option">
+                            <div class="option-icon">
+                                <svg class="icon">
+                                    <use xlink:href="#icon-chat"></use>
+                                </svg>
+                            </div>
+                            <h3>Contact Form</h3>
+                            <p>Send us a message</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Book Appointment CTA -->
+        <section class="cta-section">
+            <div class="container">
+                <div class="cta-content">
+                    <h2>Ready to Schedule Your Visit?</h2>
+                    <p>Book an appointment with our expert dental team today and take the first step toward a healthier smile.</p>
+                    <a href="booking.html" class="btn btn-primary">Book Appointment</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-top">
+                <div class="footer-column">
+                    <div class="footer-logo">
+                        <img src="/assets/images/logo.svg" alt="Wisdom Bites Dental Clinic Logo">
+                    </div>
+                    <p>Providing quality dental care with a gentle touch since 2005. Your smile is our priority.</p>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Services</h3>
+                    <ul class="footer-links">
+                        <li><a href="general-dentistry.html">General Dentistry</a></li>
+                        <li><a href="cosmetic-dentistry.html">Cosmetic Dentistry</a></li>
+                        <li><a href="emergency-care.html">Emergency Care</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="booking.html">Book Appointment</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Contact Us</h3>
+                    <address>
+                        <p>123 Dental Street<br>Smile City, SC 12345</p>
+                        <p><a href="tel:+15551234567">(555) 123-4567</a></p>
+                        <p><a href="mailto:info@wisdombites.com">info@wisdombites.com</a></p>
+                    </address>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook"><svg class="icon"><use xlink:href="#icon-facebook"></use></svg></a>
+                        <a href="#" aria-label="Instagram"><svg class="icon"><use xlink:href="#icon-instagram"></use></svg></a>
+                        <a href="#" aria-label="Twitter"><svg class="icon"><use xlink:href="#icon-twitter"></use></svg></a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 Wisdom Bites Dental Clinic. All rights reserved.</p>
+                <ul class="legal-links">
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Accessibility</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <!-- SVG Icons -->
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+        <symbol id="icon-phone" viewBox="0 0 24 24">
+            <path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57a1.02 1.02 0 0 0-1.02.24l-2.2 2.2a15.045 15.045 0 0 1-6.59-6.59l2.2-2.21a.96.96 0 0 0 .25-1A11.36 11.36 0 0 1 8.5 4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1zM5.03 5h1.5c.07.88.22 1.75.45 2.58l-1.2 1.21c-.4-1.21-.66-2.47-.75-3.79zM19 18.97c-1.32-.09-2.6-.35-3.8-.76l1.2-1.2c.85.24 1.72.39 2.6.45v1.51z"></path>
+        </symbol>
+        <symbol id="icon-email" viewBox="0 0 24 24">
+            <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"></path>
+        </symbol>
+        <symbol id="icon-chat" viewBox="0 0 24 24">
+            <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12z"></path>
+        </symbol>
+        <symbol id="icon-search" viewBox="0 0 24 24">
+            <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path>
+        </symbol>
+        <symbol id="icon-facebook" viewBox="0 0 24 24">
+            <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"></path>
+        </symbol>
+        <symbol id="icon-instagram" viewBox="0 0 24 24">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.332.014 7.052.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
+        </symbol>
+        <symbol id="icon-twitter" viewBox="0 0 24 24">
+            <path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z"></path>
+        </symbol>
+    </svg>
+
+    <!-- JavaScript -->
+    <script src="/assets/js/main.js"></script>
+    <script src="/assets/js/faq.js"></script>

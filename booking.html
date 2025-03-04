@@ -10,41 +10,125 @@
     <!-- Favicon -->
     <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
     
-    <!-- CSS -->
-    <link rel="stylesheet" href="assets/css/styles.css">
-    <link rel="stylesheet" href="assets/css/animations.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Critical CSS -->
+    <style>
+        :root {
+            /* Modern color palette */
+            --primary: #4a90e2;
+            --primary-dark: #3a7abd;
+            --secondary: #50c878;
+            --secondary-dark: #3ca45e;
+            --accent: #f5a623;
+            --dark: #2d3748;
+            --light: #f8fafc;
+            --white: #ffffff;
+            
+            /* Typography */
+            --font-heading: 'Montserrat', sans-serif;
+            --font-body: 'Open Sans', sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-body);
+            color: var(--dark);
+            background-color: var(--light);
+            overflow-x: hidden;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        body.loaded {
+            opacity: 1;
+        }
+        
+        .site-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background-color: transparent;
+            transition: background-color 0.3s ease, padding 0.3s ease;
+            padding: 1.5rem 0;
+        }
+        
+        .site-header.scrolled {
+            background-color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 0.75rem 0;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+    </style>
+    
+    <!-- Main CSS (loaded asynchronously) -->
+    <link rel="stylesheet" href="assets/css/styles.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="assets/css/animations.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="assets/css/responsive.css" media="print" onload="this.media='all'">
+    
+    <!-- Preload critical assets -->
+    <link rel="preload" href="assets/images/booking-hero.webp" as="image">
+    <link rel="preload" href="assets/fonts/icons.woff2" as="font" type="font/woff2" crossorigin>
 </head>
-<body>
+<body class="booking-page">
+    <!-- Loading Screen -->
+    <div class="loading-screen">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Header -->
     <header class="site-header">
         <div class="container">
-            <div class="logo">
-                <a href="index.html">
-                    <img src="assets/images/logo.png" alt="Wisdom Bites Dental Clinic Logo">
-                </a>
-            </div>
-            <nav class="main-nav">
-                <button class="menu-toggle" aria-label="Toggle menu">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-                <ul class="nav-list">
-                    <li class="nav-item"><a href="index.html">Home</a></li>
-                    <li class="nav-item"><a href="about.html">About Us</a></li>
-                    <li class="nav-item has-dropdown">
-                        <a href="#" class="dropdown-toggle">Services</a>
-                        <ul class="dropdown-menu">
-                            <li><a href="services/general-dentistry.html">General Dentistry</a></li>
-                            <li><a href="services/cosmetic-dentistry.html">Cosmetic Dentistry</a></li>
-                            <li><a href="services/emergency-care.html">Emergency Care</a></li>
+            <div class="header-wrapper">
+                <div class="logo">
+                    <a href="index.html" aria-label="Wisdom Bites Dental Clinic">
+                        <img src="assets/images/logo.svg" alt="Wisdom Bites Dental Clinic Logo" width="180" height="45">
+                    </a>
+                </div>
+                
+                <nav class="main-nav">
+                    <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false">
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                    </button>
+                    
+                    <div class="nav-container">
+                        <ul class="nav-list">
+                            <li class="nav-item"><a href="index.html">Home</a></li>
+                            <li class="nav-item"><a href="about.html">About Us</a></li>
+                            <li class="nav-item has-dropdown">
+                                <a href="#" class="dropdown-toggle">Services</a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="services/general-dentistry.html">General Dentistry</a></li>
+                                    <li><a href="services/cosmetic-dentistry.html">Cosmetic Dentistry</a></li>
+                                    <li><a href="services/emergency-care.html">Emergency Care</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item"><a href="booking.html" class="active">Book Appointment</a></li>
+                            <li class="nav-item"><a href="contact.html">Contact</a></li>
                         </ul>
-                    </li>
-                    <li class="nav-item"><a href="booking.html" class="active">Book Appointment</a></li>
-                    <li class="nav-item"><a href="contact.html">Contact</a></li>
-                </ul>
-            </nav>
-            <div class="header-cta">
-                <a href="booking.html" class="btn btn-primary">Book Now</a>
+                        
+                        <div class="nav-cta">
+                            <a href="tel:+15551234567" class="phone-link">
+                                <i class="icon icon-phone"></i>
+                                <span>(555) 123-4567</span>
+                            </a>
+                            <a href="booking.html" class="btn btn-primary">Book Now</a>
+                        </div>
+                    </div>
+                </nav>
             </div>
         </div>
     </header>
@@ -52,11 +136,26 @@
     <main>
         <!-- Hero Section -->
         <section class="page-hero booking-hero">
+            <div class="hero-background">
+                <picture>
+                    <source srcset="assets/images/booking-hero.webp" type="image/webp">
+                    <source srcset="assets/images/booking-hero.jpg" type="image/jpeg">
+                    <img src="assets/images/booking-hero.jpg" alt="" aria-hidden="true" loading="eager">
+                </picture>
+                <div class="hero-overlay"></div>
+            </div>
+            
             <div class="container">
                 <div class="page-hero-content">
-                    <h1 class="page-title">Book Your Appointment</h1>
-                    <p class="page-subtitle">Schedule your visit in just a few easy steps</p>
+                    <h1 class="page-title" data-animation="fade-up">Book Your Appointment</h1>
+                    <p class="page-subtitle" data-animation="fade-up" data-delay="0.2">Schedule your visit in just a few easy steps</p>
                 </div>
+            </div>
+            
+            <div class="hero-waves">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+                    <path fill="#ffffff" fill-opacity="1" d="M0,64L48,80C96,96,192,128,288,133.3C384,139,480,117,576,122.7C672,128,768,160,864,186.7C960,213,1056,235,1152,229.3C1248,224,1344,192,1392,176L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+                </svg>
             </div>
         </section>
 
@@ -64,44 +163,61 @@
         <section class="booking-section">
             <div class="container">
                 <div class="booking-wrapper">
-                    <div class="booking-info">
+                    <div class="booking-info" data-animation="fade-right">
                         <div class="booking-text">
-                            <h2>Easy Online Scheduling</h2>
+                            <h2>Simple Online Scheduling</h2>
                             <p>Book your appointment with Wisdom Bites Dental Clinic to receive expert dental care from our experienced team. Whether you need a routine check-up, cosmetic procedure, or emergency care, we're here to help.</p>
-                            <p>Fill out the form, choose your preferred date and time, and we'll confirm your appointment. If you have a dental emergency, please call us directly at <a href="tel:+15551234567">+1 (555) 123-4567</a> for immediate assistance.</p>
+                            <p>Fill out the form, choose your preferred date and time, and we'll confirm your appointment. If you have a dental emergency, please call us directly at <a href="tel:+15551234567" class="accent-link">(555) 123-4567</a> for immediate assistance.</p>
                         </div>
+                        
                         <div class="booking-features">
-                            <div class="feature">
+                            <div class="feature-item">
                                 <div class="feature-icon">
-                                    <img src="assets/images/icon-calendar.svg" alt="Calendar Icon">
+                                    <i class="icon icon-calendar"></i>
                                 </div>
-                                <div class="feature-content">
+                                <div class="feature-text">
                                     <h3>Flexible Scheduling</h3>
                                     <p>Choose from a variety of available time slots that fit your busy schedule.</p>
                                 </div>
                             </div>
-                            <div class="feature">
+                            
+                            <div class="feature-item">
                                 <div class="feature-icon">
-                                    <img src="assets/images/icon-reminder.svg" alt="Reminder Icon">
+                                    <i class="icon icon-bell"></i>
                                 </div>
-                                <div class="feature-content">
+                                <div class="feature-text">
                                     <h3>Appointment Reminders</h3>
                                     <p>Receive email and text reminders to help you remember your upcoming appointment.</p>
                                 </div>
                             </div>
-                            <div class="feature">
+                            
+                            <div class="feature-item">
                                 <div class="feature-icon">
-                                    <img src="assets/images/icon-reschedule.svg" alt="Reschedule Icon">
+                                    <i class="icon icon-reschedule"></i>
                                 </div>
-                                <div class="feature-content">
+                                <div class="feature-text">
                                     <h3>Easy Rescheduling</h3>
                                     <p>Need to change your appointment? Easily reschedule online or by phone.</p>
                                 </div>
                             </div>
                         </div>
+                        
+                        <div class="booking-emergency">
+                            <div class="emergency-card">
+                                <div class="emergency-icon">
+                                    <i class="icon icon-emergency"></i>
+                                </div>
+                                <div class="emergency-content">
+                                    <h3>Dental Emergency?</h3>
+                                    <p>Don't wait! Call our emergency line for immediate assistance.</p>
+                                    <a href="tel:+15551234567" class="btn btn-secondary">Call (555) 123-4567</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="booking-form-container">
-                        <form id="appointment-form" class="booking-form" action="#" method="post">
+                    
+                    <div class="booking-form-container" data-animation="fade-left">
+                        <form id="booking-form" class="booking-form" action="#" method="post">
                             <div class="form-progress">
                                 <div class="progress-step active" data-step="1">
                                     <span class="step-number">1</span>
@@ -126,32 +242,35 @@
                                 <h3 class="form-step-title">Your Information</h3>
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label for="first-name">First Name *</label>
+                                        <label for="first-name">First Name*</label>
                                         <input type="text" id="first-name" name="first-name" required>
                                     </div>
                                     <div class="form-group">
-                                        <label for="last-name">Last Name *</label>
+                                        <label for="last-name">Last Name*</label>
                                         <input type="text" id="last-name" name="last-name" required>
                                     </div>
                                 </div>
+                                
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label for="email">Email Address *</label>
+                                        <label for="email">Email Address*</label>
                                         <input type="email" id="email" name="email" required>
                                     </div>
                                     <div class="form-group">
-                                        <label for="phone">Phone Number *</label>
+                                        <label for="phone">Phone Number*</label>
                                         <input type="tel" id="phone" name="phone" required>
                                     </div>
                                 </div>
+                                
                                 <div class="form-group">
-                                    <label for="patient-type">Are you a new patient? *</label>
+                                    <label for="patient-type">Are you a new patient?*</label>
                                     <select id="patient-type" name="patient-type" required>
                                         <option value="">Please select</option>
                                         <option value="new">Yes, I'm a new patient</option>
                                         <option value="existing">No, I've been here before</option>
                                     </select>
                                 </div>
+                                
                                 <div class="form-buttons">
                                     <button type="button" class="btn btn-primary next-step">Continue</button>
                                 </div>
@@ -160,8 +279,9 @@
                             <!-- Step 2: Service Selection -->
                             <div class="form-step hidden" data-step="2">
                                 <h3 class="form-step-title">Select a Service</h3>
+                                
                                 <div class="form-group">
-                                    <label for="service-category">Service Category *</label>
+                                    <label for="service-category">Service Category*</label>
                                     <select id="service-category" name="service-category" required>
                                         <option value="">Please select</option>
                                         <option value="general">General Dentistry</option>
@@ -169,12 +289,14 @@
                                         <option value="emergency">Emergency Care</option>
                                     </select>
                                 </div>
+                                
                                 <div class="form-group">
-                                    <label for="specific-service">Specific Service *</label>
+                                    <label for="specific-service">Specific Service*</label>
                                     <select id="specific-service" name="specific-service" required disabled>
                                         <option value="">Please select a category first</option>
                                     </select>
                                 </div>
+                                
                                 <div class="form-group">
                                     <label for="preferred-dentist">Preferred Dentist (Optional)</label>
                                     <select id="preferred-dentist" name="preferred-dentist">
@@ -184,12 +306,14 @@
                                         <option value="dr-rodriguez">Dr. Sophia Rodriguez</option>
                                     </select>
                                 </div>
+                                
                                 <div class="form-group">
                                     <label for="notes">Additional Notes (Optional)</label>
                                     <textarea id="notes" name="notes" rows="3" placeholder="Please share any relevant information about your visit or specific concerns."></textarea>
                                 </div>
+                                
                                 <div class="form-buttons">
-                                    <button type="button" class="btn btn-secondary prev-step">Back</button>
+                                    <button type="button" class="btn btn-outline prev-step">Back</button>
                                     <button type="button" class="btn btn-primary next-step">Continue</button>
                                 </div>
                             </div>
@@ -197,20 +321,22 @@
                             <!-- Step 3: Date and Time Selection -->
                             <div class="form-step hidden" data-step="3">
                                 <h3 class="form-step-title">Select Date & Time</h3>
+                                
                                 <div class="calendar-container">
                                     <div class="calendar-header">
                                         <button type="button" class="prev-month" aria-label="Previous month">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                                            <i class="icon icon-arrow-left"></i>
                                         </button>
-                                        <h4 class="calendar-month">March 2024</h4>
+                                        <h4 class="calendar-month">March 2025</h4>
                                         <button type="button" class="next-month" aria-label="Next month">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                                            <i class="icon icon-arrow-right"></i>
                                         </button>
                                     </div>
                                     <div class="calendar-grid">
                                         <!-- Calendar will be populated with JavaScript -->
                                     </div>
                                 </div>
+                                
                                 <div class="time-slot-container">
                                     <h4 class="time-slot-header">Available Time Slots for <span class="selected-date">Select a date</span></h4>
                                     <div class="time-slots">
@@ -218,10 +344,13 @@
                                         <p class="no-slots-message">Please select a date to view available time slots.</p>
                                     </div>
                                 </div>
+                                
+                                <input type="hidden" id="appointment-date" name="appointment-date">
                                 <input type="hidden" id="selected-date" name="selected-date">
                                 <input type="hidden" id="selected-time" name="selected-time">
+                                
                                 <div class="form-buttons">
-                                    <button type="button" class="btn btn-secondary prev-step">Back</button>
+                                    <button type="button" class="btn btn-outline prev-step">Back</button>
                                     <button type="button" class="btn btn-primary next-step" disabled>Continue</button>
                                 </div>
                             </div>
@@ -229,6 +358,7 @@
                             <!-- Step 4: Confirmation -->
                             <div class="form-step hidden" data-step="4">
                                 <h3 class="form-step-title">Confirm Your Appointment</h3>
+                                
                                 <div class="appointment-summary">
                                     <h4>Appointment Details</h4>
                                     <div class="summary-item">
@@ -248,17 +378,24 @@
                                         <span class="summary-value" id="summary-datetime"></span>
                                     </div>
                                 </div>
+                                
+                                <div class="confirmation-notice">
+                                    <p>By completing this booking, you agree to our <a href="cancellation-policy.html">cancellation policy</a>. You will receive a confirmation email with your appointment details.</p>
+                                </div>
+                                
                                 <div class="form-group">
                                     <div class="checkbox-group">
                                         <input type="checkbox" id="terms-agree" name="terms-agree" required>
                                         <label for="terms-agree">I agree to the <a href="terms-of-service.html" target="_blank">Terms of Service</a> and <a href="privacy-policy.html" target="_blank">Privacy Policy</a>.</label>
                                     </div>
                                 </div>
+                                
                                 <div class="form-group captcha-container">
                                     <div class="g-recaptcha" data-sitekey="your-recaptcha-site-key"></div>
                                 </div>
+                                
                                 <div class="form-buttons">
-                                    <button type="button" class="btn btn-secondary prev-step">Back</button>
+                                    <button type="button" class="btn btn-outline prev-step">Back</button>
                                     <button type="submit" class="btn btn-primary">Book Appointment</button>
                                 </div>
                             </div>
@@ -271,161 +408,411 @@
         <!-- Insurance Section -->
         <section class="insurance-section">
             <div class="container">
-                <div class="section-header">
+                <div class="section-header" data-animation="fade-up">
+                    <span class="section-tagline">Insurance & Payment</span>
                     <h2 class="section-title">We Accept Most Insurance Plans</h2>
                     <p class="section-subtitle">Making quality dental care accessible</p>
                 </div>
+                
                 <div class="insurance-content">
-                    <div class="insurance-text">
+                    <div class="insurance-text" data-animation="fade-up">
                         <p>At Wisdom Bites Dental Clinic, we work with most major dental insurance providers to help maximize your benefits and minimize out-of-pocket expenses. Our administrative team is happy to verify your coverage and explain your benefits before treatment.</p>
                         <p>If you don't see your insurance provider listed or have questions about coverage, please contact our office for assistance.</p>
                     </div>
-                    <div class="insurance-logos">
-                        <div class="insurance-logo">
-                            <img src="assets/images/insurance-logo-1.png" alt="Insurance Provider Logo" loading="lazy">
+                    
+                    <div class="insurance-logos" data-animation="fade-up" data-delay="0.2">
+                        <div class="logos-grid">
+                            <img src="assets/images/insurance-logo-1.png" alt="Delta Dental" width="100" height="60" loading="lazy">
+                            <img src="assets/images/insurance-logo-2.png" alt="Cigna" width="100" height="60" loading="lazy">
+                            <img src="assets/images/insurance-logo-3.png" alt="Aetna" width="100" height="60" loading="lazy">
+                            <img src="assets/images/insurance-logo-4.png" alt="MetLife" width="100" height="60" loading="lazy">
+                            <img src="assets/images/insurance-logo-5.png" alt="Guardian" width="100" height="60" loading="lazy">
+                            <img src="assets/images/insurance-logo-6.png" alt="Humana" width="100" height="60" loading="lazy">
                         </div>
-                        <div class="insurance-logo">
-                            <img src="assets/images/insurance-logo-2.png" alt="Insurance Provider Logo" loading="lazy">
-                        </div>
-                        <div class="insurance-logo">
-                            <img src="assets/images/insurance-logo-3.png" alt="Insurance Provider Logo" loading="lazy">
-                        </div>
-                        <div class="insurance-logo">
-                            <img src="assets/images/insurance-logo-4.png" alt="Insurance Provider Logo" loading="lazy">
-                        </div>
-                        <div class="insurance-logo">
-                            <img src="assets/images/insurance-logo-5.png" alt="Insurance Provider Logo" loading="lazy">
-                        </div>
-                        <div class="insurance-logo">
-                            <img src="assets/images/insurance-logo-6.png" alt="Insurance Provider Logo" loading="lazy">
-                        </div>
+                    </div>
+                    
+                    <div class="insurance-cta" data-animation="fade-up" data-delay="0.4">
+                        <a href="insurance.html" class="btn btn-primary">Insurance Information</a>
+                        <a href="contact.html" class="btn btn-outline">Contact Us With Questions</a>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- What to Expect Section -->
-        <section class="what-to-expect booking-expect">
+        <section class="what-to-expect">
             <div class="container">
-                <div class="section-header">
-                    <h2 class="section-title">What to Expect at Your First Appointment</h2>
-                    <p class="section-subtitle">Making your visit comfortable and productive</p>
+                <div class="section-header" data-animation="fade-up">
+                    <span class="section-tagline">Patient Information</span>
+                    <h2 class="section-title">What to Expect at Your Visit</h2>
+                    <p class="section-subtitle">Making your dental experience comfortable and stress-free</p>
                 </div>
+                
                 <div class="expect-content">
-                    <div class="expect-image">
-                        <img src="assets/images/first-appointment.jpg" alt="Patient at first dental appointment" loading="lazy">
+                    <div class="expect-image" data-animation="fade-right">
+                        <img src="assets/images/first-appointment.jpg" alt="Patient at first dental appointment" width="540" height="400" loading="lazy">
                     </div>
-                    <div class="expect-items">
-                        <div class="expect-item">
-                            <div class="expect-icon">
-                                <img src="assets/images/icon-clipboard.svg" alt="Paperwork Icon">
+                    
+                    <div class="expect-items" data-animation="fade-left">
+                        <div class="expect-timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-icon">
+                                    <i class="icon icon-clipboard"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h3>Before Your Visit</h3>
+                                    <p>Download and complete our <a href="assets/files/new-patient-forms.pdf" target="_blank">new patient forms</a> ahead of time to save time during your appointment. Please arrive 15 minutes early if you need to complete forms in our office.</p>
+                                </div>
                             </div>
-                            <div class="expect-text">
-                                <h3>New Patient Forms</h3>
-                                <p>Please arrive 15 minutes early to complete new patient forms, or download them from our website and bring them completed.</p>
+                            
+                            <div class="timeline-item">
+                                <div class="timeline-icon">
+                                    <i class="icon icon-dental-record"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h3>During Your Visit</h3>
+                                    <p>We'll review your medical history, take necessary X-rays, and perform a comprehensive examination. Your dentist will discuss their findings and recommend a personalized treatment plan.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="timeline-item">
+                                <div class="timeline-icon">
+                                    <i class="icon icon-tooth-clean"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h3>Professional Cleaning</h3>
+                                    <p>Our skilled hygienist will perform a thorough cleaning to remove plaque and tartar, polish your teeth, and provide oral hygiene instructions tailored to your needs.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="timeline-item">
+                                <div class="timeline-icon">
+                                    <i class="icon icon-calendar-check"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h3>After Your Visit</h3>
+                                    <p>We'll schedule any necessary follow-up appointments and send you home with care instructions. You'll also receive a reminder for your next routine check-up.</p>
+                                </div>
                             </div>
                         </div>
-                        <div class="expect-item">
-                            <div class="expect-icon">
-                                <img src="assets/images/icon-medical-history.svg" alt="Medical History Icon">
-                            </div>
-                            <div class="expect-text">
-                                <h3>Medical History Review</h3>
-                                <p>We'll review your medical history and any concerns you have about your dental health.</p>
-                            </div>
-                        </div>
-                        <div class="expect-item">
-                            <div class="expect-icon">
-                                <img src="assets/images/icon-xray.svg" alt="X-Ray Icon">
-                            </div>
-                            <div class="expect-text">
-                                <h3>Digital X-Rays</h3>
-                                <p>We may take digital x-rays to help diagnose issues not visible during the oral examination.</p>
-                            </div>
-                        </div>
-                        <div class="expect-item">
-                            <div class="expect-icon">
-                                <img src="assets/images/icon-examination.svg" alt="Examination Icon">
-                            </div>
-                            <div class="expect-text">
-                                <h3>Comprehensive Examination</h3>
-                                <p>Your dentist will perform a thorough examination of your teeth, gums, and oral tissues.</p>
-                            </div>
-                        </div>
-                        <div class="expect-item">
-                            <div class="expect-icon">
-                                <img src="assets/images/icon-treatment-plan.svg" alt="Treatment Plan Icon">
-                            </div>
-                            <div class="expect-text">
-                                <h3>Treatment Discussion</h3>
-                                <p>We'll discuss our findings and recommend a personalized treatment plan tailored to your needs.</p>
-                            </div>
+                    </div>
+                </div>
+                
+                <div class="expect-cta" data-animation="fade-up">
+                    <div class="cta-container">
+                        <h3>Have Questions About Your Visit?</h3>
+                        <p>Our team is happy to address any concerns you may have before your appointment.</p>
+                        <div class="cta-buttons">
+                            <a href="tel:+15551234567" class="btn btn-primary">Call Us</a>
+                            <a href="faq.html" class="btn btn-outline">View FAQs</a>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
-    </main>
 
-    <footer class="site-footer">
-        <div class="container">
-            <div class="footer-top">
-                <div class="footer-logo">
-                    <img src="assets/images/logo-white.png" alt="Wisdom Bites Dental Clinic Logo">
+        <!-- Testimonials Section -->
+        <section class="testimonials testimonials-compact">
+            <div class="container">
+                <div class="section-header" data-animation="fade-up">
+                    <span class="section-tagline">Patient Reviews</span>
+                    <h2 class="section-title">What Our Patients Say</h2>
+                    <p class="section-subtitle">Real experiences from real people</p>
                 </div>
-                <div class="footer-contact">
-                    <h3 class="footer-heading">Contact Us</h3>
-                    <address>
-                        <p>123 Dental Avenue, Smile City, SC 12345</p>
-                        <p>Phone: <a href="tel:+15551234567">+1 (555) 123-4567</a></p>
-                        <p>Email: <a href="mailto:info@wisdombites.com">info@wisdombites.com</a></p>
-                    </address>
-                </div>
-                <div class="footer-hours">
-                    <h3 class="footer-heading">Hours</h3>
-                    <ul class="hours-list">
-                        <li><span>Monday - Friday:</span> 9:00 AM - 6:00 PM</li>
-                        <li><span>Saturday:</span> 10:00 AM - 3:00 PM</li>
-                        <li><span>Sunday:</span> Closed</li>
-                    </ul>
-                </div>
-                <div class="footer-links">
-                    <h3 class="footer-heading">Quick Links</h3>
-                    <ul class="footer-nav">
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="about.html">About Us</a></li>
-                        <li><a href="services/general-dentistry.html">Services</a></li>
-                        <li><a href="booking.html">Book Appointment</a></li>
-                        <li><a href="contact.html">Contact</a></li>
-                    </ul>
+                
+                <div class="testimonials-slider" data-animation="fade-up">
+                    <div class="swiper-container">
+                        <div class="swiper-wrapper">
+                            <!-- Testimonial 1 -->
+                            <div class="swiper-slide">
+                                <div class="testimonial-card">
+                                    <div class="testimonial-rating">
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                    </div>
+                                    <blockquote class="testimonial-quote">
+                                        <p>I was impressed by how quick and easy it was to book my appointment online. The system is user-friendly, and I received my confirmation immediately. Very efficient!</p>
+                                    </blockquote>
+                                    <div class="testimonial-author">
+                                        <img src="assets/images/patient-4.jpg" alt="David Miller" class="author-image" width="60" height="60" loading="lazy">
+                                        <div class="author-details">
+                                            <p class="author-name">David Miller</p>
+                                            <p class="author-info">New Patient</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Testimonial 2 -->
+                            <div class="swiper-slide">
+                                <div class="testimonial-card">
+                                    <div class="testimonial-rating">
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                    </div>
+                                    <blockquote class="testimonial-quote">
+                                        <p>The appointment reminders are so helpful! I received an email and a text message the day before, which ensured I didn't forget. The entire booking process was smooth from start to finish.</p>
+                                    </blockquote>
+                                    <div class="testimonial-author">
+                                        <img src="assets/images/patient-5.jpg" alt="Emily Thompson" class="author-image" width="60" height="60" loading="lazy">
+                                        <div class="author-details">
+                                            <p class="author-name">Emily Thompson</p>
+                                            <p class="author-info">Regular Patient</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Testimonial 3 -->
+                            <div class="swiper-slide">
+                                <div class="testimonial-card">
+                                    <div class="testimonial-rating">
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                    </div>
+                                    <blockquote class="testimonial-quote">
+                                        <p>When I needed to reschedule my appointment, it was incredibly easy to do through the website. I appreciated the flexibility and quick confirmation of my new appointment time.</p>
+                                    </blockquote>
+                                    <div class="testimonial-author">
+                                        <img src="assets/images/patient-6.jpg" alt="Miguel Gonzalez" class="author-image" width="60" height="60" loading="lazy">
+                                        <div class="author-details">
+                                            <p class="author-name">Miguel Gonzalez</p>
+                                            <p class="author-info">Patient for 2 years</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="testimonials-navigation">
+                        <button class="slider-button prev" aria-label="Previous testimonial">
+                            <i class="icon icon-arrow-left"></i>
+                        </button>
+                        <div class="swiper-pagination"></div>
+                        <button class="slider-button next" aria-label="Next testimonial">
+                            <i class="icon icon-arrow-right"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
-            <div class="footer-bottom">
-                <div class="social-links">
-                    <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
-                    </a>
-                    <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-                    </a>
-                    <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
-                    </a>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="faq-section">
+            <div class="container">
+                <div class="section-header" data-animation="fade-up">
+                    <span class="section-tagline">Common Questions</span>
+                    <h2 class="section-title">Frequently Asked Questions</h2>
+                    <p class="section-subtitle">Find answers to common booking questions</p>
                 </div>
-                <div class="copyright">
-                    <p>&copy; <script>document.write(new Date().getFullYear())</script> Wisdom Bites Dental Clinic. All Rights Reserved.</p>
+                
+                <div class="faq-container" data-animation="fade-up">
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            How far in advance should I book my appointment?
+                            <i class="icon icon-arrow-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>For routine check-ups and cleanings, we recommend booking 2-3 weeks in advance to ensure you get your preferred day and time. For specific treatments or to see a particular dentist, booking 3-4 weeks ahead is advisable. If you have a dental emergency, please call us immediately at (555) 123-4567, and we'll do our best to see you on the same day.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            What if I need to reschedule or cancel my appointment?
+                            <i class="icon icon-arrow-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>We understand that schedules change. You can reschedule or cancel your appointment online through our patient portal or by calling our office at (555) 123-4567. We request at least 24 hours' notice for cancellations or changes to avoid a $50 cancellation fee. For Monday appointments, please notify us by Friday at noon.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            How long will my appointment take?
+                            <i class="icon icon-arrow-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Appointment durations vary based on the type of service:
+                            <ul>
+                                <li>New patient exams and cleanings: 60-90 minutes</li>
+                                <li>Routine check-ups and cleanings: 45-60 minutes</li>
+                                <li>Fillings: 30-60 minutes per tooth</li>
+                                <li>Cosmetic consultations: 45 minutes</li>
+                                <li>Emergency appointments: Varies based on treatment needed</li>
+                            </ul>
+                            The estimated duration will be provided when you book your appointment.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            Will I receive an appointment confirmation?
+                            <i class="icon icon-arrow-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Yes, we send appointment confirmations via email immediately after booking. Additionally, you'll receive a reminder email 48 hours before your appointment and a text message reminder (if you provided a mobile number) 24 hours in advance. If you haven't received your confirmation email, please check your spam folder or contact our office to verify your appointment.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            What should I bring to my first appointment?
+                            <i class="icon icon-arrow-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>For your first visit, please bring:
+                            <ul>
+                                <li>Photo ID (driver's license or other government-issued ID)</li>
+                                <li>Dental insurance card (if applicable)</li>
+                                <li>Completed new patient forms (download from our website or arrive 15 minutes early to complete them)</li>
+                                <li>List of current medications</li>
+                                <li>Any recent dental X-rays (if available)</li>
+                                <li>Payment method for any co-pays or fees not covered by insurance</li>
+                            </ul>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            Can I book appointments for my entire family?
+                            <i class="icon icon-arrow-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Yes, you can book appointments for family members using our online booking system. Simply complete the booking process separately for each family member. If you'd prefer to book everyone at once or schedule consecutive appointments, please call our office at (555) 123-4567, and our staff will be happy to assist you in finding convenient times for everyone.</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="footer-legal">
-                    <a href="privacy-policy.html">Privacy Policy</a>
-                    <a href="terms-of-service.html">Terms of Service</a>
+                
+                <div class="faq-cta" data-animation="fade-up">
+                    <p>Don't see your question? Contact us for more information.</p>
+                    <a href="contact.html" class="btn btn-primary">Contact Us</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-top">
+            <div class="container">
+                <div class="footer-widgets">
+                    <div class="footer-widget">
+                        <div class="footer-logo">
+                            <img src="assets/images/logo-white.svg" alt="Wisdom Bites Dental Clinic" width="180" height="45">
+                        </div>
+                        <p class="footer-description">Providing exceptional dental care in a comfortable, modern environment. Our mission is to help you achieve and maintain optimal oral health.</p>
+                        <div class="social-links">
+                            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                                <i class="icon icon-facebook"></i>
+                            </a>
+                            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                                <i class="icon icon-instagram"></i>
+                            </a>
+                            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+                                <i class="icon icon-twitter"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-widget">
+                        <h3 class="footer-heading">Contact Us</h3>
+                        <address>
+                            <div class="contact-item">
+                                <i class="icon icon-map"></i>
+                                <span>123 Dental Avenue, Smile City, SC 12345</span>
+                            </div>
+                            <div class="contact-item">
+                                <i class="icon icon-phone"></i>
+                                <a href="tel:+15551234567">+1 (555) 123-4567</a>
+                            </div>
+                            <div class="contact-item">
+                                <i class="icon icon-email"></i>
+                                <a href="mailto:info@wisdombites.com">info@wisdombites.com</a>
+                            </div>
+                        </address>
+                    </div>
+                    
+                    <div class="footer-widget">
+                        <h3 class="footer-heading">Office Hours</h3>
+                        <ul class="hours-list">
+                            <li><span>Monday - Friday:</span> 9:00 AM - 6:00 PM</li>
+                            <li><span>Saturday:</span> 10:00 AM - 3:00 PM</li>
+                            <li><span>Sunday:</span> Closed</li>
+                        </ul>
+                        <div class="emergency-info">
+                            <p><strong>Dental Emergency?</strong></p>
+                            <a href="services/emergency-care.html" class="btn btn-sm btn-primary">Emergency Information</a>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-widget">
+                        <h3 class="footer-heading">Quick Links</h3>
+                        <ul class="footer-links">
+                            <li><a href="index.html">Home</a></li>
+                            <li><a href="about.html">About Us</a></li>
+                            <li><a href="services/general-dentistry.html">Services</a></li>
+                            <li><a href="booking.html">Book Appointment</a></li>
+                            <li><a href="contact.html">Contact</a></li>
+                            <li><a href="blog.html">Blog</a></li>
+                            <li><a href="insurance.html">Insurance Information</a></li>
+                            <li><a href="faq.html">FAQs</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="container">
+                <div class="footer-bottom-content">
+                    <div class="copyright">
+                        <p>&copy; <span id="current-year">2025</span> Wisdom Bites Dental Clinic. All Rights Reserved.</p>
+                    </div>
+                    <div class="footer-legal">
+                        <a href="privacy-policy.html">Privacy Policy</a>
+                        <a href="terms-of-service.html">Terms of Service</a>
+                        <a href="accessibility.html">Accessibility</a>
+                    </div>
                 </div>
             </div>
         </div>
     </footer>
 
+    <!-- Back to Top Button -->
+    <a href="#" class="back-to-top" aria-label="Back to top">
+        <i class="icon icon-arrow-up"></i>
+    </a>
+
     <!-- JavaScript -->
-    <script src="assets/js/scripts.js"></script>
-    <script src="assets/js/booking.js"></script>
+    <script src="assets/js/vendors/swiper-bundle.min.js" defer></script>
+    <script src="assets/js/main.js" defer></script>
+    <script src="assets/js/animations.js" defer></script>
+    <script src="assets/js/booking.js" defer></script>
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    
+    <!-- Initialize current year for copyright -->
+    <script>
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+        
+        // Mark body as loaded when content is ready
+        window.addEventListener('load', function() {
+            document.body.classList.add('loaded');
+            setTimeout(function() {
+                document.querySelector('.loading-screen').style.display = 'none';
+            }, 500);
+        });
+    </script>
 </body>
-</html> 
+</html>

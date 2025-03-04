@@ -5,3 +5,4 @@ v2.0.1 (2025-03-04): Cleaned up repository by removing node_modules from Git tra
 v2.0.2 (2025-03-04): Updated README with accurate Cloudflare Pages deployment instructions and troubleshooting
 v2.0.3 (2025-03-04): Updated README with accurate Cloudflare Pages deployment instructions and troubleshooting
 v2.1.0 (2025-03-04): Added AI_ASSISTANT_GUIDE.md for better AI-assisted debugging and development
+v3.0.0 (2025-03-04): Major enhancement: Implemented comprehensive virtual tour feature with Google Maps API integration, responsive panorama viewer, interactive hotspots, place info panel, tour progression indicators, completion dialog, and fallback mechanisms. Also fixed CSS compatibility issues and accessibility problems.

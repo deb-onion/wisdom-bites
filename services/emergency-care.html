@@ -3,324 +3,712 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Fast, effective emergency dental care at Wisdom Bites Dental Clinic for toothaches, broken teeth, and other urgent dental problems.">
-    <meta name="keywords" content="emergency dental care, dental emergency, toothache relief, broken tooth repair, urgent dental care">
+    <meta name="description" content="Get immediate emergency dental care for toothaches, broken teeth, and other dental emergencies at Wisdom Bites Dental Clinic. Same-day appointments available.">
+    <meta name="keywords" content="emergency dentist, dental emergency, emergency tooth extraction, broken tooth, severe toothache, dental pain relief, same-day dental appointment">
     <title>Emergency Dental Care | Wisdom Bites Dental Clinic</title>
     
     <!-- Favicon -->
     <link rel="icon" href="../assets/images/favicon.ico" type="image/x-icon">
     
-    <!-- CSS -->
-    <link rel="stylesheet" href="../assets/css/styles.css">
-    <link rel="stylesheet" href="../assets/css/animations.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Critical CSS -->
+    <style>
+        :root {
+            /* Modern color palette */
+            --primary: #4a90e2;
+            --primary-dark: #3a7abd;
+            --secondary: #50c878;
+            --secondary-dark: #3ca45e;
+            --accent: #f5a623;
+            --error: #e53e3e;
+            --error-dark: #c53030;
+            --dark: #2d3748;
+            --light: #f8fafc;
+            --white: #ffffff;
+            
+            /* Typography */
+            --font-heading: 'Montserrat', sans-serif;
+            --font-body: 'Open Sans', sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-body);
+            color: var(--dark);
+            background-color: var(--light);
+            overflow-x: hidden;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        body.loaded {
+            opacity: 1;
+        }
+        
+        .site-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background-color: transparent;
+            transition: background-color 0.3s ease, padding 0.3s ease;
+            padding: 1.5rem 0;
+        }
+        
+        .site-header.scrolled {
+            background-color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 0.75rem 0;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+    </style>
+    
+    <!-- Main CSS (loaded asynchronously) -->
+    <link rel="stylesheet" href="../assets/css/styles.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="../assets/css/animations.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="../assets/css/responsive.css" media="print" onload="this.media='all'">
+    
+    <!-- Preload critical assets -->
+    <link rel="preload" href="../assets/images/emergency-care-hero.webp" as="image">
+    <link rel="preload" href="../assets/fonts/icons.woff2" as="font" type="font/woff2" crossorigin>
+    
+    <!-- Schema Markup for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "MedicalService",
+        "name": "Emergency Dental Care - Wisdom Bites Dental Clinic",
+        "provider": {
+            "@type": "Dentist",
+            "name": "Wisdom Bites Dental Clinic",
+            "image": "../assets/images/logo.png",
+            "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "123 Dental Avenue",
+                "addressLocality": "Smile City",
+                "addressRegion": "SC",
+                "postalCode": "12345",
+                "addressCountry": "US"
+            }
+        },
+        "description": "Immediate emergency dental care for severe toothache, broken teeth, knocked-out teeth, and other dental emergencies. Same-day appointments available.",
+        "serviceType": "Emergency Dental Care",
+        "medicalSpecialty": "Dentistry",
+        "availableService": [
+            {
+                "@type": "MedicalProcedure",
+                "name": "Emergency Tooth Extraction",
+                "procedureType": "Therapeutic",
+                "howPerformed": "Professional removal of severely damaged or infected teeth that cannot be saved."
+            },
+            {
+                "@type": "MedicalProcedure",
+                "name": "Broken Tooth Repair",
+                "procedureType": "Therapeutic",
+                "howPerformed": "Restoration of damaged or fractured teeth using dental bonding, crowns, or other appropriate treatments."
+            },
+            {
+                "@type": "MedicalProcedure",
+                "name": "Severe Toothache Treatment",
+                "procedureType": "Therapeutic",
+                "howPerformed": "Diagnosis and treatment of severe dental pain, including root canal therapy, abscess drainage, or other appropriate interventions."
+            },
+            {
+                "@type": "MedicalProcedure",
+                "name": "Lost Filling or Crown Replacement",
+                "procedureType": "Therapeutic",
+                "howPerformed": "Replacement of lost or damaged dental restorations to restore function and prevent further damage."
+            }
+        ],
+        "availableChannel": {
+            "@type": "ServiceChannel",
+            "name": "Emergency Appointment",
+            "availableLanguage": "English",
+            "serviceUrl": "https://wisdombites.com/booking.html?service=emergency",
+            "servicePhone": "+1-555-123-4567"
+        },
+        "hoursAvailable": [
+            {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                "opens": "09:00",
+                "closes": "18:00"
+            },
+            {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": "Saturday",
+                "opens": "10:00",
+                "closes": "15:00"
+            }
+        ]
+    }
+    </script>
 </head>
 <body>
+    <!-- Loading Screen -->
+    <div class="loading-screen">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Header -->
     <header class="site-header">
         <div class="container">
-            <div class="logo">
-                <a href="../index.html">
-                    <img src="../assets/images/logo.png" alt="Wisdom Bites Dental Clinic Logo">
-                </a>
-            </div>
-            <nav class="main-nav">
-                <button class="menu-toggle" aria-label="Toggle menu">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-                <ul class="nav-list">
-                    <li class="nav-item"><a href="../index.html">Home</a></li>
-                    <li class="nav-item"><a href="../about.html">About Us</a></li>
-                    <li class="nav-item has-dropdown">
-                        <a href="#" class="dropdown-toggle active">Services</a>
-                        <ul class="dropdown-menu">
-                            <li><a href="general-dentistry.html">General Dentistry</a></li>
-                            <li><a href="cosmetic-dentistry.html">Cosmetic Dentistry</a></li>
-                            <li><a href="emergency-care.html" class="active">Emergency Care</a></li>
+            <div class="header-wrapper">
+                <div class="logo">
+                    <a href="../index.html" aria-label="Wisdom Bites Dental Clinic">
+                        <img src="../assets/images/logo.svg" alt="Wisdom Bites Dental Clinic Logo" width="180" height="45">
+                    </a>
+                </div>
+                
+                <nav class="main-nav">
+                    <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false">
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                    </button>
+                    
+                    <div class="nav-container">
+                        <ul class="nav-list">
+                            <li class="nav-item"><a href="../index.html">Home</a></li>
+                            <li class="nav-item"><a href="../about.html">About Us</a></li>
+                            <li class="nav-item has-dropdown">
+                                <a href="#" class="dropdown-toggle active">Services</a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="general-dentistry.html">General Dentistry</a></li>
+                                    <li><a href="cosmetic-dentistry.html">Cosmetic Dentistry</a></li>
+                                    <li><a href="emergency-care.html" class="active">Emergency Care</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item"><a href="../booking.html">Book Appointment</a></li>
+                            <li class="nav-item"><a href="../contact.html">Contact</a></li>
                         </ul>
-                    </li>
-                    <li class="nav-item"><a href="../booking.html">Book Appointment</a></li>
-                    <li class="nav-item"><a href="../contact.html">Contact</a></li>
-                </ul>
-            </nav>
-            <div class="header-cta">
-                <a href="../booking.html" class="btn btn-primary">Book Now</a>
+                        
+                        <div class="nav-cta">
+                            <a href="tel:+15551234567" class="phone-link">
+                                <i class="icon icon-phone"></i>
+                                <span>(555) 123-4567</span>
+                            </a>
+                            <a href="../booking.html?service=emergency" class="btn btn-primary">Book Now</a>
+                        </div>
+                    </div>
+                </nav>
             </div>
         </div>
     </header>
 
     <main>
         <!-- Hero Section -->
-        <section class="page-hero service-hero emergency-hero">
+        <section class="page-hero emergency-hero">
+            <div class="hero-background">
+                <picture>
+                    <source srcset="../assets/images/emergency-care-hero.webp" type="image/webp">
+                    <source srcset="../assets/images/emergency-care-hero.jpg" type="image/jpeg">
+                    <img src="../assets/images/emergency-care-hero.jpg" alt="Dentist providing emergency dental care" loading="eager">
+                </picture>
+                <div class="hero-overlay emergency-overlay"></div>
+            </div>
+            
             <div class="container">
                 <div class="page-hero-content">
-                    <h1 class="page-title">Emergency Dental Care</h1>
-                    <p class="page-subtitle">Immediate relief when you need it most</p>
-                    <div class="emergency-contact">
-                        <p class="emergency-text">Dental emergency? Call us now:</p>
-                        <a href="tel:+15551234567" class="emergency-phone">+1 (555) 123-4567</a>
+                    <div class="emergency-badge" data-animation="pulse">
+                        <span>Dental Emergency?</span>
+                    </div>
+                    <h1 class="page-title" data-animation="fade-up">Emergency Dental Care</h1>
+                    <p class="page-subtitle" data-animation="fade-up" data-delay="0.2">Immediate relief for dental emergencies</p>
+                    <div class="hero-cta" data-animation="fade-up" data-delay="0.4">
+                        <a href="tel:+15551234567" class="btn btn-error btn-lg">Call Now: (555) 123-4567</a>
+                        <a href="../booking.html?service=emergency" class="btn btn-primary btn-lg">Book Emergency Visit</a>
                     </div>
                 </div>
             </div>
+            
+            <div class="hero-waves">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+                    <path fill="#ffffff" fill-opacity="1" d="M0,64L48,80C96,96,192,128,288,133.3C384,139,480,117,576,122.7C672,128,768,160,864,186.7C960,213,1056,235,1152,229.3C1248,224,1344,192,1392,176L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+                </svg>
+            </div>
         </section>
 
-        <!-- Service Overview Section -->
-        <section class="service-overview">
+        <!-- Emergency Alert Section -->
+        <section class="emergency-alert">
             <div class="container">
-                <div class="service-content">
-                    <div class="service-image">
-                        <img src="../assets/images/emergency-dentistry-main.jpg" alt="Emergency Dental Care at Wisdom Bites" loading="lazy">
+                <div class="alert-box" data-animation="fade-up">
+                    <div class="alert-icon">
+                        <i class="icon icon-clock"></i>
                     </div>
-                    <div class="service-description">
-                        <div class="service-icon">
-                            <img src="../assets/images/icon-emergency.svg" alt="Emergency Care Icon">
-                        </div>
-                        <h2>Fast Relief for Dental Emergencies</h2>
-                        <p>Dental emergencies can happen at any time, causing severe pain and discomfort. At Wisdom Bites Dental Clinic, we prioritize emergency cases to provide immediate care when you need it most.</p>
-                        <p>Our experienced team is equipped to handle a wide range of dental emergencies, from severe toothaches to broken teeth. We understand the urgency of these situations and strive to see emergency patients on the same day whenever possible.</p>
-                        <div class="emergency-buttons">
-                            <a href="tel:+15551234567" class="btn btn-primary">Call for Emergency Care</a>
-                            <a href="../booking.html" class="btn btn-secondary">Book Online</a>
-                        </div>
+                    <div class="alert-content">
+                        <h2>Same-Day Emergency Care Available</h2>
+                        <p>We reserve time in our daily schedule for emergency patients. Call us immediately at <a href="tel:+15551234567" class="emergency-phone">(555) 123-4567</a> for prompt care.</p>
+                        <p><strong>After-hours emergencies:</strong> Call our emergency line and follow the prompts to reach our on-call dentist.</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Emergency Services Section -->
-        <section class="services-details">
+        <section class="emergency-services">
             <div class="container">
-                <div class="section-header">
-                    <h2 class="section-title">Our Emergency Dental Services</h2>
-                    <p class="section-subtitle">Quick, effective care for urgent dental issues</p>
+                <div class="section-header" data-animation="fade-up">
+                    <span class="section-tagline">Immediate Care</span>
+                    <h2 class="section-title">Emergency Dental Services</h2>
+                    <p class="section-subtitle">Prompt treatment for urgent dental problems</p>
                 </div>
-                <div class="services-grid">
-                    <div class="service-detail-card">
-                        <div class="service-detail-icon">
-                            <img src="../assets/images/icon-toothache.svg" alt="Toothache Relief Icon">
+                
+                <div class="emergency-grid">
+                    <!-- Emergency Item 1 -->
+                    <div class="emergency-item" data-animation="fade-up">
+                        <div class="emergency-icon">
+                            <i class="icon icon-toothache"></i>
                         </div>
-                        <h3>Severe Toothache Relief</h3>
-                        <p>Immediate diagnosis and treatment for intense tooth pain, which may indicate infection, decay, or other serious dental issues.</p>
-                        <ul class="service-features">
-                            <li>Same-day pain management</li>
-                            <li>Root canal therapy when needed</li>
-                            <li>Prescription medications if required</li>
-                            <li>Treatment of underlying causes</li>
-                        </ul>
-                    </div>
-                    <div class="service-detail-card">
-                        <div class="service-detail-icon">
-                            <img src="../assets/images/icon-broken-tooth.svg" alt="Broken Tooth Icon">
-                        </div>
-                        <h3>Broken or Chipped Teeth</h3>
-                        <p>Fast repair of damaged teeth to prevent further complications and restore both function and appearance.</p>
-                        <ul class="service-features">
-                            <li>Dental bonding for minor chips</li>
-                            <li>Crowns for significant breaks</li>
-                            <li>Extraction if necessary</li>
-                            <li>Temporary solutions while healing</li>
-                        </ul>
-                    </div>
-                    <div class="service-detail-card">
-                        <div class="service-detail-icon">
-                            <img src="../assets/images/icon-knocked-out.svg" alt="Knocked-Out Tooth Icon">
-                        </div>
-                        <h3>Knocked-Out Teeth</h3>
-                        <p>Emergency treatment for avulsed (completely knocked-out) teeth with the possibility of reimplantation if treated promptly.</p>
-                        <ul class="service-features">
-                            <li>Tooth reimplantation when possible</li>
-                            <li>Proper handling instructions</li>
-                            <li>Follow-up care</li>
-                            <li>Replacement options if needed</li>
-                        </ul>
-                    </div>
-                    <div class="service-detail-card">
-                        <div class="service-detail-icon">
-                            <img src="../assets/images/icon-dental-abscess.svg" alt="Dental Abscess Icon">
-                        </div>
-                        <h3>Dental Abscess Treatment</h3>
-                        <p>Urgent care for painful dental abscesses, which are infections that can become serious if left untreated.</p>
-                        <ul class="service-features">
-                            <li>Drainage of the infection</li>
-                            <li>Antibiotic therapy</li>
-                            <li>Root canal treatment</li>
-                            <li>Pain management</li>
-                        </ul>
-                    </div>
-                    <div class="service-detail-card">
-                        <div class="service-detail-icon">
-                            <img src="../assets/images/icon-lost-filling.svg" alt="Lost Filling Icon">
-                        </div>
-                        <h3>Lost Fillings or Crowns</h3>
-                        <p>Quick replacement of lost or damaged dental restorations to protect the affected tooth and restore function.</p>
-                        <ul class="service-features">
-                            <li>Temporary or permanent replacement</li>
-                            <li>Evaluation of underlying tooth</li>
-                            <li>Pain relief</li>
-                            <li>Prevention of further damage</li>
-                        </ul>
-                    </div>
-                    <div class="service-detail-card">
-                        <div class="service-detail-icon">
-                            <img src="../assets/images/icon-soft-tissue.svg" alt="Soft Tissue Injury Icon">
-                        </div>
-                        <h3>Soft Tissue Injuries</h3>
-                        <p>Treatment for injuries to the gums, lips, cheeks, or tongue that require immediate dental attention.</p>
-                        <ul class="service-features">
-                            <li>Cleaning of the affected area</li>
-                            <li>Suturing when necessary</li>
-                            <li>Infection prevention</li>
-                            <li>Pain management</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- What to Do Section -->
-        <section class="emergency-instructions">
-            <div class="container">
-                <div class="section-header">
-                    <h2 class="section-title">What to Do in a Dental Emergency</h2>
-                    <p class="section-subtitle">Important steps before you reach our office</p>
-                </div>
-                <div class="emergency-scenarios">
-                    <div class="emergency-scenario">
-                        <h3>For a Knocked-Out Tooth</h3>
-                        <ol class="emergency-steps">
-                            <li>Pick up the tooth by the crown (not the root)</li>
-                            <li>Gently rinse it with water if dirty (do not scrub)</li>
-                            <li>If possible, place the tooth back in its socket</li>
-                            <li>If that's not possible, keep the tooth moist in milk, saliva, or a tooth preservation product</li>
-                            <li>Call us immediately — time is critical for saving a knocked-out tooth</li>
-                        </ol>
-                    </div>
-                    <div class="emergency-scenario">
-                        <h3>For a Severe Toothache</h3>
-                        <ol class="emergency-steps">
-                            <li>Rinse your mouth with warm water</li>
-                            <li>Use dental floss to remove any food caught between teeth</li>
-                            <li>Take over-the-counter pain relievers as directed</li>
-                            <li>Apply a cold compress to your cheek for swelling</li>
-                            <li>Call our office for same-day treatment</li>
-                        </ol>
-                    </div>
-                    <div class="emergency-scenario">
-                        <h3>For a Chipped or Broken Tooth</h3>
-                        <ol class="emergency-steps">
-                            <li>Rinse your mouth with warm water</li>
-                            <li>Apply a cold compress to reduce swelling</li>
-                            <li>Save any broken pieces if possible</li>
-                            <li>Cover any sharp edges with dental wax if available</li>
-                            <li>Contact us for prompt treatment</li>
-                        </ol>
-                    </div>
-                    <div class="emergency-scenario">
-                        <h3>For a Dental Abscess</h3>
-                        <ol class="emergency-steps">
-                            <li>Rinse with mild salt water several times a day</li>
-                            <li>Take over-the-counter pain medication as directed</li>
-                            <li>Apply a cold compress to your face for swelling</li>
-                            <li>Do not apply aspirin directly to the affected area</li>
-                            <li>Call us immediately — dental abscesses require prompt treatment</li>
-                        </ol>
-                    </div>
-                </div>
-                <div class="emergency-note">
-                    <p><strong>Important:</strong> If you experience severe swelling, uncontrolled bleeding, or trauma to the face or jaw, go to the nearest emergency room immediately or call 911.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Why Choose Us for Emergency Care -->
-        <section class="why-choose-emergency">
-            <div class="container">
-                <div class="section-header">
-                    <h2 class="section-title">Why Choose Us for Emergency Dental Care</h2>
-                    <p class="section-subtitle">Trusted care when you need it most</p>
-                </div>
-                <div class="emergency-benefits">
-                    <div class="benefit-card">
-                        <div class="benefit-icon">
-                            <img src="../assets/images/icon-same-day.svg" alt="Same-Day Appointments Icon">
-                        </div>
-                        <h3 class="benefit-title">Same-Day Appointments</h3>
-                        <p class="benefit-description">We reserve time in our schedule each day for emergency patients, ensuring you get the care you need promptly.</p>
-                    </div>
-                    <div class="benefit-card">
-                        <div class="benefit-icon">
-                            <img src="../assets/images/icon-experienced.svg" alt="Experienced Team Icon">
-                        </div>
-                        <h3 class="benefit-title">Experienced Emergency Team</h3>
-                        <p class="benefit-description">Our dentists have extensive training and experience in handling all types of dental emergencies quickly and effectively.</p>
-                    </div>
-                    <div class="benefit-card">
-                        <div class="benefit-icon">
-                            <img src="../assets/images/icon-pain-relief.svg" alt="Fast Pain Relief Icon">
-                        </div>
-                        <h3 class="benefit-title">Fast Pain Relief</h3>
-                        <p class="benefit-description">We prioritize getting you out of pain quickly, using advanced techniques and appropriate medications when necessary.</p>
-                    </div>
-                    <div class="benefit-card">
-                        <div class="benefit-icon">
-                            <img src="../assets/images/icon-technology.svg" alt="Advanced Technology Icon">
-                        </div>
-                        <h3 class="benefit-title">Advanced Technology</h3>
-                        <p class="benefit-description">Our state-of-the-art equipment allows for quick diagnosis and treatment, even for complex emergency cases.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Testimonials for Emergency Care -->
-        <section class="emergency-testimonials">
-            <div class="container">
-                <div class="section-header">
-                    <h2 class="section-title">Patient Experiences</h2>
-                    <p class="section-subtitle">How we've helped in dental emergencies</p>
-                </div>
-                <div class="testimonials-grid">
-                    <div class="testimonial-card">
-                        <div class="testimonial-content">
-                            <div class="testimonial-rating">
-                                <span class="star">★</span>
-                                <span class="star">★</span>
-                                <span class="star">★</span>
-                                <span class="star">★</span>
-                                <span class="star">★</span>
+                        <div class="emergency-content">
+                            <h3>Severe Toothache Relief</h3>
+                            <p>Immediate treatment for intense dental pain, which may be caused by infection, severe decay, or pulp inflammation. We identify the root cause and provide effective pain relief and treatment.</p>
+                            <div class="symptoms-box">
+                                <h4>Common Symptoms:</h4>
+                                <ul class="symptom-list">
+                                    <li>Persistent, intense dental pain</li>
+                                    <li>Pain that worsens with pressure or temperature changes</li>
+                                    <li>Swelling around the affected tooth</li>
+                                    <li>Difficulty eating or sleeping due to pain</li>
+                                </ul>
                             </div>
-                            <blockquote class="testimonial-quote">
-                                "I cracked a tooth on a Friday evening and was in severe pain. I called Wisdom Bites and they got me in within an hour! Dr. Chen was amazing and fixed me up quickly. I can't thank them enough for their emergency care."
-                            </blockquote>
-                            <div class="testimonial-author">
-                                <img src="../assets/images/patient-emergency-1.jpg" alt="Michael Roberts" class="author-image">
-                                <div class="author-details">
-                                    <p class="author-name">Michael Roberts</p>
-                                    <p class="author-info">Emergency Patient</p>
+                            <div class="emergency-action">
+                                <a href="../booking.html?service=toothache" class="btn btn-primary">Book Emergency Care</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Emergency Item 2 -->
+                    <div class="emergency-item" data-animation="fade-up" data-delay="0.2">
+                        <div class="emergency-icon">
+                            <i class="icon icon-broken-tooth"></i>
+                        </div>
+                        <div class="emergency-content">
+                            <h3>Broken or Chipped Tooth</h3>
+                            <p>Prompt repair of fractured or broken teeth to prevent further damage, infection, and restore function and appearance. Treatments may include dental bonding, crowns, or in severe cases, extraction.</p>
+                            <div class="symptoms-box">
+                                <h4>Common Symptoms:</h4>
+                                <ul class="symptom-list">
+                                    <li>Visible fracture or missing piece of tooth</li>
+                                    <li>Sharp edges that may cut tongue or cheek</li>
+                                    <li>Pain or sensitivity when chewing or exposed to temperature</li>
+                                    <li>Swelling or bleeding around the damaged tooth</li>
+                                </ul>
+                            </div>
+                            <div class="emergency-action">
+                                <a href="../booking.html?service=broken-tooth" class="btn btn-primary">Book Emergency Care</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Emergency Item 3 -->
+                    <div class="emergency-item" data-animation="fade-up" data-delay="0.4">
+                        <div class="emergency-icon">
+                            <i class="icon icon-knocked-out"></i>
+                        </div>
+                        <div class="emergency-content">
+                            <h3>Knocked-Out Tooth</h3>
+                            <p>Immediate care for avulsed (knocked-out) teeth. With prompt treatment, we may be able to save and replant your natural tooth, but quick action is essential. If this happens, call us immediately.</p>
+                            <div class="symptoms-box">
+                                <h4>Emergency Instructions:</h4>
+                                <ul class="symptom-list">
+                                    <li>Handle the tooth by the crown (not the root)</li>
+                                    <li>Gently rinse with water if dirty (do not scrub)</li>
+                                    <li>Try to reinsert the tooth in its socket if possible</li>
+                                    <li>If reinsertion isn't possible, store in milk or saliva</li>
+                                    <li>Seek immediate dental care (within 30-60 minutes)</li>
+                                </ul>
+                            </div>
+                            <div class="emergency-action">
+                                <a href="tel:+15551234567" class="btn btn-error">Call Immediately</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Emergency Item 4 -->
+                    <div class="emergency-item" data-animation="fade-up" data-delay="0.6">
+                        <div class="emergency-icon">
+                            <i class="icon icon-abscess"></i>
+                        </div>
+                        <div class="emergency-content">
+                            <h3>Dental Abscess</h3>
+                            <p>Urgent treatment for dental abscesses, which are painful infections that can lead to serious health complications if left untreated. Treatment typically involves draining the infection, prescribing antibiotics, and addressing the underlying cause.</p>
+                            <div class="symptoms-box">
+                                <h4>Common Symptoms:</h4>
+                                <ul class="symptom-list">
+                                    <li>Severe, throbbing pain</li>
+                                    <li>Facial or jaw swelling</li>
+                                    <li>Tender, swollen lymph nodes under the jaw</li>
+                                    <li>Fever and general feeling of unwellness</li>
+                                    <li>Foul taste or smell in the mouth</li>
+                                </ul>
+                            </div>
+                            <div class="emergency-action">
+                                <a href="../booking.html?service=dental-abscess" class="btn btn-primary">Book Emergency Care</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Emergency Item 5 -->
+                    <div class="emergency-item" data-animation="fade-up" data-delay="0.8">
+                        <div class="emergency-icon">
+                            <i class="icon icon-crown"></i>
+                        </div>
+                        <div class="emergency-content">
+                            <h3>Lost Filling or Crown</h3>
+                            <p>Prompt replacement of lost fillings or crowns to protect the exposed tooth from further damage and relieve sensitivity. We provide temporary or permanent solutions based on your specific situation.</p>
+                            <div class="symptoms-box">
+                                <h4>Emergency Instructions:</h4>
+                                <ul class="symptom-list">
+                                    <li>Save the crown or filling if possible</li>
+                                    <li>Protect the exposed tooth from temperature changes</li>
+                                    <li>If experiencing pain, take over-the-counter pain relievers as directed</li>
+                                    <li>Avoid chewing on the affected side</li>
+                                    <li>Seek dental care within 24-48 hours</li>
+                                </ul>
+                            </div>
+                            <div class="emergency-action">
+                                <a href="../booking.html?service=lost-filling" class="btn btn-primary">Book Emergency Care</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Emergency Item 6 -->
+                    <div class="emergency-item" data-animation="fade-up" data-delay="1.0">
+                        <div class="emergency-icon">
+                            <i class="icon icon-jaw"></i>
+                        </div>
+                        <div class="emergency-content">
+                            <h3>Jaw Pain or Injury</h3>
+                            <p>Prompt evaluation and treatment for jaw pain, injuries, or suspected TMJ disorders. We provide diagnosis, pain relief, and appropriate treatment or referral based on the severity and cause of your condition.</p>
+                            <div class="symptoms-box">
+                                <h4>Common Symptoms:</h4>
+                                <ul class="symptom-list">
+                                    <li>Pain or tenderness in the jaw joint area</li>
+                                    <li>Difficulty or pain when opening or closing mouth</li>
+                                    <li>Clicking, popping, or grating sounds</li>
+                                    <li>Facial swelling after injury</li>
+                                    <li>Inability to properly close mouth or bite properly</li>
+                                </ul>
+                            </div>
+                            <div class="emergency-action">
+                                <a href="../booking.html?service=jaw-pain" class="btn btn-primary">Book Emergency Care</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- First Aid Section -->
+        <section class="first-aid-section">
+            <div class="container">
+                <div class="section-header" data-animation="fade-up">
+                    <span class="section-tagline">Until You See Us</span>
+                    <h2 class="section-title">Dental Emergency First Aid</h2>
+                    <p class="section-subtitle">What to do before reaching our office</p>
+                </div>
+                
+                <div class="first-aid-container">
+                    <div class="first-aid-content" data-animation="fade-right">
+                        <div class="accordion-container">
+                            <!-- First Aid Item 1 -->
+                            <div class="accordion-item">
+                                <button class="accordion-header">
+                                    <i class="icon icon-toothache"></i>
+                                    <span>Severe Toothache</span>
+                                    <i class="icon icon-arrow-down"></i>
+                                </button>
+                                <div class="accordion-content">
+                                    <ul class="first-aid-steps">
+                                        <li>Rinse your mouth gently with warm saltwater (½ teaspoon salt in 8 oz water).</li>
+                                        <li>Take over-the-counter pain relievers as directed on the packaging.</li>
+                                        <li>Apply a cold compress to the outside of your cheek (20 minutes on, 20 minutes off).</li>
+                                        <li>Avoid extreme temperatures in food and drinks.</li>
+                                        <li>Do NOT place aspirin directly on the gums or tooth as it can cause tissue damage.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <!-- First Aid Item 2 -->
+                            <div class="accordion-item">
+                                <button class="accordion-header">
+                                    <i class="icon icon-broken-tooth"></i>
+                                    <span>Broken or Chipped Tooth</span>
+                                    <i class="icon icon-arrow-down"></i>
+                                </button>
+                                <div class="accordion-content">
+                                    <ul class="first-aid-steps">
+                                        <li>Save any broken tooth fragments and rinse them gently with water.</li>
+                                        <li>Rinse your mouth with warm water to clean the area.</li>
+                                        <li>Apply a cold compress to reduce swelling.</li>
+                                        <li>Cover any sharp edges with dental wax or sugar-free gum to protect your tongue and cheeks.</li>
+                                        <li>Take over-the-counter pain relievers if needed.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <!-- First Aid Item 3 -->
+                            <div class="accordion-item">
+                                <button class="accordion-header">
+                                    <i class="icon icon-knocked-out"></i>
+                                    <span>Knocked-Out Tooth</span>
+                                    <i class="icon icon-arrow-down"></i>
+                                </button>
+                                <div class="accordion-content">
+                                    <ul class="first-aid-steps">
+                                        <li>Find the tooth and pick it up by the crown (not the root).</li>
+                                        <li>Gently rinse it with water without scrubbing or removing any attached tissue.</li>
+                                        <li>If possible, try to reinsert the tooth into its socket and hold it in place.</li>
+                                        <li>If reinsertion isn't possible, store the tooth in milk, saliva, or a tooth preservation product.</li>
+                                        <li>Seek immediate dental care within 30-60 minutes for the best chance of saving the tooth.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <!-- First Aid Item 4 -->
+                            <div class="accordion-item">
+                                <button class="accordion-header">
+                                    <i class="icon icon-abscess"></i>
+                                    <span>Dental Abscess</span>
+                                    <i class="icon icon-arrow-down"></i>
+                                </button>
+                                <div class="accordion-content">
+                                    <ul class="first-aid-steps">
+                                        <li>Rinse your mouth frequently with mild saltwater (½ teaspoon salt in 8 oz water).</li>
+                                        <li>Take over-the-counter pain relievers as directed on the packaging.</li>
+                                        <li>Apply a cold compress to the outside of your face to reduce swelling.</li>
+                                        <li>DO NOT apply heat, as this can spread the infection.</li>
+                                        <li>Seek immediate dental care, especially if you have fever, facial swelling, or difficulty swallowing or breathing.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <!-- First Aid Item 5 -->
+                            <div class="accordion-item">
+                                <button class="accordion-header">
+                                    <i class="icon icon-crown"></i>
+                                    <span>Lost Filling or Crown</span>
+                                    <i class="icon icon-arrow-down"></i>
+                                </button>
+                                <div class="accordion-content">
+                                    <ul class="first-aid-steps">
+                                        <li>Save the crown or filling if you have it.</li>
+                                        <li>If the area is painful, apply clove oil with a cotton swab to the sensitive area.</li>
+                                        <li>For a lost crown, you can use dental cement, denture adhesive, or even sugar-free gum to temporarily reattach it.</li>
+                                        <li>Avoid chewing on that side of your mouth.</li>
+                                        <li>Seek dental care within 1-2 days.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <!-- First Aid Item 6 -->
+                            <div class="accordion-item">
+                                <button class="accordion-header">
+                                    <i class="icon icon-jaw"></i>
+                                    <span>Jaw Injury</span>
+                                    <i class="icon icon-arrow-down"></i>
+                                </button>
+                                <div class="accordion-content">
+                                    <ul class="first-aid-steps">
+                                        <li>Apply a cold compress to reduce swelling (20 minutes on, 20 minutes off).</li>
+                                        <li>Take over-the-counter pain relievers as directed.</li>
+                                        <li>Eat soft foods and avoid wide mouth opening.</li>
+                                        <li>For a suspected broken jaw, gently secure the jaw with a bandage wrapped under the chin and over the top of the head.</li>
+                                        <li>Seek immediate medical attention at an emergency room for severe injuries.</li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="testimonial-card">
-                        <div class="testimonial-content">
-                            <div class="testimonial-rating">
-                                <span class="star">★</span>
-                                <span class="star">★</span>
-                                <span class="star">★</span>
-                                <span class="star">★</span>
-                                <span class="star">★</span>
+                    
+                    <div class="first-aid-image" data-animation="fade-left">
+                        <img src="../assets/images/emergency-first-aid.jpg" alt="Dental emergency first aid supplies" width="540" height="400" loading="lazy">
+                        <div class="emergency-kit-badge">
+                            <h4>Dental Emergency Kit</h4>
+                            <ul>
+                                <li>Gauze pads</li>
+                                <li>Small container with lid</li>
+                                <li>Over-the-counter pain reliever</li>
+                                <li>Salt (for saltwater rinse)</li>
+                                <li>Dental wax</li>
+                                <li>Our emergency contact info</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- What to Expect Section -->
+        <section class="what-to-expect">
+            <div class="container">
+                <div class="section-header" data-animation="fade-up">
+                    <span class="section-tagline">Emergency Visit Process</span>
+                    <h2 class="section-title">What to Expect</h2>
+                    <p class="section-subtitle">When you arrive for emergency dental care</p>
+                </div>
+                
+                <div class="process-timeline" data-animation="fade-up">
+                    <!-- Step 1 -->
+                    <div class="timeline-item">
+                        <div class="timeline-number">1</div>
+                        <div class="timeline-content">
+                            <h3>Immediate Assessment</h3>
+                            <p>Our team will quickly assess the severity of your emergency. If you're in severe pain or have a time-sensitive issue like a knocked-out tooth, you'll be seen immediately.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="timeline-item">
+                        <div class="timeline-number">2</div>
+                        <div class="timeline-content">
+                            <h3>Pain Management</h3>
+                            <p>Relieving your pain is our first priority. We'll use appropriate anesthetics, medications, or techniques to make you comfortable before proceeding with diagnosis and treatment.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 3 -->
+                    <div class="timeline-item">
+                        <div class="timeline-number">3</div>
+                        <div class="timeline-content">
+                            <h3>Diagnosis & Imaging</h3>
+                            <p>We'll take any necessary X-rays or images to diagnose the problem correctly. Our digital X-ray system provides immediate images with minimal radiation exposure.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 4 -->
+                    <div class="timeline-item">
+                        <div class="timeline-number">4</div>
+                        <div class="timeline-content">
+                            <h3>Treatment Options</h3>
+                            <p>We'll explain your condition and discuss treatment options, focusing on immediate relief and long-term solutions. All costs will be transparently communicated before proceeding.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 5 -->
+                    <div class="timeline-item">
+                        <div class="timeline-number">5</div>
+                        <div class="timeline-content">
+                            <h3>Emergency Treatment</h3>
+                            <p>Our skilled dentists will provide the necessary emergency treatment to address your immediate concern, using the latest techniques and materials for optimal results.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 6 -->
+                    <div class="timeline-item">
+                        <div class="timeline-number">6</div>
+                        <div class="timeline-content">
+                            <h3>Follow-Up Plan</h3>
+                            <p>Before you leave, we'll provide detailed aftercare instructions and schedule any necessary follow-up appointments to ensure complete resolution of your dental emergency.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials Section -->
+        <section class="testimonials testimonials-compact">
+            <div class="container">
+                <div class="section-header" data-animation="fade-up">
+                    <span class="section-tagline">Patient Stories</span>
+                    <h2 class="section-title">Emergency Care Testimonials</h2>
+                    <p class="section-subtitle">Real experiences from patients we've helped</p>
+                </div>
+                
+                <div class="testimonials-slider" data-animation="fade-up">
+                    <div class="swiper-container">
+                        <div class="swiper-wrapper">
+                            <!-- Testimonial 1 -->
+                            <div class="swiper-slide">
+                                <div class="testimonial-card">
+                                    <div class="testimonial-rating">
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                    </div>
+                                    <blockquote class="testimonial-quote">
+                                        <p>I called in extreme pain on a Saturday morning and was seen within the hour. Dr. Chen was incredibly gentle and found the source of my pain immediately. After treating an abscess and starting me on antibiotics, the relief was almost instant. I can't thank the team enough!</p>
+                                    </blockquote>
+                                    <div class="testimonial-author">
+                                        <img src="../assets/images/emergency-patient-1.jpg" alt="Michael Thompson" class="author-image" width="60" height="60" loading="lazy">
+                                        <div class="author-details">
+                                            <p class="author-name">Michael Thompson</p>
+                                            <p class="author-info">Emergency Patient</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <blockquote class="testimonial-quote">
-                                "My son knocked out his front tooth during a soccer game. We called Wisdom Bites in a panic, and they calmly guided us through exactly what to do. By the time we arrived, they were ready for us and managed to save his tooth. Their expertise in handling dental emergencies is incredible."
-                            </blockquote>
-                            <div class="testimonial-author">
-                                <img src="../assets/images/patient-emergency-2.jpg" alt="Jennifer Watkins" class="author-image">
-                                <div class="author-details">
-                                    <p class="author-name">Jennifer Watkins</p>
-                                    <p class="author-info">Parent of Emergency Patient</p>
+                            
+                            <!-- Testimonial 2 -->
+                            <div class="swiper-slide">
+                                <div class="testimonial-card">
+                                    <div class="testimonial-rating">
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                    </div>
+                                    <blockquote class="testimonial-quote">
+                                        <p>My daughter knocked out her front tooth during a soccer game, and I was in a panic. The staff at Wisdom Bites told me exactly what to do over the phone and saw us immediately. Thanks to their quick action and expertise, they were able to save her tooth. Eternally grateful!</p>
+                                    </blockquote>
+                                    <div class="testimonial-author">
+                                        <img src="../assets/images/emergency-patient-2.jpg" alt="Jennifer Adams" class="author-image" width="60" height="60" loading="lazy">
+                                        <div class="author-details">
+                                            <p class="author-name">Jennifer Adams</p>
+                                            <p class="author-info">Parent of Emergency Patient</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Testimonial 3 -->
+                            <div class="swiper-slide">
+                                <div class="testimonial-card">
+                                    <div class="testimonial-rating">
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                    </div>
+                                    <blockquote class="testimonial-quote">
+                                        <p>I broke a crown while traveling for business and was in tremendous pain. I called Wisdom Bites as a new patient, and they fit me in that same day. Dr. Wilson repaired my crown, explained what happened, and even coordinated with my regular dentist back home. Outstanding service!</p>
+                                    </blockquote>
+                                    <div class="testimonial-author">
+                                        <img src="../assets/images/emergency-patient-3.jpg" alt="Robert Chen" class="author-image" width="60" height="60" loading="lazy">
+                                        <div class="author-details">
+                                            <p class="author-name">Robert Chen</p>
+                                            <p class="author-info">Out-of-Town Emergency Patient</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    
+                    <div class="testimonials-navigation">
+                        <button class="slider-button prev" aria-label="Previous testimonial">
+                            <i class="icon icon-arrow-left"></i>
+                        </button>
+                        <div class="swiper-pagination"></div>
+                        <button class="slider-button next" aria-label="Next testimonial">
+                            <i class="icon icon-arrow-right"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -329,132 +717,283 @@
         <!-- FAQ Section -->
         <section class="faq-section">
             <div class="container">
-                <div class="section-header">
-                    <h2 class="section-title">Frequently Asked Questions</h2>
-                    <p class="section-subtitle">Common questions about emergency dental care</p>
+                <div class="section-header" data-animation="fade-up">
+                    <span class="section-tagline">Common Questions</span>
+                    <h2 class="section-title">Emergency Care FAQs</h2>
+                    <p class="section-subtitle">Answers to your urgent dental questions</p>
                 </div>
-                <div class="faq-container">
+                
+                <div class="faq-container" data-animation="fade-up">
                     <div class="faq-item">
                         <button class="faq-question">
-                            What qualifies as a dental emergency?
-                            <span class="icon-plus"></span>
+                            What constitutes a dental emergency?
+                            <i class="icon icon-arrow-down"></i>
                         </button>
                         <div class="faq-answer">
-                            <p>Dental emergencies include situations that require immediate attention to relieve severe pain, stop bleeding, or save a tooth. These include knocked-out teeth, severely cracked or broken teeth, abscesses or infections with swelling, severe toothaches, lost fillings or crowns that cause pain, and injuries to the soft tissues of the mouth. If you're in severe pain or experiencing any of these issues, you should contact us right away.</p>
+                            <p>Dental emergencies typically include situations involving severe pain, infection, bleeding, or trauma that require immediate attention to alleviate pain, prevent further damage, or save a tooth. Examples include:</p>
+                            <ul>
+                                <li>Severe, persistent toothache</li>
+                                <li>Knocked-out or loosened tooth</li>
+                                <li>Cracked or fractured tooth (especially if painful)</li>
+                                <li>Dental abscess or severe swelling</li>
+                                <li>Tissue injury or severe bleeding from the mouth</li>
+                                <li>Lost crown or filling when accompanied by pain</li>
+                                <li>Broken jaw or severe jaw pain</li>
+                            </ul>
+                            <p>If you're unsure whether your situation is an emergency, call our office at (555) 123-4567, and we'll help you determine the appropriate course of action.</p>
                         </div>
                     </div>
+                    
                     <div class="faq-item">
                         <button class="faq-question">
                             How quickly can I be seen for a dental emergency?
-                            <span class="icon-plus"></span>
+                            <i class="icon icon-arrow-down"></i>
                         </button>
                         <div class="faq-answer">
-                            <p>At Wisdom Bites Dental Clinic, we prioritize emergency cases and make every effort to see patients experiencing dental emergencies on the same day they contact us. We reserve time in our daily schedule specifically for emergency appointments. When you call with an emergency, our team will ask questions to assess the severity of your situation and get you in as quickly as possible.</p>
+                            <p>We reserve time in our daily schedule specifically for emergency patients. For severe emergencies like a knocked-out tooth, severe pain, or facial swelling, we make every effort to see you the same day, often within hours of your call. The timing can depend on:</p>
+                            <ul>
+                                <li>The nature and severity of your emergency</li>
+                                <li>The time of day you call</li>
+                                <li>Whether you're a current patient (though we welcome emergency patients of record or not)</li>
+                            </ul>
+                            <p>For the most time-sensitive emergencies (like a knocked-out tooth, which should be treated within 30-60 minutes), we prioritize immediate care. For after-hours emergencies, call our regular number and follow the prompts to reach our on-call dentist.</p>
                         </div>
                     </div>
+                    
                     <div class="faq-item">
                         <button class="faq-question">
-                            What should I do if my tooth is knocked out after hours?
-                            <span class="icon-plus"></span>
+                            How much does emergency dental care cost?
+                            <i class="icon icon-arrow-down"></i>
                         </button>
                         <div class="faq-answer">
-                            <p>If your tooth is knocked out after our regular business hours, first call our emergency number, as we often have on-call staff for serious emergencies. While waiting to be seen: 1) Handle the tooth by the crown, not the root. 2) Gently rinse it with water if dirty, but don't scrub. 3) Try to reinsert it in the socket if possible. 4) If not, keep the tooth moist in milk, saliva, or a tooth preservation product. 5) Get to our office or an emergency dental provider as soon as possible—ideally within 30 minutes for the best chance of saving the tooth.</p>
+                            <p>The cost of emergency dental care varies based on the specific treatment needed. Your total cost will depend on:</p>
+                            <ul>
+                                <li>The type and extent of the emergency</li>
+                                <li>The treatment(s) required to address it</li>
+                                <li>Your dental insurance coverage</li>
+                                <li>Whether any follow-up treatments are needed</li>
+                            </ul>
+                            <p>We understand that emergency situations are unexpected, and we strive to make care accessible. We accept most major dental insurance plans and offer payment plans through CareCredit. Before proceeding with any emergency treatment, we'll discuss the estimated costs with you so there are no surprises.</p>
                         </div>
                     </div>
+                    
                     <div class="faq-item">
                         <button class="faq-question">
-                            Will my dental insurance cover emergency treatment?
-                            <span class="icon-plus"></span>
+                            Should I go to the emergency room for a dental emergency?
+                            <i class="icon icon-arrow-down"></i>
                         </button>
                         <div class="faq-answer">
-                            <p>Most dental insurance plans provide coverage for emergency dental procedures, as they are considered necessary care. However, coverage varies by provider and specific plan. Our administrative team can help verify your insurance benefits and provide an estimate of your out-of-pocket costs. We also offer payment plans and financing options for emergency treatments not fully covered by insurance, as we believe financial concerns should never prevent you from getting the emergency care you need.</p>
+                            <p>While dental emergencies are best treated by a dentist, there are certain situations where you should go to the emergency room instead of or before seeing a dentist:</p>
+                            <ul>
+                                <li>Severe facial or jaw trauma</li>
+                                <li>Uncontrolled bleeding from the mouth</li>
+                                <li>Significant swelling affecting breathing or swallowing</li>
+                                <li>Signs of severe infection (high fever, facial swelling, difficulty breathing)</li>
+                                <li>Suspected broken jaw</li>
+                            </ul>
+                            <p>For other dental emergencies, contact our office first. Hospital emergency rooms typically aren't equipped to provide definitive dental treatment and will often provide pain relief and antibiotics before referring you to a dentist. For the most effective care, contact us directly at (555) 123-4567.</p>
                         </div>
                     </div>
+                    
                     <div class="faq-item">
                         <button class="faq-question">
-                            How can I prevent dental emergencies?
-                            <span class="icon-plus"></span>
+                            What if I have a dental emergency while traveling?
+                            <i class="icon icon-arrow-down"></i>
                         </button>
                         <div class="faq-answer">
-                            <p>While not all dental emergencies can be prevented, many can be avoided through: 1) Regular dental check-ups to catch problems early. 2) Wearing a mouthguard during sports activities. 3) Avoiding chewing hard foods like ice or hard candy that can crack teeth. 4) Not using teeth as tools to open packages or bottles. 5) Maintaining good oral hygiene to prevent infections. 6) Addressing minor dental issues before they become major problems. Remember, preventive care is always better than emergency treatment.</p>
+                            <p>If you experience a dental emergency while traveling:</p>
+                            <ul>
+                                <li>Call our office at (555) 123-4567 for guidance and to determine if treatment can wait until you return.</li>
+                                <li>For urgent care needs, we can recommend emergency dental services in your location or help you find a dentist through dental society referral services.</li>
+                                <li>We can coordinate with another dental office to share your records if necessary.</li>
+                                <li>Your dental insurance may cover emergency treatment out of network or while traveling; we can help you understand your coverage.</li>
+                            </ul>
+                            <p>As a precaution when traveling, carry our contact information, your dental insurance card, and basic pain relievers. If you have upcoming travel and have any dental concerns, consider scheduling a check-up before your trip to address potential issues before they become emergencies.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            What should I do if my child has a dental emergency?
+                            <i class="icon icon-arrow-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>For pediatric dental emergencies:</p>
+                            <ol>
+                                <li><strong>Stay calm</strong> to help your child remain calm as well.</li>
+                                <li><strong>Call our office immediately</strong> at (555) 123-4567 for guidance specific to your child's situation.</li>
+                                <li><strong>For a knocked-out permanent tooth</strong>, gently rinse it without scrubbing, try to place it back in the socket, or store it in milk and seek immediate care.</li>
+                                <li><strong>For a knocked-out baby tooth</strong>, don't try to reinsert it, but save it and come in for an evaluation to ensure no fragments remain.</li>
+                                <li><strong>For broken teeth</strong>, save any fragments, rinse your child's mouth with warm water, and apply a cold compress for swelling.</li>
+                                <li><strong>For toothaches</strong>, rinse with warm saltwater and give appropriate children's pain medication as needed.</li>
+                            </ol>
+                            <p>Our pediatric specialist, Dr. Rodriguez, has extensive experience making emergency dental visits comfortable and less frightening for children. We prioritize creating a positive experience even during emergency situations.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- CTA Section -->
-        <section class="cta-section emergency-cta">
+        <!-- Emergency Call to Action Section -->
+        <section class="emergency-cta-section">
             <div class="container">
-                <div class="cta-content">
-                    <h2 class="cta-title">Experiencing a Dental Emergency?</h2>
-                    <p class="cta-description">Don't wait in pain. Contact us immediately for prompt, professional care.</p>
-                    <div class="cta-buttons">
-                        <a href="tel:+15551234567" class="btn btn-primary btn-large">Call Emergency Line</a>
-                        <a href="../booking.html" class="btn btn-secondary btn-large">Book Online</a>
+                <div class="emergency-cta-wrapper" data-animation="fade-up">
+                    <div class="emergency-cta-content">
+                        <h2 class="cta-title">Dental Emergency? Don't Wait.</h2>
+                        <p class="cta-description">Call us now for immediate assistance or book an emergency appointment online.</p>
+                        
+                        <div class="cta-actions">
+                            <a href="tel:+15551234567" class="btn btn-error btn-lg">Call (555) 123-4567</a>
+                            <a href="../booking.html?service=emergency" class="btn btn-primary btn-lg">Book Emergency Visit</a>
+                        </div>
+                        
+                        <div class="emergency-notice">
+                            <i class="icon icon-info-circle"></i>
+                            <p>For life-threatening emergencies, call 911 or go to the nearest hospital emergency room.</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
     </main>
 
+    <!-- Footer -->
     <footer class="site-footer">
-        <div class="container">
-            <div class="footer-top">
-                <div class="footer-logo">
-                    <img src="../assets/images/logo-white.png" alt="Wisdom Bites Dental Clinic Logo">
-                </div>
-                <div class="footer-contact">
-                    <h3 class="footer-heading">Contact Us</h3>
-                    <address>
-                        <p>123 Dental Avenue, Smile City, SC 12345</p>
-                        <p>Phone: <a href="tel:+15551234567">+1 (555) 123-4567</a></p>
-                        <p>Email: <a href="mailto:info@wisdombites.com">info@wisdombites.com</a></p>
-                    </address>
-                </div>
-                <div class="footer-hours">
-                    <h3 class="footer-heading">Hours</h3>
-                    <ul class="hours-list">
-                        <li><span>Monday - Friday:</span> 9:00 AM - 6:00 PM</li>
-                        <li><span>Saturday:</span> 10:00 AM - 3:00 PM</li>
-                        <li><span>Sunday:</span> Closed</li>
-                    </ul>
-                </div>
-                <div class="footer-links">
-                    <h3 class="footer-heading">Quick Links</h3>
-                    <ul class="footer-nav">
-                        <li><a href="../index.html">Home</a></li>
-                        <li><a href="../about.html">About Us</a></li>
-                        <li><a href="general-dentistry.html">Services</a></li>
-                        <li><a href="../booking.html">Book Appointment</a></li>
-                        <li><a href="../contact.html">Contact</a></li>
-                    </ul>
+        <div class="footer-top">
+            <div class="container">
+                <div class="footer-widgets">
+                    <div class="footer-widget">
+                        <div class="footer-logo">
+                            <img src="../assets/images/logo-white.svg" alt="Wisdom Bites Dental Clinic" width="180" height="45">
+                        </div>
+                        <p class="footer-description">Providing exceptional dental care in a comfortable, modern environment. Our mission is to help you achieve and maintain optimal oral health.</p>
+                        <div class="social-links">
+                            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                                <i class="icon icon-facebook"></i>
+                            </a>
+                            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                                <i class="icon icon-instagram"></i>
+                            </a>
+                            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+                                <i class="icon icon-twitter"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-widget">
+                        <h3 class="footer-heading">Contact Us</h3>
+                        <address>
+                            <div class="contact-item">
+                                <i class="icon icon-map"></i>
+                                <span>123 Dental Avenue, Smile City, SC 12345</span>
+                            </div>
+                            <div class="contact-item">
+                                <i class="icon icon-phone"></i>
+                                <a href="tel:+15551234567">+1 (555) 123-4567</a>
+                            </div>
+                            <div class="contact-item">
+                                <i class="icon icon-email"></i>
+                                <a href="mailto:info@wisdombites.com">info@wisdombites.com</a>
+                            </div>
+                        </address>
+                    </div>
+                    
+                    <div class="footer-widget">
+                        <h3 class="footer-heading">Office Hours</h3>
+                        <ul class="hours-list">
+                            <li><span>Monday - Friday:</span> 9:00 AM - 6:00 PM</li>
+                            <li><span>Saturday:</span> 10:00 AM - 3:00 PM</li>
+                            <li><span>Sunday:</span> Closed</li>
+                        </ul>
+                        <div class="emergency-info">
+                            <p><strong>Dental Emergency?</strong></p>
+                            <a href="tel:+15551234567" class="btn btn-sm btn-error">Call (555) 123-4567</a>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-widget">
+                        <h3 class="footer-heading">Quick Links</h3>
+                        <ul class="footer-links">
+                            <li><a href="../index.html">Home</a></li>
+                            <li><a href="../about.html">About Us</a></li>
+                            <li><a href="general-dentistry.html">Services</a></li>
+                            <li><a href="../booking.html">Book Appointment</a></li>
+                            <li><a href="../contact.html">Contact</a></li>
+                            <li><a href="../blog.html">Blog</a></li>
+                            <li><a href="../insurance.html">Insurance Information</a></li>
+                            <li><a href="../faq.html">FAQs</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-            <div class="footer-bottom">
-                <div class="social-links">
-                    <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
-                    </a>
-                    <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-                    </a>
-                    <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
-                    </a>
-                </div>
-                <div class="copyright">
-                    <p>&copy; <script>document.write(new Date().getFullYear())</script> Wisdom Bites Dental Clinic. All Rights Reserved.</p>
-                </div>
-                <div class="footer-legal">
-                    <a href="../privacy-policy.html">Privacy Policy</a>
-                    <a href="../terms-of-service.html">Terms of Service</a>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="container">
+                <div class="footer-bottom-content">
+                    <div class="copyright">
+                        <p>&copy; <span id="current-year">2025</span> Wisdom Bites Dental Clinic. All Rights Reserved.</p>
+                    </div>
+                    <div class="footer-legal">
+                        <a href="../privacy-policy.html">Privacy Policy</a>
+                        <a href="../terms-of-service.html">Terms of Service</a>
+                        <a href="../accessibility.html">Accessibility</a>
+                    </div>
                 </div>
             </div>
         </div>
     </footer>
 
+    <!-- Back to Top Button -->
+    <a href="#" class="back-to-top" aria-label="Back to top">
+        <i class="icon icon-arrow-up"></i>
+    </a>
+
+    <!-- Emergency CTA Sticky -->
+    <div class="emergency-sticky">
+        <div class="container">
+            <p>Dental Emergency? Don't wait!</p>
+            <a href="tel:+15551234567" class="btn btn-error">Call (555) 123-4567</a>
+        </div>
+    </div>
+
     <!-- JavaScript -->
-    <script src="../assets/js/scripts.js"></script>
+    <script src="../assets/js/vendors/swiper-bundle.min.js" defer></script>
+    <script src="../assets/js/main.js" defer></script>
+    <script src="../assets/js/animations.js" defer></script>
+    
+    <!-- Initialize current year for copyright -->
+    <script>
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+        
+        // Mark body as loaded when content is ready
+        window.addEventListener('load', function() {
+            document.body.classList.add('loaded');
+            setTimeout(function() {
+                document.querySelector('.loading-screen').style.display = 'none';
+            }, 500);
+        });
+        
+        // Initialize accordion functionality for First Aid section
+        document.addEventListener('DOMContentLoaded', function() {
+            const accordionHeaders = document.querySelectorAll('.accordion-header');
+            
+            accordionHeaders.forEach(header => {
+                header.addEventListener('click', function() {
+                    const accordionItem = this.parentElement;
+                    
+                    // Close all other accordion items
+                    document.querySelectorAll('.accordion-item').forEach(item => {
+                        if (item !== accordionItem) {
+                            item.classList.remove('active');
+                        }
+                    });
+                    
+                    // Toggle current accordion item
+                    accordionItem.classList.toggle('active');
+                });
+            });
+        });
+    </script>
 </body>
-</html> 
+</html>

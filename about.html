@@ -3,238 +3,650 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Learn about Wisdom Bites Dental Clinic, our experienced team, and our commitment to exceptional dental care and patient comfort.">
-    <meta name="keywords" content="dental clinic, dentist team, dental professionals, dental care, dental experience">
+    <meta name="description" content="Learn about Wisdom Bites Dental Clinic, our expert team of dentists, our mission, and our approach to providing exceptional dental care in a comfortable environment.">
+    <meta name="keywords" content="dental clinic, dentist, dental team, dental practice history, dental mission statement, dental care philosophy">
     <title>About Us | Wisdom Bites Dental Clinic</title>
     
     <!-- Favicon -->
     <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
     
-    <!-- CSS -->
-    <link rel="stylesheet" href="assets/css/styles.css">
-    <link rel="stylesheet" href="assets/css/animations.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Critical CSS -->
+    <style>
+        :root {
+            /* Modern color palette */
+            --primary: #4a90e2;
+            --primary-dark: #3a7abd;
+            --secondary: #50c878;
+            --secondary-dark: #3ca45e;
+            --accent: #f5a623;
+            --dark: #2d3748;
+            --light: #f8fafc;
+            --white: #ffffff;
+            
+            /* Typography */
+            --font-heading: 'Montserrat', sans-serif;
+            --font-body: 'Open Sans', sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-body);
+            color: var(--dark);
+            background-color: var(--light);
+            overflow-x: hidden;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        body.loaded {
+            opacity: 1;
+        }
+        
+        .site-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background-color: transparent;
+            transition: background-color 0.3s ease, padding 0.3s ease;
+            padding: 1.5rem 0;
+        }
+        
+        .site-header.scrolled {
+            background-color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 0.75rem 0;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+    </style>
+    
+    <!-- Main CSS (loaded asynchronously) -->
+    <link rel="stylesheet" href="assets/css/styles.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="assets/css/animations.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="assets/css/responsive.css" media="print" onload="this.media='all'">
+    
+    <!-- Preload critical assets -->
+    <link rel="preload" href="assets/images/about-hero.webp" as="image">
+    <link rel="preload" href="assets/fonts/icons.woff2" as="font" type="font/woff2" crossorigin>
+    
+    <!-- Schema Markup for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Dentist",
+        "name": "Wisdom Bites Dental Clinic",
+        "image": "assets/images/logo.png",
+        "url": "https://wisdombites.com/about.html",
+        "telephone": "+1-555-123-4567",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "123 Dental Avenue",
+            "addressLocality": "Smile City",
+            "addressRegion": "SC",
+            "postalCode": "12345",
+            "addressCountry": "US"
+        },
+        "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": "40.7128",
+            "longitude": "-74.0060"
+        },
+        "openingHoursSpecification": [
+            {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                "opens": "09:00",
+                "closes": "18:00"
+            },
+            {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": "Saturday",
+                "opens": "10:00",
+                "closes": "15:00"
+            }
+        ],
+        "sameAs": [
+            "https://www.facebook.com/wisdombites",
+            "https://www.instagram.com/wisdombites",
+            "https://twitter.com/wisdombites"
+        ],
+        "description": "Wisdom Bites Dental Clinic provides comprehensive dental care in a comfortable, modern environment. Our team of experienced dentists is dedicated to helping you achieve optimal oral health.",
+        "priceRange": "$$$",
+        "employee": [
+            {
+                "@type": "Person",
+                "name": "Dr. Emily Chen",
+                "jobTitle": "Founder & Lead Dentist",
+                "image": "assets/images/doctor-1.jpg"
+            },
+            {
+                "@type": "Person",
+                "name": "Dr. James Wilson",
+                "jobTitle": "Orthodontist",
+                "image": "assets/images/doctor-2.jpg"
+            },
+            {
+                "@type": "Person",
+                "name": "Dr. Sophia Rodriguez",
+                "jobTitle": "Pediatric Dentist",
+                "image": "assets/images/doctor-3.jpg"
+            }
+        ]
+    }
+    </script>
 </head>
 <body>
+    <!-- Loading Screen -->
+    <div class="loading-screen">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Header -->
     <header class="site-header">
         <div class="container">
-            <div class="logo">
-                <a href="index.html">
-                    <img src="assets/images/logo.png" alt="Wisdom Bites Dental Clinic Logo">
-                </a>
-            </div>
-            <nav class="main-nav">
-                <button class="menu-toggle" aria-label="Toggle menu">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-                <ul class="nav-list">
-                    <li class="nav-item"><a href="index.html">Home</a></li>
-                    <li class="nav-item"><a href="about.html" class="active">About Us</a></li>
-                    <li class="nav-item has-dropdown">
-                        <a href="#" class="dropdown-toggle">Services</a>
-                        <ul class="dropdown-menu">
-                            <li><a href="services/general-dentistry.html">General Dentistry</a></li>
-                            <li><a href="services/cosmetic-dentistry.html">Cosmetic Dentistry</a></li>
-                            <li><a href="services/emergency-care.html">Emergency Care</a></li>
+            <div class="header-wrapper">
+                <div class="logo">
+                    <a href="index.html" aria-label="Wisdom Bites Dental Clinic">
+                        <img src="assets/images/logo.svg" alt="Wisdom Bites Dental Clinic Logo" width="180" height="45">
+                    </a>
+                </div>
+                
+                <nav class="main-nav">
+                    <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false">
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                    </button>
+                    
+                    <div class="nav-container">
+                        <ul class="nav-list">
+                            <li class="nav-item"><a href="index.html">Home</a></li>
+                            <li class="nav-item"><a href="about.html" class="active">About Us</a></li>
+                            <li class="nav-item has-dropdown">
+                                <a href="#" class="dropdown-toggle">Services</a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="services/general-dentistry.html">General Dentistry</a></li>
+                                    <li><a href="services/cosmetic-dentistry.html">Cosmetic Dentistry</a></li>
+                                    <li><a href="services/emergency-care.html">Emergency Care</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item"><a href="booking.html">Book Appointment</a></li>
+                            <li class="nav-item"><a href="contact.html">Contact</a></li>
                         </ul>
-                    </li>
-                    <li class="nav-item"><a href="booking.html">Book Appointment</a></li>
-                    <li class="nav-item"><a href="contact.html">Contact</a></li>
-                </ul>
-            </nav>
-            <div class="header-cta">
-                <a href="booking.html" class="btn btn-primary">Book Now</a>
+                        
+                        <div class="nav-cta">
+                            <a href="tel:+15551234567" class="phone-link">
+                                <i class="icon icon-phone"></i>
+                                <span>(555) 123-4567</span>
+                            </a>
+                            <a href="booking.html" class="btn btn-primary">Book Now</a>
+                        </div>
+                    </div>
+                </nav>
             </div>
         </div>
     </header>
 
     <main>
         <!-- Hero Section -->
-        <section class="page-hero">
+        <section class="page-hero about-hero">
+            <div class="hero-background">
+                <picture>
+                    <source srcset="assets/images/about-hero.webp" type="image/webp">
+                    <source srcset="assets/images/about-hero.jpg" type="image/jpeg">
+                    <img src="assets/images/about-hero.jpg" alt="Wisdom Bites Dental Clinic team" loading="eager">
+                </picture>
+                <div class="hero-overlay"></div>
+            </div>
+            
             <div class="container">
                 <div class="page-hero-content">
-                    <h1 class="page-title">About Wisdom Bites</h1>
-                    <p class="page-subtitle">Modern dentistry with a compassionate approach</p>
+                    <h1 class="page-title" data-animation="fade-up">About Us</h1>
+                    <p class="page-subtitle" data-animation="fade-up" data-delay="0.2">Get to know our dental practice and team</p>
                 </div>
+            </div>
+            
+            <div class="hero-waves">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+                    <path fill="#ffffff" fill-opacity="1" d="M0,64L48,80C96,96,192,128,288,133.3C384,139,480,117,576,122.7C672,128,768,160,864,186.7C960,213,1056,235,1152,229.3C1248,224,1344,192,1392,176L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+                </svg>
             </div>
         </section>
 
         <!-- Our Story Section -->
-        <section class="our-story">
+        <section class="our-story-section">
             <div class="container">
-                <div class="section-header">
-                    <h2 class="section-title">Our Story</h2>
-                    <p class="section-subtitle">A legacy of dental excellence since 2005</p>
-                </div>
                 <div class="story-content">
-                    <div class="story-image">
-                        <img src="assets/images/clinic-exterior.jpg" alt="Wisdom Bites Dental Clinic Exterior" loading="lazy">
+                    <div class="story-text" data-animation="fade-right">
+                        <span class="section-tagline">Our Journey</span>
+                        <h2 class="section-title">The Wisdom Bites Story</h2>
+                        
+                        <p>Wisdom Bites Dental Clinic was founded in 2010 by Dr. Emily Chen with a clear vision — to create a dental practice where patients would feel genuinely cared for, comfortable, and confident in the quality of care they receive.</p>
+                        
+                        <p>After years of practicing in traditional dental offices, Dr. Chen recognized the need for a different approach to dental care. She observed that many patients delayed necessary treatment due to anxiety, confusion about treatment options, or previous negative experiences. This inspired her to establish a practice centered around patient education, comfort, and transparent communication.</p>
+                        
+                        <p>The name "Wisdom Bites" reflects our philosophy that dental knowledge should be accessible and easy to understand. We believe that when patients are well-informed about their oral health, they make better decisions and experience better outcomes.</p>
+                        
+                        <p>Starting with just two treatment rooms and a small team, we've grown to become a comprehensive dental center with state-of-the-art facilities and a diverse team of specialists. Throughout our growth, we've remained committed to our founding principles of patient-centered care, clinical excellence, and creating positive dental experiences.</p>
+                        
+                        <p>Today, we're proud to serve thousands of patients in the Smile City community and surrounding areas, helping them achieve and maintain their healthiest smiles.</p>
                     </div>
-                    <div class="story-text">
-                        <p>Wisdom Bites Dental Clinic was founded in 2005 by Dr. Emily Chen with a simple but powerful vision: to transform the dental experience from one of anxiety to one of comfort and trust.</p>
-                        <p>Starting with just two treatment rooms and a small team, we've grown to become one of the most respected dental practices in the region, with state-of-the-art facilities and a diverse team of specialists covering all aspects of dental care.</p>
-                        <p>Despite our growth, we've never lost sight of our founding principle: that each patient deserves personalized, compassionate care and the highest quality treatment available.</p>
+                    
+                    <div class="story-image" data-animation="fade-left">
+                        <div class="image-wrapper">
+                            <img src="assets/images/clinic-building.jpg" alt="Wisdom Bites Dental Clinic exterior" width="540" height="400" loading="lazy">
+                            <div class="experience-badge">
+                                <span class="years">15+</span>
+                                <span class="text">Years of Excellence</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Mission & Values Section -->
-        <section class="mission-values">
+        <!-- Mission and Values Section -->
+        <section class="mission-values-section">
             <div class="container">
-                <div class="section-header">
+                <div class="section-header" data-animation="fade-up">
+                    <span class="section-tagline">What Drives Us</span>
                     <h2 class="section-title">Our Mission & Values</h2>
-                    <p class="section-subtitle">What drives us every day</p>
+                    <p class="section-subtitle">The principles that guide our practice</p>
                 </div>
-                <div class="mission-content">
-                    <div class="mission-statement">
-                        <h3>Our Mission</h3>
-                        <p>To provide exceptional dental care in a comfortable environment where patients feel valued, respected, and confident in their treatment. We strive to improve the oral health of our community through education, prevention, and personalized care.</p>
+                
+                <div class="mission-statement" data-animation="fade-up">
+                    <div class="mission-icon">
+                        <i class="icon icon-mission"></i>
                     </div>
-                    <div class="values-grid">
-                        <div class="value-card">
-                            <div class="value-icon">
-                                <img src="assets/images/icon-excellence.svg" alt="Excellence Icon">
-                            </div>
-                            <h3 class="value-title">Excellence</h3>
-                            <p class="value-description">We pursue the highest standards in clinical care and patient service.</p>
+                    <div class="mission-content">
+                        <h3>Our Mission</h3>
+                        <p>To provide exceptional dental care that enhances our patients' quality of life through improved oral health, beautiful smiles, and positive dental experiences, while maintaining the highest standards of clinical excellence, integrity, and compassion.</p>
+                    </div>
+                </div>
+                
+                <div class="values-grid">
+                    <!-- Value 1 -->
+                    <div class="value-card" data-animation="fade-up">
+                        <div class="value-icon">
+                            <i class="icon icon-patient-centered"></i>
                         </div>
-                        <div class="value-card">
-                            <div class="value-icon">
-                                <img src="assets/images/icon-compassion.svg" alt="Compassion Icon">
-                            </div>
-                            <h3 class="value-title">Compassion</h3>
-                            <p class="value-description">We treat our patients with kindness, understanding, and empathy.</p>
+                        <h3>Patient-Centered Care</h3>
+                        <p>We place our patients' needs, preferences, and comfort at the center of everything we do. Each treatment plan is personalized to address individual concerns and achieve optimal outcomes.</p>
+                    </div>
+                    
+                    <!-- Value 2 -->
+                    <div class="value-card" data-animation="fade-up" data-delay="0.2">
+                        <div class="value-icon">
+                            <i class="icon icon-excellence"></i>
                         </div>
-                        <div class="value-card">
-                            <div class="value-icon">
-                                <img src="assets/images/icon-integrity.svg" alt="Integrity Icon">
-                            </div>
-                            <h3 class="value-title">Integrity</h3>
-                            <p class="value-description">We practice honest communication and ethical treatment decisions.</p>
+                        <h3>Clinical Excellence</h3>
+                        <p>We are committed to delivering the highest quality dental care through continuous education, advanced technology, and evidence-based practices. We never stop learning and improving our skills.</p>
+                    </div>
+                    
+                    <!-- Value 3 -->
+                    <div class="value-card" data-animation="fade-up" data-delay="0.4">
+                        <div class="value-icon">
+                            <i class="icon icon-compassion"></i>
                         </div>
-                        <div class="value-card">
-                            <div class="value-icon">
-                                <img src="assets/images/icon-innovation.svg" alt="Innovation Icon">
-                            </div>
-                            <h3 class="value-title">Innovation</h3>
-                            <p class="value-description">We embrace new technologies and techniques to improve patient outcomes.</p>
+                        <h3>Compassion & Empathy</h3>
+                        <p>We understand dental anxiety and treat every patient with kindness, patience, and respect. Our team takes the time to listen, answer questions, and ensure you feel comfortable and cared for.</p>
+                    </div>
+                    
+                    <!-- Value 4 -->
+                    <div class="value-card" data-animation="fade-up" data-delay="0.6">
+                        <div class="value-icon">
+                            <i class="icon icon-integrity"></i>
                         </div>
+                        <h3>Integrity & Transparency</h3>
+                        <p>We maintain the highest ethical standards in all aspects of our practice. We provide clear information about treatment options, costs, and expectations, empowering patients to make informed decisions.</p>
+                    </div>
+                    
+                    <!-- Value 5 -->
+                    <div class="value-card" data-animation="fade-up" data-delay="0.8">
+                        <div class="value-icon">
+                            <i class="icon icon-innovation"></i>
+                        </div>
+                        <h3>Innovation & Progress</h3>
+                        <p>We embrace advancements in dental technology and techniques that improve patient care, comfort, and outcomes. Our practice continuously evolves to incorporate best practices and innovations.</p>
+                    </div>
+                    
+                    <!-- Value 6 -->
+                    <div class="value-card" data-animation="fade-up" data-delay="1.0">
+                        <div class="value-icon">
+                            <i class="icon icon-community"></i>
+                        </div>
+                        <h3>Community Engagement</h3>
+                        <p>We are committed to making a positive impact in our community through education, outreach, and service. We believe that oral health education and access to quality dental care should be available to everyone.</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Meet the Team Section -->
-        <section class="team-section">
+        <section class="team-section" id="team">
             <div class="container">
-                <div class="section-header">
-                    <h2 class="section-title">Meet Our Team</h2>
-                    <p class="section-subtitle">Experienced professionals committed to your smile</p>
+                <div class="section-header" data-animation="fade-up">
+                    <span class="section-tagline">Our Experts</span>
+                    <h2 class="section-title">Meet Our Dental Team</h2>
+                    <p class="section-subtitle">Dedicated professionals committed to your oral health</p>
                 </div>
-                <div class="team-grid">
-                    <!-- Doctor 1 -->
-                    <div class="team-member">
-                        <div class="member-image">
-                            <img src="assets/images/doctor-1.jpg" alt="Dr. Emily Chen" loading="lazy">
-                        </div>
-                        <div class="member-details">
-                            <h3 class="member-name">Dr. Emily Chen</h3>
-                            <p class="member-role">Founder & Lead Dentist</p>
-                            <div class="member-specialties">
-                                <span class="specialty">General Dentistry</span>
-                                <span class="specialty">Cosmetic Dentistry</span>
+                
+                <!-- Dentists -->
+                <div class="team-category" data-animation="fade-up">
+                    <h3 class="category-title">Our Dentists</h3>
+                    
+                    <div class="team-grid">
+                        <!-- Dentist 1 -->
+                        <div class="team-member" id="dr-chen">
+                            <div class="member-image">
+                                <img src="assets/images/doctor-1.jpg" alt="Dr. Emily Chen" width="300" height="400" loading="lazy">
+                                <div class="member-social">
+                                    <a href="#" aria-label="LinkedIn profile"><i class="icon icon-linkedin"></i></a>
+                                    <a href="#" aria-label="Twitter profile"><i class="icon icon-twitter"></i></a>
+                                </div>
                             </div>
-                            <p class="member-bio">Dr. Chen graduated from Harvard School of Dental Medicine and has over 20 years of experience. She is passionate about creating beautiful, healthy smiles and making patients feel at ease.</p>
-                        </div>
-                    </div>
-                    <!-- Doctor 2 -->
-                    <div class="team-member">
-                        <div class="member-image">
-                            <img src="assets/images/doctor-2.jpg" alt="Dr. James Wilson" loading="lazy">
-                        </div>
-                        <div class="member-details">
-                            <h3 class="member-name">Dr. James Wilson</h3>
-                            <p class="member-role">Orthodontist</p>
-                            <div class="member-specialties">
-                                <span class="specialty">Orthodontics</span>
-                                <span class="specialty">Invisalign</span>
+                            <div class="member-info">
+                                <h4 class="member-name">Dr. Emily Chen</h4>
+                                <p class="member-title">Founder & Lead Dentist</p>
+                                <div class="member-specialties">
+                                    <span>General Dentistry</span>
+                                    <span>Cosmetic Dentistry</span>
+                                </div>
+                                <div class="member-details">
+                                    <p>Dr. Chen earned her Doctor of Dental Surgery degree from the University of Pennsylvania School of Dental Medicine, graduating with honors. She has over 15 years of experience in general and cosmetic dentistry and is known for her gentle approach and meticulous attention to detail.</p>
+                                    <p>She is an active member of the American Dental Association, Academy of General Dentistry, and American Academy of Cosmetic Dentistry. Dr. Chen regularly participates in continuing education to stay at the forefront of dental advancements.</p>
+                                    <p>Outside the office, Dr. Chen enjoys hiking, cooking, and volunteering with community dental outreach programs.</p>
+                                </div>
                             </div>
-                            <p class="member-bio">Dr. Wilson specializes in creating perfectly aligned smiles with both traditional braces and invisible aligners. His gentle approach makes orthodontic treatment a positive experience for patients of all ages.</p>
                         </div>
-                    </div>
-                    <!-- Doctor 3 -->
-                    <div class="team-member">
-                        <div class="member-image">
-                            <img src="assets/images/doctor-3.jpg" alt="Dr. Sophia Rodriguez" loading="lazy">
-                        </div>
-                        <div class="member-details">
-                            <h3 class="member-name">Dr. Sophia Rodriguez</h3>
-                            <p class="member-role">Pediatric Dentist</p>
-                            <div class="member-specialties">
-                                <span class="specialty">Pediatric Dentistry</span>
-                                <span class="specialty">Preventive Care</span>
+                        
+                        <!-- Dentist 2 -->
+                        <div class="team-member" id="dr-wilson">
+                            <div class="member-image">
+                                <img src="assets/images/doctor-2.jpg" alt="Dr. James Wilson" width="300" height="400" loading="lazy">
+                                <div class="member-social">
+                                    <a href="#" aria-label="LinkedIn profile"><i class="icon icon-linkedin"></i></a>
+                                    <a href="#" aria-label="Twitter profile"><i class="icon icon-twitter"></i></a>
+                                </div>
                             </div>
-                            <p class="member-bio">Dr. Rodriguez has a special gift for working with children. She creates a fun, relaxing environment that helps young patients develop positive associations with dental care from an early age.</p>
+                            <div class="member-info">
+                                <h4 class="member-name">Dr. James Wilson</h4>
+                                <p class="member-title">Orthodontist</p>
+                                <div class="member-specialties">
+                                    <span>Orthodontics</span>
+                                    <span>Invisalign</span>
+                                </div>
+                                <div class="member-details">
+                                    <p>Dr. Wilson received his dental degree from NYU College of Dentistry and completed his orthodontic specialty training at Columbia University. He has been creating beautiful, functional smiles for over a decade and is a certified Invisalign provider.</p>
+                                    <p>He is a member of the American Association of Orthodontists and has published research on efficient orthodontic treatment techniques. Dr. Wilson is particularly passionate about helping adults achieve their ideal smiles through discreet orthodontic options.</p>
+                                    <p>When not straightening teeth, Dr. Wilson enjoys playing guitar, cycling, and spending time with his wife and two children.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Dentist 3 -->
+                        <div class="team-member" id="dr-rodriguez">
+                            <div class="member-image">
+                                <img src="assets/images/doctor-3.jpg" alt="Dr. Sophia Rodriguez" width="300" height="400" loading="lazy">
+                                <div class="member-social">
+                                    <a href="#" aria-label="LinkedIn profile"><i class="icon icon-linkedin"></i></a>
+                                    <a href="#" aria-label="Twitter profile"><i class="icon icon-twitter"></i></a>
+                                </div>
+                            </div>
+                            <div class="member-info">
+                                <h4 class="member-name">Dr. Sophia Rodriguez</h4>
+                                <p class="member-title">Pediatric Dentist</p>
+                                <div class="member-specialties">
+                                    <span>Pediatric Dentistry</span>
+                                    <span>Preventive Care</span>
+                                </div>
+                                <div class="member-details">
+                                    <p>Dr. Rodriguez earned her DMD from Tufts University School of Dental Medicine and completed her pediatric dentistry residency at Boston Children's Hospital. She has specialized training in treating children with special needs and dental anxiety.</p>
+                                    <p>She is board-certified by the American Board of Pediatric Dentistry and is a member of the American Academy of Pediatric Dentistry. Dr. Rodriguez has a gift for making dental visits fun and non-threatening for young patients.</p>
+                                    <p>In her spare time, Dr. Rodriguez enjoys painting, traveling, and volunteering with organizations that provide dental care to underserved children.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <!-- Staff Member 1 -->
-                    <div class="team-member">
-                        <div class="member-image">
-                            <img src="assets/images/staff-1.jpg" alt="Sarah Thompson" loading="lazy">
+                </div>
+                
+                <!-- Dental Hygienists -->
+                <div class="team-category" data-animation="fade-up">
+                    <h3 class="category-title">Our Dental Hygienists</h3>
+                    
+                    <div class="team-grid team-grid-compact">
+                        <!-- Hygienist 1 -->
+                        <div class="team-member-compact">
+                            <div class="member-image">
+                                <img src="assets/images/hygienist-1.jpg" alt="Sarah Johnson" width="200" height="200" loading="lazy">
+                            </div>
+                            <div class="member-info">
+                                <h4 class="member-name">Sarah Johnson</h4>
+                                <p class="member-title">Lead Dental Hygienist</p>
+                                <p class="member-bio">With over 10 years of experience, Sarah is known for her gentle technique and thorough cleanings. She is passionate about patient education and preventive care.</p>
+                            </div>
                         </div>
-                        <div class="member-details">
-                            <h3 class="member-name">Sarah Thompson</h3>
-                            <p class="member-role">Dental Hygienist</p>
-                            <p class="member-bio">With over 10 years of experience, Sarah is known for her gentle touch and thoroughness. She's passionate about patient education and helping people maintain optimal oral health.</p>
+                        
+                        <!-- Hygienist 2 -->
+                        <div class="team-member-compact">
+                            <div class="member-image">
+                                <img src="assets/images/hygienist-2.jpg" alt="Michael Brown" width="200" height="200" loading="lazy">
+                            </div>
+                            <div class="member-info">
+                                <h4 class="member-name">Michael Brown</h4>
+                                <p class="member-title">Dental Hygienist</p>
+                                <p class="member-bio">Michael specializes in periodontal care and is skilled at helping patients with dental anxiety feel comfortable during their cleaning appointments.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Hygienist 3 -->
+                        <div class="team-member-compact">
+                            <div class="member-image">
+                                <img src="assets/images/hygienist-3.jpg" alt="Lisa Patel" width="200" height="200" loading="lazy">
+                            </div>
+                            <div class="member-info">
+                                <h4 class="member-name">Lisa Patel</h4>
+                                <p class="member-title">Dental Hygienist</p>
+                                <p class="member-bio">Lisa has a special focus on pediatric dental hygiene and excels at making cleaning appointments enjoyable for our youngest patients.</p>
+                            </div>
                         </div>
                     </div>
-                    <!-- Staff Member 2 -->
-                    <div class="team-member">
-                        <div class="member-image">
-                            <img src="assets/images/staff-2.jpg" alt="Michael Davis" loading="lazy">
+                </div>
+                
+                <!-- Support Team -->
+                <div class="team-category" data-animation="fade-up">
+                    <h3 class="category-title">Our Support Team</h3>
+                    
+                    <div class="team-grid team-grid-compact">
+                        <!-- Staff 1 -->
+                        <div class="team-member-compact">
+                            <div class="member-image">
+                                <img src="assets/images/staff-1.jpg" alt="Jessica Martinez" width="200" height="200" loading="lazy">
+                            </div>
+                            <div class="member-info">
+                                <h4 class="member-name">Jessica Martinez</h4>
+                                <p class="member-title">Office Manager</p>
+                                <p class="member-bio">Jessica oversees daily operations and ensures everything runs smoothly. She is an expert at helping patients navigate insurance and financing options.</p>
+                            </div>
                         </div>
-                        <div class="member-details">
-                            <h3 class="member-name">Michael Davis</h3>
-                            <p class="member-role">Office Manager</p>
-                            <p class="member-bio">Michael ensures that everything runs smoothly at Wisdom Bites. From scheduling to insurance questions, he's dedicated to making your experience as seamless as possible.</p>
+                        
+                        <!-- Staff 2 -->
+                        <div class="team-member-compact">
+                            <div class="member-image">
+                                <img src="assets/images/staff-2.jpg" alt="Robert Kim" width="200" height="200" loading="lazy">
+                            </div>
+                            <div class="member-info">
+                                <h4 class="member-name">Robert Kim</h4>
+                                <p class="member-title">Dental Assistant</p>
+                                <p class="member-bio">Robert assists our dentists during procedures, prepares treatment rooms, and helps ensure patients are comfortable throughout their visit.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Staff 3 -->
+                        <div class="team-member-compact">
+                            <div class="member-image">
+                                <img src="assets/images/staff-3.jpg" alt="Tanya Williams" width="200" height="200" loading="lazy">
+                            </div>
+                            <div class="member-info">
+                                <h4 class="member-name">Tanya Williams</h4>
+                                <p class="member-title">Front Desk Coordinator</p>
+                                <p class="member-bio">Tanya is often the first person you'll meet at our office. She manages scheduling, welcomes patients, and ensures a seamless check-in process.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Staff 4 -->
+                        <div class="team-member-compact">
+                            <div class="member-image">
+                                <img src="assets/images/staff-4.jpg" alt="David Thompson" width="200" height="200" loading="lazy">
+                            </div>
+                            <div class="member-info">
+                                <h4 class="member-name">David Thompson</h4>
+                                <p class="member-title">Dental Assistant</p>
+                                <p class="member-bio">David brings a calm, reassuring presence to the treatment room and is particularly skilled at helping anxious patients feel at ease.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Our Clinic Section -->
-        <section class="clinic-section">
+        <!-- Office Tour Section -->
+        <section class="office-tour-section">
             <div class="container">
-                <div class="section-header">
-                    <h2 class="section-title">Our Clinic</h2>
-                    <p class="section-subtitle">Modern facilities designed for your comfort</p>
+                <div class="section-header" data-animation="fade-up">
+                    <span class="section-tagline">Our Facilities</span>
+                    <h2 class="section-title">Tour Our Modern Dental Office</h2>
+                    <p class="section-subtitle">A comfortable environment with state-of-the-art technology</p>
                 </div>
-                <div class="clinic-gallery">
-                    <div class="clinic-video">
-                        <div class="video-wrapper">
-                            <img src="assets/images/clinic-video-placeholder.jpg" alt="Clinic Tour Video Thumbnail" class="video-thumbnail">
-                            <button class="play-button" aria-label="Play clinic tour video">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                
+                <div class="office-gallery" data-animation="fade-up">
+                    <div class="gallery-slider">
+                        <div class="swiper-container">
+                            <div class="swiper-wrapper">
+                                <!-- Gallery Image 1 -->
+                                <div class="swiper-slide">
+                                    <div class="gallery-item">
+                                        <img src="assets/images/office-reception.jpg" alt="Modern reception area" loading="lazy">
+                                        <div class="gallery-caption">
+                                            <h4>Welcoming Reception Area</h4>
+                                            <p>Our comfortable reception area is designed to make you feel at home from the moment you arrive.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Gallery Image 2 -->
+                                <div class="swiper-slide">
+                                    <div class="gallery-item">
+                                        <img src="assets/images/office-treatment.jpg" alt="Modern treatment room" loading="lazy">
+                                        <div class="gallery-caption">
+                                            <h4>Treatment Rooms</h4>
+                                            <p>Our spacious treatment rooms feature comfortable chairs, ceiling-mounted TVs, and the latest dental technology.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Gallery Image 3 -->
+                                <div class="swiper-slide">
+                                    <div class="gallery-item">
+                                        <img src="assets/images/office-equipment.jpg" alt="Advanced dental equipment" loading="lazy">
+                                        <div class="gallery-caption">
+                                            <h4>Advanced Technology</h4>
+                                            <p>We invest in the latest dental technology to provide efficient, precise, and comfortable treatment.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Gallery Image 4 -->
+                                <div class="swiper-slide">
+                                    <div class="gallery-item">
+                                        <img src="assets/images/office-kids.jpg" alt="Kids dental area" loading="lazy">
+                                        <div class="gallery-caption">
+                                            <h4>Children's Area</h4>
+                                            <p>Our specially designed children's area makes dental visits fun and engaging for our youngest patients.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Gallery Image 5 -->
+                                <div class="swiper-slide">
+                                    <div class="gallery-item">
+                                        <img src="assets/images/office-consultation.jpg" alt="Consultation room" loading="lazy">
+                                        <div class="gallery-caption">
+                                            <h4>Consultation Room</h4>
+                                            <p>Our private consultation room provides a comfortable space to discuss treatment options and ask questions.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="gallery-navigation">
+                            <button class="slider-button prev" aria-label="Previous image">
+                                <i class="icon icon-arrow-left"></i>
+                            </button>
+                            <div class="swiper-pagination"></div>
+                            <button class="slider-button next" aria-label="Next image">
+                                <i class="icon icon-arrow-right"></i>
                             </button>
                         </div>
-                        <p class="video-caption">Take a virtual tour of our state-of-the-art facility</p>
                     </div>
-                    <div class="clinic-photos">
-                        <div class="photo-grid">
-                            <div class="clinic-photo">
-                                <img src="assets/images/clinic-reception.jpg" alt="Clinic Reception Area" loading="lazy">
+                </div>
+                
+                <div class="office-features" data-animation="fade-up">
+                    <div class="features-grid">
+                        <!-- Feature 1 -->
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="icon icon-technology"></i>
                             </div>
-                            <div class="clinic-photo">
-                                <img src="assets/images/clinic-treatment-room.jpg" alt="Treatment Room" loading="lazy">
+                            <div class="feature-text">
+                                <h4>Advanced Technology</h4>
+                                <p>Digital X-rays, intraoral cameras, laser dentistry, and CAD/CAM same-day restorations.</p>
                             </div>
-                            <div class="clinic-photo">
-                                <img src="assets/images/clinic-waiting-area.jpg" alt="Waiting Area" loading="lazy">
+                        </div>
+                        
+                        <!-- Feature 2 -->
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="icon icon-comfort"></i>
                             </div>
-                            <div class="clinic-photo">
-                                <img src="assets/images/clinic-equipment.jpg" alt="Dental Equipment" loading="lazy">
+                            <div class="feature-text">
+                                <h4>Comfort Amenities</h4>
+                                <p>Noise-cancelling headphones, blankets, pillows, and ceiling-mounted TVs.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Feature 3 -->
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="icon icon-safety"></i>
+                            </div>
+                            <div class="feature-text">
+                                <h4>Safety Standards</h4>
+                                <p>Exceeding industry standards for sterilization and infection control protocols.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Feature 4 -->
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="icon icon-accessibility"></i>
+                            </div>
+                            <div class="feature-text">
+                                <h4>Accessibility</h4>
+                                <p>Wheelchair accessible facility with ground-floor treatment rooms.</p>
                             </div>
                         </div>
                     </div>
@@ -242,75 +654,307 @@
             </div>
         </section>
 
-        <!-- CTA Section -->
+        <!-- Testimonials Section -->
+        <section class="testimonials testimonials-compact">
+            <div class="container">
+                <div class="section-header" data-animation="fade-up">
+                    <span class="section-tagline">What Patients Say</span>
+                    <h2 class="section-title">Patient Testimonials</h2>
+                    <p class="section-subtitle">The experiences of those we've served</p>
+                </div>
+                
+                <div class="testimonials-slider" data-animation="fade-up">
+                    <div class="swiper-container">
+                        <div class="swiper-wrapper">
+                            <!-- Testimonial 1 -->
+                            <div class="swiper-slide">
+                                <div class="testimonial-card">
+                                    <div class="testimonial-rating">
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                    </div>
+                                    <blockquote class="testimonial-quote">
+                                        <p>I've been a patient at Wisdom Bites for over 5 years, and I can't imagine going anywhere else. The entire team is professional, caring, and genuinely committed to providing exceptional care. Dr. Chen takes the time to explain everything and always ensures I'm comfortable. The office is beautiful, and they're always on time!</p>
+                                    </blockquote>
+                                    <div class="testimonial-author">
+                                        <img src="assets/images/testimonial-author-1.jpg" alt="Amanda Johnson" class="author-image" width="60" height="60" loading="lazy">
+                                        <div class="author-details">
+                                            <p class="author-name">Amanda Johnson</p>
+                                            <p class="author-info">Patient for 5 years</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Testimonial 2 -->
+                            <div class="swiper-slide">
+                                <div class="testimonial-card">
+                                    <div class="testimonial-rating">
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                    </div>
+                                    <blockquote class="testimonial-quote">
+                                        <p>As someone with severe dental anxiety, finding Wisdom Bites has been life-changing. Dr. Rodriguez is incredibly patient and understanding. The staff takes extra steps to ensure I'm relaxed and comfortable during every visit. For the first time in my life, I don't dread going to the dentist. I highly recommend them to anyone with dental fears.</p>
+                                    </blockquote>
+                                    <div class="testimonial-author">
+                                        <img src="assets/images/testimonial-author-2.jpg" alt="Mark Thompson" class="author-image" width="60" height="60" loading="lazy">
+                                        <div class="author-details">
+                                            <p class="author-name">Mark Thompson</p>
+                                            <p class="author-info">Patient with dental anxiety</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Testimonial 3 -->
+                            <div class="swiper-slide">
+                                <div class="testimonial-card">
+                                    <div class="testimonial-rating">
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                    </div>
+                                    <blockquote class="testimonial-quote">
+                                        <p>My children actually look forward to their dental appointments at Wisdom Bites! Dr. Rodriguez has a special way with kids, making them feel comfortable and excited about dental care. The children's area is fantastic, and the staff treats them with such kindness. As a parent, I appreciate the focus on education and prevention to establish good habits early.</p>
+                                    </blockquote>
+                                    <div class="testimonial-author">
+                                        <img src="assets/images/testimonial-author-3.jpg" alt="Jennifer Williams" class="author-image" width="60" height="60" loading="lazy">
+                                        <div class="author-details">
+                                            <p class="author-name">Jennifer Williams</p>
+                                            <p class="author-info">Parent of two young patients</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="testimonials-navigation">
+                        <button class="slider-button prev" aria-label="Previous testimonial">
+                            <i class="icon icon-arrow-left"></i>
+                        </button>
+                        <div class="swiper-pagination"></div>
+                        <button class="slider-button next" aria-label="Next testimonial">
+                            <i class="icon icon-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="testimonials-cta" data-animation="fade-up">
+                    <div class="rating-summary">
+                        <div class="rating-stars">
+                            <i class="icon icon-star"></i>
+                            <i class="icon icon-star"></i>
+                            <i class="icon icon-star"></i>
+                            <i class="icon icon-star"></i>
+                            <i class="icon icon-star"></i>
+                        </div>
+                        <div class="rating-text">
+                            <span class="rating-score">4.9/5</span>
+                            <span class="rating-count">Based on 125+ verified reviews</span>
+                        </div>
+                    </div>
+                    <a href="reviews.html" class="btn btn-text">Read More Patient Stories <i class="icon icon-arrow-right"></i></a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Community Involvement Section -->
+        <section class="community-section">
+            <div class="container">
+                <div class="section-header" data-animation="fade-up">
+                    <span class="section-tagline">Making A Difference</span>
+                    <h2 class="section-title">Our Community Involvement</h2>
+                    <p class="section-subtitle">Giving back through outreach and education</p>
+                </div>
+                
+                <div class="community-content">
+                    <div class="community-text" data-animation="fade-right">
+                        <p>At Wisdom Bites Dental Clinic, we believe in the importance of giving back to the community that has supported us. Our team is actively involved in various initiatives aimed at improving oral health awareness and access to dental care for underserved populations.</p>
+                        
+                        <h3>Our Community Programs:</h3>
+                        
+                        <div class="program-item">
+                            <h4>School Education Program</h4>
+                            <p>Our team visits local schools to provide fun, interactive oral health education sessions. We teach children about proper brushing and flossing techniques, healthy eating habits, and the importance of regular dental check-ups.</p>
+                        </div>
+                        
+                        <div class="program-item">
+                            <h4>Smiles for All Initiative</h4>
+                            <p>Through this program, we provide free or reduced-cost dental care to individuals and families facing financial hardship. We believe that everyone deserves access to quality dental care, regardless of their financial situation.</p>
+                        </div>
+                        
+                        <div class="program-item">
+                            <h4>Senior Dental Health Program</h4>
+                            <p>We offer specialized dental services for seniors, including educational workshops at retirement communities and assisted living facilities, focusing on the unique oral health challenges faced by older adults.</p>
+                        </div>
+                        
+                        <div class="program-item">
+                            <h4>Annual Charity Event</h4>
+                            <p>Each year, we host a "Day of Free Dentistry" where our team provides complimentary cleanings, fillings, and extractions to community members in need. This event has helped hundreds of patients receive essential dental care.</p>
+                        </div>
+                        
+                        <p>We are proud to partner with local organizations, schools, and community groups to promote oral health and make a positive impact. If you're interested in learning more about our community programs or would like to suggest a partnership opportunity, please <a href="contact.html">contact us</a>.</p>
+                    </div>
+                    
+                    <div class="community-image" data-animation="fade-left">
+                        <div class="image-grid">
+                            <img src="assets/images/community-1.jpg" alt="School dental education program" loading="lazy">
+                            <img src="assets/images/community-2.jpg" alt="Free dental care event" loading="lazy">
+                            <img src="assets/images/community-3.jpg" alt="Senior dental health workshop" loading="lazy">
+                            <img src="assets/images/community-4.jpg" alt="Community outreach program" loading="lazy">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Call to Action Section -->
         <section class="cta-section">
             <div class="container">
-                <div class="cta-content">
-                    <h2 class="cta-title">Ready to Experience the Difference?</h2>
-                    <p class="cta-description">Schedule your appointment with our caring team and take the first step toward optimal dental health.</p>
-                    <a href="booking.html" class="btn btn-primary btn-large">Book Your Appointment</a>
+                <div class="cta-wrapper" data-animation="fade-up">
+                    <div class="cta-content">
+                        <h2 class="cta-title">Experience the Difference</h2>
+                        <p class="cta-description">Schedule your appointment today and discover why our patients love Wisdom Bites Dental Clinic.</p>
+                        
+                        <div class="cta-actions">
+                            <a href="booking.html" class="btn btn-primary btn-lg">Book Your Appointment</a>
+                            <div class="cta-contact">
+                                <span>or call us at</span>
+                                <a href="tel:+15551234567" class="phone-link">(555) 123-4567</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
     </main>
 
+    <!-- Footer -->
     <footer class="site-footer">
-        <div class="container">
-            <div class="footer-top">
-                <div class="footer-logo">
-                    <img src="assets/images/logo-white.png" alt="Wisdom Bites Dental Clinic Logo">
-                </div>
-                <div class="footer-contact">
-                    <h3 class="footer-heading">Contact Us</h3>
-                    <address>
-                        <p>123 Dental Avenue, Smile City, SC 12345</p>
-                        <p>Phone: <a href="tel:+15551234567">+1 (555) 123-4567</a></p>
-                        <p>Email: <a href="mailto:info@wisdombites.com">info@wisdombites.com</a></p>
-                    </address>
-                </div>
-                <div class="footer-hours">
-                    <h3 class="footer-heading">Hours</h3>
-                    <ul class="hours-list">
-                        <li><span>Monday - Friday:</span> 9:00 AM - 6:00 PM</li>
-                        <li><span>Saturday:</span> 10:00 AM - 3:00 PM</li>
-                        <li><span>Sunday:</span> Closed</li>
-                    </ul>
-                </div>
-                <div class="footer-links">
-                    <h3 class="footer-heading">Quick Links</h3>
-                    <ul class="footer-nav">
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="about.html">About Us</a></li>
-                        <li><a href="services/general-dentistry.html">Services</a></li>
-                        <li><a href="booking.html">Book Appointment</a></li>
-                        <li><a href="contact.html">Contact</a></li>
-                    </ul>
+        <div class="footer-top">
+            <div class="container">
+                <div class="footer-widgets">
+                    <div class="footer-widget">
+                        <div class="footer-logo">
+                            <img src="assets/images/logo-white.svg" alt="Wisdom Bites Dental Clinic" width="180" height="45">
+                        </div>
+                        <p class="footer-description">Providing exceptional dental care in a comfortable, modern environment. Our mission is to help you achieve and maintain optimal oral health.</p>
+                        <div class="social-links">
+                            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                                <i class="icon icon-facebook"></i>
+                            </a>
+                            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                                <i class="icon icon-instagram"></i>
+                            </a>
+                            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+                                <i class="icon icon-twitter"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-widget">
+                        <h3 class="footer-heading">Contact Us</h3>
+                        <address>
+                            <div class="contact-item">
+                                <i class="icon icon-map"></i>
+                                <span>123 Dental Avenue, Smile City, SC 12345</span>
+                            </div>
+                            <div class="contact-item">
+                                <i class="icon icon-phone"></i>
+                                <a href="tel:+15551234567">+1 (555) 123-4567</a>
+                            </div>
+                            <div class="contact-item">
+                                <i class="icon icon-email"></i>
+                                <a href="mailto:info@wisdombites.com">info@wisdombites.com</a>
+                            </div>
+                        </address>
+                    </div>
+                    
+                    <div class="footer-widget">
+                        <h3 class="footer-heading">Office Hours</h3>
+                        <ul class="hours-list">
+                            <li><span>Monday - Friday:</span> 9:00 AM - 6:00 PM</li>
+                            <li><span>Saturday:</span> 10:00 AM - 3:00 PM</li>
+                            <li><span>Sunday:</span> Closed</li>
+                        </ul>
+                        <div class="emergency-info">
+                            <p><strong>Dental Emergency?</strong></p>
+                            <a href="services/emergency-care.html" class="btn btn-sm btn-primary">Emergency Information</a>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-widget">
+                        <h3 class="footer-heading">Quick Links</h3>
+                        <ul class="footer-links">
+                            <li><a href="index.html">Home</a></li>
+                            <li><a href="about.html">About Us</a></li>
+                            <li><a href="services/general-dentistry.html">Services</a></li>
+                            <li><a href="booking.html">Book Appointment</a></li>
+                            <li><a href="contact.html">Contact</a></li>
+                            <li><a href="blog.html">Blog</a></li>
+                            <li><a href="insurance.html">Insurance Information</a></li>
+                            <li><a href="faq.html">FAQs</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-            <div class="footer-bottom">
-                <div class="social-links">
-                    <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
-                    </a>
-                    <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-                    </a>
-                    <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
-                    </a>
-                </div>
-                <div class="copyright">
-                    <p>&copy; <script>document.write(new Date().getFullYear())</script> Wisdom Bites Dental Clinic. All Rights Reserved.</p>
-                </div>
-                <div class="footer-legal">
-                    <a href="privacy-policy.html">Privacy Policy</a>
-                    <a href="terms-of-service.html">Terms of Service</a>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="container">
+                <div class="footer-bottom-content">
+                    <div class="copyright">
+                        <p>&copy; <span id="current-year">2025</span> Wisdom Bites Dental Clinic. All Rights Reserved.</p>
+                    </div>
+                    <div class="footer-legal">
+                        <a href="privacy-policy.html">Privacy Policy</a>
+                        <a href="terms-of-service.html">Terms of Service</a>
+                        <a href="accessibility.html">Accessibility</a>
+                    </div>
                 </div>
             </div>
         </div>
     </footer>
 
+    <!-- Back to Top Button -->
+    <a href="#" class="back-to-top" aria-label="Back to top">
+        <i class="icon icon-arrow-up"></i>
+    </a>
+
+    <!-- Booking CTA Sticky -->
+    <div class="booking-sticky">
+        <div class="container">
+            <p>Ready to schedule your visit?</p>
+            <a href="booking.html" class="btn btn-primary">Book Now</a>
+        </div>
+    </div>
+
     <!-- JavaScript -->
-    <script src="assets/js/scripts.js"></script>
+    <script src="assets/js/vendors/swiper-bundle.min.js" defer></script>
+    <script src="assets/js/main.js" defer></script>
+    <script src="assets/js/animations.js" defer></script>
+    <script src="assets/js/about.js" defer></script>
+    
+    <!-- Initialize current year for copyright -->
+    <script>
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+        
+        // Mark body as loaded when content is ready
+        window.addEventListener('load', function() {
+            document.body.classList.add('loaded');
+            setTimeout(function() {
+                document.querySelector('.loading-screen').style.display = 'none';
+            }, 500);
+        });
+    </script>
 </body>
-</html> 
+</html>

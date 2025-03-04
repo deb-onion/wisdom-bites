@@ -5,14 +5,92 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Wisdom Bites Dental Clinic provides expert dental care in a comfortable, modern environment. Book your appointment today for general, cosmetic, and emergency dental services.">
     <meta name="keywords" content="dental clinic, dentist, teeth cleaning, cosmetic dentistry, emergency dental care">
+    <meta name="google-maps-preload" content="true">
+    <meta name="place-id" content="ChIJEZw2uCNxAjoRrPHJvp1VC2g">
     <title>Wisdom Bites Dental Clinic | Expert Dental Care</title>
     
     <!-- Favicon -->
     <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
     
-    <!-- CSS -->
-    <link rel="stylesheet" href="assets/css/styles.css">
-    <link rel="stylesheet" href="assets/css/animations.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Critical CSS -->
+    <style>
+        :root {
+            /* Modern color palette */
+            --primary: #4a90e2;
+            --primary-dark: #3a7abd;
+            --secondary: #50c878;
+            --secondary-dark: #3ca45e;
+            --accent: #f5a623;
+            --dark: #2d3748;
+            --light: #f8fafc;
+            --gray-100: #f7fafc;
+            --gray-200: #edf2f7;
+            --gray-300: #e2e8f0;
+            --gray-400: #cbd5e0;
+            --gray-500: #a0aec0;
+            --gray-600: #718096;
+            --gray-700: #4a5568;
+            --gray-800: #2d3748;
+            --gray-900: #1a202c;
+            
+            /* Typography */
+            --font-heading: 'Montserrat', sans-serif;
+            --font-body: 'Open Sans', sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-body);
+            color: var(--gray-800);
+            background-color: var(--light);
+            overflow-x: hidden;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        body.loaded {
+            opacity: 1;
+        }
+        
+        .site-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background-color: transparent;
+            transition: background-color 0.3s ease, padding 0.3s ease;
+            padding: 1.5rem 0;
+        }
+        
+        .site-header.scrolled {
+            background-color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 0.75rem 0;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+    </style>
+    
+    <!-- Main CSS (loaded asynchronously) -->
+    <link rel="stylesheet" href="assets/css/styles.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="assets/css/animations.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="assets/css/responsive.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="assets/css/virtual-tour.css" media="print" onload="this.media='all'">
+    
+    <!-- Preload critical assets -->
+    <link rel="preload" href="assets/images/hero-bg.webp" as="image">
+    <link rel="preload" href="assets/fonts/icons.woff2" as="font" type="font/woff2" crossorigin>
     
     <!-- Schema Markup for SEO -->
     <script type="application/ld+json">
@@ -25,16 +103,16 @@
         "telephone": "+1-555-123-4567",
         "address": {
             "@type": "PostalAddress",
-            "streetAddress": "123 Dental Avenue",
-            "addressLocality": "Smile City",
-            "addressRegion": "SC",
-            "postalCode": "12345",
-            "addressCountry": "US"
+            "streetAddress": "1/4A, North Road, Poddar Nagar, Jadavpur",
+            "addressLocality": "Kolkata",
+            "addressRegion": "West Bengal",
+            "postalCode": "700032",
+            "addressCountry": "IN"
         },
         "geo": {
             "@type": "GeoCoordinates",
-            "latitude": "40.7128",
-            "longitude": "-74.0060"
+            "latitude": "22.4969",
+            "longitude": "88.3722"
         },
         "openingHoursSpecification": [
             {
@@ -57,91 +135,270 @@
         ]
     }
     </script>
+    
+    <!-- Preload clinic data for virtual tour -->
+    <script type="application/json" id="clinic-data">
+    {
+        "name": "Wisdom Bites Dental Clinic",
+        "address": "1/4A, North Road, Poddar Nagar, Jadavpur, Kolkata, West Bengal 700032, India",
+        "phone": "+1-555-123-4567",
+        "position": {"lat": 22.4969, "lng": 88.3722},
+        "placeId": "ChIJEZw2uCNxAjoRrPHJvp1VC2g",
+        "hours": [
+            "Monday: 9:00 AM - 6:00 PM",
+            "Tuesday: 9:00 AM - 6:00 PM",
+            "Wednesday: 9:00 AM - 6:00 PM",
+            "Thursday: 9:00 AM - 6:00 PM",
+            "Friday: 9:00 AM - 6:00 PM",
+            "Saturday: 10:00 AM - 3:00 PM",
+            "Sunday: Closed"
+        ],
+        "services": [
+            "General Dentistry",
+            "Cosmetic Dentistry",
+            "Emergency Care",
+            "Orthodontics",
+            "Dental Implants"
+        ]
+    }
+    </script>
 </head>
 <body>
+    <!-- Loading Screen -->
+    <div class="loading-screen">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Header -->
     <header class="site-header">
         <div class="container">
-            <div class="logo">
-                <a href="index.html">
-                    <img src="assets/images/logo.png" alt="Wisdom Bites Dental Clinic Logo">
-                </a>
-            </div>
-            <nav class="main-nav">
-                <button class="menu-toggle" aria-label="Toggle menu">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-                <ul class="nav-list">
-                    <li class="nav-item"><a href="index.html" class="active">Home</a></li>
-                    <li class="nav-item"><a href="about.html">About Us</a></li>
-                    <li class="nav-item has-dropdown">
-                        <a href="#" class="dropdown-toggle">Services</a>
-                        <ul class="dropdown-menu">
-                            <li><a href="services/general-dentistry.html">General Dentistry</a></li>
-                            <li><a href="services/cosmetic-dentistry.html">Cosmetic Dentistry</a></li>
-                            <li><a href="services/emergency-care.html">Emergency Care</a></li>
+            <div class="header-wrapper">
+                <div class="logo">
+                    <a href="index.html" aria-label="Wisdom Bites Dental Clinic">
+                        <img src="assets/images/logo.svg" alt="Wisdom Bites Dental Clinic Logo" width="180" height="45">
+                    </a>
+                </div>
+                
+                <nav class="main-nav">
+                    <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false">
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                    </button>
+                    
+                    <div class="nav-container">
+                        <ul class="nav-list">
+                            <li class="nav-item"><a href="index.html" class="active">Home</a></li>
+                            <li class="nav-item"><a href="about.html">About Us</a></li>
+                            <li class="nav-item has-dropdown">
+                                <a href="#" class="dropdown-toggle">Services</a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="services/general-dentistry.html">General Dentistry</a></li>
+                                    <li><a href="services/cosmetic-dentistry.html">Cosmetic Dentistry</a></li>
+                                    <li><a href="services/emergency-care.html">Emergency Care</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item"><a href="booking.html">Book Appointment</a></li>
+                            <li class="nav-item"><a href="contact.html">Contact</a></li>
                         </ul>
-                    </li>
-                    <li class="nav-item"><a href="booking.html">Book Appointment</a></li>
-                    <li class="nav-item"><a href="contact.html">Contact</a></li>
-                </ul>
-            </nav>
-            <div class="header-cta">
-                <a href="booking.html" class="btn btn-primary">Book Now</a>
+                        
+                        <div class="nav-cta">
+                            <a href="tel:+15551234567" class="phone-link">
+                                <i class="icon icon-phone"></i>
+                                <span>(555) 123-4567</span>
+                            </a>
+                            <a href="booking.html" class="btn btn-primary">Book Now</a>
+                        </div>
+                    </div>
+                </nav>
             </div>
         </div>
     </header>
 
     <main>
         <!-- Hero Section -->
-        <section class="hero">
+        <section class="hero" id="hero">
+            <div class="hero-background">
+                <picture>
+                    <source srcset="assets/images/hero-bg.webp" type="image/webp">
+                    <source srcset="assets/images/hero-bg.jpg" type="image/jpeg">
+                    <img src="assets/images/hero-bg.jpg" alt="" aria-hidden="true" loading="eager">
+                </picture>
+                <div class="hero-overlay"></div>
+            </div>
+            
             <div class="container">
                 <div class="hero-content">
-                    <h1 class="hero-title">Your Smile, Our Passion</h1>
-                    <p class="hero-subtitle">Experience exceptional dental care in a comfortable, modern environment.</p>
-                    <div class="hero-buttons">
-                        <a href="booking.html" class="btn btn-primary btn-large">Book an Appointment</a>
-                        <a href="services/general-dentistry.html" class="btn btn-secondary btn-large">Our Services</a>
+                    <div class="hero-text" data-animation="fade-up">
+                        <h1 class="hero-title">Your Smile, Our Passion</h1>
+                        <p class="hero-subtitle">Experience exceptional dental care in a comfortable, modern environment.</p>
+                        <div class="hero-cta">
+                            <a href="booking.html" class="btn btn-primary btn-lg">Book an Appointment</a>
+                            <a href="#services" class="btn btn-outline btn-lg">Explore Services</a>
+                        </div>
+                        <a id="virtual-tour-button" class="virtual-tour-button">
+                            <i class="icon icon-360"></i>
+                            Take a Virtual Tour
+                        </a>
+                    </div>
+                    
+                    <div class="hero-feature" data-animation="fade-in" data-delay="0.3">
+                        <div class="hero-feature-card">
+                            <div class="feature-icons">
+                                <i class="icon icon-calendar"></i>
+                                <i class="icon icon-clock"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h3>Same-Day Appointments</h3>
+                                <p>Emergency dental care available</p>
+                                <a href="services/emergency-care.html" class="feature-link">Learn More</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="hero-image">
-                    <img src="assets/images/hero-dentist.jpg" alt="Dentist caring for patient" loading="eager">
-                </div>
+            </div>
+            
+            <div class="hero-waves">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+                    <path fill="#ffffff" fill-opacity="1" d="M0,64L48,80C96,96,192,128,288,133.3C384,139,480,117,576,122.7C672,128,768,160,864,186.7C960,213,1056,235,1152,229.3C1248,224,1344,192,1392,176L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+                </svg>
             </div>
         </section>
 
         <!-- Services Section -->
-        <section class="services">
+        <section class="services" id="services">
             <div class="container">
-                <div class="section-header">
-                    <h2 class="section-title">Our Services</h2>
-                    <p class="section-subtitle">Comprehensive dental care tailored to your needs</p>
+                <div class="section-header" data-animation="fade-up">
+                    <span class="section-tagline">Our Expertise</span>
+                    <h2 class="section-title">Comprehensive Dental Services</h2>
+                    <p class="section-subtitle">Professional care for your entire family</p>
                 </div>
+                
                 <div class="services-grid">
-                    <div class="service-card">
+                    <!-- Service Card 1 -->
+                    <div class="service-card" data-animation="fade-up">
                         <div class="service-icon">
-                            <img src="assets/images/icon-general.svg" alt="General Dentistry Icon">
+                            <i class="icon icon-tooth"></i>
                         </div>
-                        <h3 class="service-title">General Dentistry</h3>
-                        <p class="service-description">Preventive care, cleanings, and routine check-ups for maintaining optimal oral health.</p>
-                        <a href="services/general-dentistry.html" class="service-link">Learn More</a>
+                        <div class="service-content">
+                            <h3 class="service-title">General Dentistry</h3>
+                            <p class="service-description">Regular check-ups, cleanings, and preventive care to maintain optimal oral health.</p>
+                            <ul class="service-features">
+                                <li>Comprehensive exams</li>
+                                <li>Professional cleanings</li>
+                                <li>Tooth-colored fillings</li>
+                                <li>Preventive treatments</li>
+                            </ul>
+                            <a href="services/general-dentistry.html" class="btn btn-outline">Learn More</a>
+                        </div>
                     </div>
-                    <div class="service-card">
+                    
+                    <!-- Service Card 2 -->
+                    <div class="service-card" data-animation="fade-up" data-delay="0.2">
                         <div class="service-icon">
-                            <img src="assets/images/icon-cosmetic.svg" alt="Cosmetic Dentistry Icon">
+                            <i class="icon icon-smile"></i>
                         </div>
-                        <h3 class="service-title">Cosmetic Dentistry</h3>
-                        <p class="service-description">Enhance your smile with whitening, veneers, and other cosmetic procedures.</p>
-                        <a href="services/cosmetic-dentistry.html" class="service-link">Learn More</a>
+                        <div class="service-content">
+                            <h3 class="service-title">Cosmetic Dentistry</h3>
+                            <p class="service-description">Transform your smile with treatments designed to enhance appearance and confidence.</p>
+                            <ul class="service-features">
+                                <li>Professional whitening</li>
+                                <li>Porcelain veneers</li>
+                                <li>Dental bonding</li>
+                                <li>Complete smile makeovers</li>
+                            </ul>
+                            <a href="services/cosmetic-dentistry.html" class="btn btn-outline">Learn More</a>
+                        </div>
                     </div>
-                    <div class="service-card">
+                    
+                    <!-- Service Card 3 -->
+                    <div class="service-card" data-animation="fade-up" data-delay="0.4">
                         <div class="service-icon">
-                            <img src="assets/images/icon-emergency.svg" alt="Emergency Care Icon">
+                            <i class="icon icon-emergency"></i>
                         </div>
-                        <h3 class="service-title">Emergency Care</h3>
-                        <p class="service-description">Immediate relief for dental emergencies and urgent dental problems.</p>
-                        <a href="services/emergency-care.html" class="service-link">Learn More</a>
+                        <div class="service-content">
+                            <h3 class="service-title">Emergency Care</h3>
+                            <p class="service-description">Immediate attention for dental emergencies to alleviate pain and prevent further damage.</p>
+                            <ul class="service-features">
+                                <li>Same-day appointments</li>
+                                <li>Severe toothache relief</li>
+                                <li>Broken tooth repair</li>
+                                <li>Emergency extractions</li>
+                            </ul>
+                            <a href="services/emergency-care.html" class="btn btn-outline">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="services-cta" data-animation="fade-up">
+                    <p>Looking for a specific treatment not listed here?</p>
+                    <a href="contact.html" class="btn btn-secondary">Contact Us</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Why Choose Us Section -->
+        <section class="why-choose-us">
+            <div class="container">
+                <div class="section-header" data-animation="fade-up">
+                    <span class="section-tagline">Why Patients Choose Us</span>
+                    <h2 class="section-title">The Wisdom Bites Difference</h2>
+                    <p class="section-subtitle">Setting the standard for modern dental care</p>
+                </div>
+                
+                <div class="features-wrapper">
+                    <div class="features-content" data-animation="fade-right">
+                        <div class="features-list">
+                            <div class="feature-item">
+                                <div class="feature-icon">
+                                    <i class="icon icon-expertise"></i>
+                                </div>
+                                <div class="feature-text">
+                                    <h3>Expert Team</h3>
+                                    <p>Our dentists and specialists have years of experience and continuous education in the latest techniques.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <div class="feature-icon">
+                                    <i class="icon icon-tech"></i>
+                                </div>
+                                <div class="feature-text">
+                                    <h3>Modern Technology</h3>
+                                    <p>State-of-the-art equipment for precise diagnoses and comfortable procedures with better outcomes.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <div class="feature-icon">
+                                    <i class="icon icon-comfort"></i>
+                                </div>
+                                <div class="feature-text">
+                                    <h3>Patient Comfort</h3>
+                                    <p>Relaxing environment with amenities designed to make your dental visit as pleasant as possible.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <div class="feature-icon">
+                                    <i class="icon icon-personalized"></i>
+                                </div>
+                                <div class="feature-text">
+                                    <h3>Personalized Care</h3>
+                                    <p>Custom treatment plans tailored to your specific dental needs, goals, and comfort level.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="features-image" data-animation="fade-left">
+                        <div class="image-wrapper">
+                            <img src="assets/images/dental-office.webp" alt="Modern dental treatment room at Wisdom Bites" width="540" height="400" loading="lazy">
+                            <div class="experience-badge">
+                                <span class="years">15+</span>
+                                <span class="text">Years of Excellence</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -150,155 +407,393 @@
         <!-- Testimonials Section -->
         <section class="testimonials">
             <div class="container">
-                <div class="section-header">
+                <div class="section-header" data-animation="fade-up">
+                    <span class="section-tagline">Patient Stories</span>
                     <h2 class="section-title">What Our Patients Say</h2>
-                    <p class="section-subtitle">Real stories from satisfied patients</p>
+                    <p class="section-subtitle">Real experiences from real people</p>
                 </div>
-                <div class="testimonials-slider">
-                    <div class="testimonial-slide">
-                        <div class="testimonial-content">
-                            <div class="testimonial-rating">
-                                <span class="star">★</span>
-                                <span class="star">★</span>
-                                <span class="star">★</span>
-                                <span class="star">★</span>
-                                <span class="star">★</span>
+                
+                <div class="testimonials-slider" data-animation="fade-up">
+                    <div class="swiper-container">
+                        <div class="swiper-wrapper">
+                            <!-- Testimonial 1 -->
+                            <div class="swiper-slide">
+                                <div class="testimonial-card">
+                                    <div class="testimonial-rating">
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                    </div>
+                                    <blockquote class="testimonial-quote">
+                                        <p>Wisdom Bites transformed my dental experience! The staff is incredibly friendly, and Dr. Smiles made my procedure painless and comfortable. I actually look forward to my appointments now.</p>
+                                    </blockquote>
+                                    <div class="testimonial-author">
+                                        <img src="assets/images/patient-1.jpg" alt="Sarah Johnson" class="author-image" width="60" height="60" loading="lazy">
+                                        <div class="author-details">
+                                            <p class="author-name">Sarah Johnson</p>
+                                            <p class="author-info">Patient for 3 years</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <blockquote class="testimonial-quote">
-                                "Wisdom Bites Dental Clinic transformed my dental experience! The staff is incredibly friendly, and Dr. Smiles made my procedure painless and comfortable. I actually look forward to my appointments now."
-                            </blockquote>
-                            <div class="testimonial-author">
-                                <img src="assets/images/patient-1.jpg" alt="Sarah Johnson" class="author-image">
-                                <div class="author-details">
-                                    <p class="author-name">Sarah Johnson</p>
-                                    <p class="author-info">Patient for 3 years</p>
+                            
+                            <!-- Testimonial 2 -->
+                            <div class="swiper-slide">
+                                <div class="testimonial-card">
+                                    <div class="testimonial-rating">
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                    </div>
+                                    <blockquote class="testimonial-quote">
+                                        <p>After years of dental anxiety, I finally found a place where I feel comfortable. The team at Wisdom Bites is patient, understanding, and genuinely cares about your wellbeing. The results of my smile makeover are incredible!</p>
+                                    </blockquote>
+                                    <div class="testimonial-author">
+                                        <img src="assets/images/patient-2.jpg" alt="James Wilson" class="author-image" width="60" height="60" loading="lazy">
+                                        <div class="author-details">
+                                            <p class="author-name">James Wilson</p>
+                                            <p class="author-info">Cosmetic Dentistry Patient</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Testimonial 3 -->
+                            <div class="swiper-slide">
+                                <div class="testimonial-card">
+                                    <div class="testimonial-rating">
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                    </div>
+                                    <blockquote class="testimonial-quote">
+                                        <p>When my son had a dental emergency on a weekend, Wisdom Bites came to the rescue. They got us in immediately, fixed the problem, and followed up to ensure everything was healing properly. Their emergency care is top-notch!</p>
+                                    </blockquote>
+                                    <div class="testimonial-author">
+                                        <img src="assets/images/patient-3.jpg" alt="Maria Rodriguez" class="author-image" width="60" height="60" loading="lazy">
+                                        <div class="author-details">
+                                            <p class="author-name">Maria Rodriguez</p>
+                                            <p class="author-info">Emergency Care Patient</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!-- Additional testimonials to be loaded via JavaScript -->
+                    
+                    <div class="testimonials-navigation">
+                        <button class="slider-button prev" aria-label="Previous testimonial">
+                            <i class="icon icon-arrow-left"></i>
+                        </button>
+                        <div class="swiper-pagination"></div>
+                        <button class="slider-button next" aria-label="Next testimonial">
+                            <i class="icon icon-arrow-right"></i>
+                        </button>
+                    </div>
                 </div>
-                <div class="testimonials-controls">
-                    <button class="control-prev" aria-label="Previous testimonial">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-                    </button>
-                    <div class="control-dots"></div>
-                    <button class="control-next" aria-label="Next testimonial">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-                    </button>
+                
+                <div class="testimonials-cta" data-animation="fade-up">
+                    <div class="rating-summary">
+                        <div class="rating-stars">
+                            <i class="icon icon-star"></i>
+                            <i class="icon icon-star"></i>
+                            <i class="icon icon-star"></i>
+                            <i class="icon icon-star"></i>
+                            <i class="icon icon-star"></i>
+                        </div>
+                        <div class="rating-text">
+                            <span class="rating-score">4.9/5</span>
+                            <span class="rating-count">Based on 125+ verified reviews</span>
+                        </div>
+                    </div>
+                    <a href="reviews.html" class="btn btn-text">Read More Patient Stories <i class="icon icon-arrow-right"></i></a>
                 </div>
             </div>
         </section>
 
-        <!-- Why Choose Us Section -->
-        <section class="why-choose-us">
+        <!-- Dentists Section -->
+        <section class="dentists">
             <div class="container">
-                <div class="section-header">
-                    <h2 class="section-title">Why Choose Wisdom Bites</h2>
-                    <p class="section-subtitle">Setting the standard for dental excellence</p>
+                <div class="section-header" data-animation="fade-up">
+                    <span class="section-tagline">Our Expert Team</span>
+                    <h2 class="section-title">Meet Our Dentists</h2>
+                    <p class="section-subtitle">Experienced professionals dedicated to your oral health</p>
                 </div>
-                <div class="features-grid">
-                    <div class="feature">
-                        <div class="feature-icon">
-                            <img src="assets/images/icon-expertise.svg" alt="Expert Team Icon">
+                
+                <div class="dentists-grid">
+                    <!-- Dentist 1 -->
+                    <div class="dentist-card" data-animation="fade-up">
+                        <div class="dentist-image">
+                            <img src="assets/images/doctor-1.jpg" alt="Dr. Emily Chen" width="300" height="400" loading="lazy">
                         </div>
-                        <h3 class="feature-title">Expert Team</h3>
-                        <p class="feature-description">Our dentists and specialists have years of experience and continuous education.</p>
+                        <div class="dentist-info">
+                            <h3 class="dentist-name">Dr. Emily Chen</h3>
+                            <p class="dentist-title">Founder & Lead Dentist</p>
+                            <div class="dentist-specialties">
+                                <span>General Dentistry</span>
+                                <span>Cosmetic Dentistry</span>
+                            </div>
+                            <a href="about.html#dr-chen" class="btn btn-text">Read Bio <i class="icon icon-arrow-right"></i></a>
+                        </div>
                     </div>
-                    <div class="feature">
-                        <div class="feature-icon">
-                            <img src="assets/images/icon-technology.svg" alt="Modern Technology Icon">
+                    
+                    <!-- Dentist 2 -->
+                    <div class="dentist-card" data-animation="fade-up" data-delay="0.2">
+                        <div class="dentist-image">
+                            <img src="assets/images/doctor-2.jpg" alt="Dr. James Wilson" width="300" height="400" loading="lazy">
                         </div>
-                        <h3 class="feature-title">Modern Technology</h3>
-                        <p class="feature-description">State-of-the-art equipment for precise diagnoses and comfortable procedures.</p>
+                        <div class="dentist-info">
+                            <h3 class="dentist-name">Dr. James Wilson</h3>
+                            <p class="dentist-title">Orthodontist</p>
+                            <div class="dentist-specialties">
+                                <span>Orthodontics</span>
+                                <span>Invisalign</span>
+                            </div>
+                            <a href="about.html#dr-wilson" class="btn btn-text">Read Bio <i class="icon icon-arrow-right"></i></a>
+                        </div>
                     </div>
-                    <div class="feature">
-                        <div class="feature-icon">
-                            <img src="assets/images/icon-comfort.svg" alt="Patient Comfort Icon">
+                    
+                    <!-- Dentist 3 -->
+                    <div class="dentist-card" data-animation="fade-up" data-delay="0.4">
+                        <div class="dentist-image">
+                            <img src="assets/images/doctor-3.jpg" alt="Dr. Sophia Rodriguez" width="300" height="400" loading="lazy">
                         </div>
-                        <h3 class="feature-title">Patient Comfort</h3>
-                        <p class="feature-description">Relaxing environment with amenities to make your visit as pleasant as possible.</p>
+                        <div class="dentist-info">
+                            <h3 class="dentist-name">Dr. Sophia Rodriguez</h3>
+                            <p class="dentist-title">Pediatric Dentist</p>
+                            <div class="dentist-specialties">
+                                <span>Pediatric Dentistry</span>
+                                <span>Preventive Care</span>
+                            </div>
+                            <a href="about.html#dr-rodriguez" class="btn btn-text">Read Bio <i class="icon icon-arrow-right"></i></a>
+                        </div>
                     </div>
-                    <div class="feature">
-                        <div class="feature-icon">
-                            <img src="assets/images/icon-care.svg" alt="Personalized Care Icon">
+                </div>
+                
+                <div class="dentists-cta" data-animation="fade-up">
+                    <a href="about.html#team" class="btn btn-secondary">Meet Our Full Team</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Insurance Section -->
+        <section class="insurance">
+            <div class="container">
+                <div class="insurance-wrapper">
+                    <div class="insurance-content" data-animation="fade-right">
+                        <span class="section-tagline">Insurance & Payment</span>
+                        <h2 class="section-title">We Make Dental Care Affordable</h2>
+                        <p>At Wisdom Bites, we work with most major insurance providers to maximize your benefits and minimize out-of-pocket expenses.</p>
+                        
+                        <ul class="insurance-benefits">
+                            <li><i class="icon icon-check"></i> We accept most PPO dental plans</li>
+                            <li><i class="icon icon-check"></i> Flexible payment options available</li>
+                            <li><i class="icon icon-check"></i> 0% financing for qualified patients</li>
+                            <li><i class="icon icon-check"></i> Transparent pricing with no surprises</li>
+                        </ul>
+                        
+                        <div class="insurance-actions">
+                            <a href="insurance.html" class="btn btn-primary">Insurance Information</a>
+                            <a href="contact.html" class="btn btn-outline">Contact Us With Questions</a>
                         </div>
-                        <h3 class="feature-title">Personalized Care</h3>
-                        <p class="feature-description">Custom treatment plans tailored to your specific dental needs and goals.</p>
+                    </div>
+                    
+                    <div class="insurance-logos" data-animation="fade-left">
+                        <div class="logos-grid">
+                            <img src="assets/images/insurance-logo-1.png" alt="Delta Dental" width="100" height="60" loading="lazy">
+                            <img src="assets/images/insurance-logo-2.png" alt="Cigna" width="100" height="60" loading="lazy">
+                            <img src="assets/images/insurance-logo-3.png" alt="Aetna" width="100" height="60" loading="lazy">
+                            <img src="assets/images/insurance-logo-4.png" alt="MetLife" width="100" height="60" loading="lazy">
+                            <img src="assets/images/insurance-logo-5.png" alt="Guardian" width="100" height="60" loading="lazy">
+                            <img src="assets/images/insurance-logo-6.png" alt="Humana" width="100" height="60" loading="lazy">
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- CTA Section -->
+        <!-- Call to Action Section -->
         <section class="cta-section">
             <div class="container">
-                <div class="cta-content">
-                    <h2 class="cta-title">Ready for a Healthier Smile?</h2>
-                    <p class="cta-description">Schedule your appointment today and experience the difference at Wisdom Bites Dental Clinic.</p>
-                    <a href="booking.html" class="btn btn-primary btn-large">Book Your Appointment</a>
+                <div class="cta-wrapper" data-animation="fade-up">
+                    <div class="cta-content">
+                        <h2 class="cta-title">Ready for Your Healthiest Smile?</h2>
+                        <p class="cta-description">Schedule your appointment today and experience the difference at Wisdom Bites Dental Clinic.</p>
+                        
+                        <div class="cta-actions">
+                            <a href="booking.html" class="btn btn-primary btn-lg">Book Your Appointment</a>
+                            <div class="cta-contact">
+                                <span>or call us at</span>
+                                <a href="tel:+15551234567" class="phone-link">(555) 123-4567</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
-    </main>
 
-    <footer class="site-footer">
-        <div class="container">
-            <div class="footer-top">
-                <div class="footer-logo">
-                    <img src="assets/images/logo-white.png" alt="Wisdom Bites Dental Clinic Logo">
-                </div>
-                <div class="footer-contact">
-                    <h3 class="footer-heading">Contact Us</h3>
-                    <address>
-                        <p>123 Dental Avenue, Smile City, SC 12345</p>
-                        <p>Phone: <a href="tel:+15551234567">+1 (555) 123-4567</a></p>
-                        <p>Email: <a href="mailto:info@wisdombites.com">info@wisdombites.com</a></p>
-                    </address>
-                </div>
-                <div class="footer-hours">
-                    <h3 class="footer-heading">Hours</h3>
-                    <ul class="hours-list">
-                        <li><span>Monday - Friday:</span> 9:00 AM - 6:00 PM</li>
-                        <li><span>Saturday:</span> 10:00 AM - 3:00 PM</li>
-                        <li><span>Sunday:</span> Closed</li>
-                    </ul>
-                </div>
-                <div class="footer-links">
-                    <h3 class="footer-heading">Quick Links</h3>
-                    <ul class="footer-nav">
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="about.html">About Us</a></li>
-                        <li><a href="services/general-dentistry.html">Services</a></li>
-                        <li><a href="booking.html">Book Appointment</a></li>
-                        <li><a href="contact.html">Contact</a></li>
-                    </ul>
+        <!-- Virtual Tour Container -->
+        <div id="virtual-tour-container" class="virtual-tour-container">
+            <div id="panorama-view" class="panorama-view">
+                <div class="panorama-loading">
+                    <div class="spinner"></div>
+                    <p>Loading Tour...</p>
                 </div>
             </div>
-            <div class="footer-bottom">
-                <div class="social-links">
-                    <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
-                    </a>
-                    <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-                    </a>
-                    <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
-                    </a>
+            
+            <div class="tour-controls">
+                <div class="tour-control-group">
+                    <button id="close-tour-button" class="tour-btn close-btn">Close Tour</button>
+                    <button id="switch-view-button" class="tour-btn">View Clinic Interior</button>
+                    <button id="toggle-info-button" class="tour-btn info-btn">Clinic Info</button>
                 </div>
-                <div class="copyright">
-                    <p>&copy; <script>document.write(new Date().getFullYear())</script> Wisdom Bites Dental Clinic. All Rights Reserved.</p>
+                
+                <div id="tour-indicators" class="tour-indicators"></div>
+                
+                <div class="tour-navigation">
+                    <button id="prev-panorama-button" class="tour-btn" disabled>Previous</button>
+                    <button id="next-panorama-button" class="tour-btn">Next</button>
+                    <button id="complete-tour-button" class="tour-btn complete-btn">Done with Tour</button>
                 </div>
-                <div class="footer-legal">
-                    <a href="privacy-policy.html">Privacy Policy</a>
-                    <a href="terms-of-service.html">Terms of Service</a>
+            </div>
+            
+            <div id="place-info-panel" class="place-info-panel"></div>
+        </div>
+        
+        <!-- Tour Completion Dialog -->
+        <div id="tour-completion-dialog" class="tour-completion-dialog">
+            <h3 class="dialog-heading">Virtual Tour Complete</h3>
+            <p class="dialog-text">Thank you for taking a virtual tour of our clinic. Would you like to book an appointment now?</p>
+            <div class="dialog-buttons">
+                <button id="post-tour-book-button" class="dialog-btn book-btn">Book an Appointment</button>
+                <button id="close-dialog-button" class="dialog-btn close-btn">Not Interested</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-top">
+            <div class="container">
+                <div class="footer-widgets">
+                    <div class="footer-widget">
+                        <div class="footer-logo">
+                            <img src="assets/images/logo-white.svg" alt="Wisdom Bites Dental Clinic" width="180" height="45">
+                        </div>
+                        <p class="footer-description">Providing exceptional dental care in a comfortable, modern environment. Our mission is to help you achieve and maintain optimal oral health.</p>
+                        <div class="social-links">
+                            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                                <i class="icon icon-facebook"></i>
+                            </a>
+                            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                                <i class="icon icon-instagram"></i>
+                            </a>
+                            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+                                <i class="icon icon-twitter"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-widget">
+                        <h3 class="footer-heading">Contact Us</h3>
+                        <address>
+                            <div class="contact-item">
+                                <i class="icon icon-map"></i>
+                                <span>123 Dental Avenue, Smile City, SC 12345</span>
+                            </div>
+                            <div class="contact-item">
+                                <i class="icon icon-phone"></i>
+                                <a href="tel:+15551234567">+1 (555) 123-4567</a>
+                            </div>
+                            <div class="contact-item">
+                                <i class="icon icon-email"></i>
+                                <a href="mailto:info@wisdombites.com">info@wisdombites.com</a>
+                            </div>
+                        </address>
+                    </div>
+                    
+                    <div class="footer-widget">
+                        <h3 class="footer-heading">Office Hours</h3>
+                        <ul class="hours-list">
+                            <li><span>Monday - Friday:</span> 9:00 AM - 6:00 PM</li>
+                            <li><span>Saturday:</span> 10:00 AM - 3:00 PM</li>
+                            <li><span>Sunday:</span> Closed</li>
+                        </ul>
+                        <div class="emergency-info">
+                            <p><strong>Dental Emergency?</strong></p>
+                            <a href="services/emergency-care.html" class="btn btn-sm btn-primary">Emergency Information</a>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-widget">
+                        <h3 class="footer-heading">Quick Links</h3>
+                        <ul class="footer-links">
+                            <li><a href="index.html">Home</a></li>
+                            <li><a href="about.html">About Us</a></li>
+                            <li><a href="services/general-dentistry.html">Services</a></li>
+                            <li><a href="booking.html">Book Appointment</a></li>
+                            <li><a href="contact.html">Contact</a></li>
+                            <li><a href="blog.html">Blog</a></li>
+                            <li><a href="insurance.html">Insurance Information</a></li>
+                            <li><a href="faq.html">FAQs</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="container">
+                <div class="footer-bottom-content">
+                    <div class="copyright">
+                        <p>&copy; <span id="current-year">2025</span> Wisdom Bites Dental Clinic. All Rights Reserved.</p>
+                    </div>
+                    <div class="footer-legal">
+                        <a href="privacy-policy.html">Privacy Policy</a>
+                        <a href="terms-of-service.html">Terms of Service</a>
+                        <a href="accessibility.html">Accessibility</a>
+                    </div>
                 </div>
             </div>
         </div>
     </footer>
 
+    <!-- Back to Top Button -->
+    <a href="#" class="back-to-top" aria-label="Back to top">
+        <i class="icon icon-arrow-up"></i>
+    </a>
+
+    <!-- Booking CTA Sticky -->
+    <div class="booking-sticky">
+        <div class="container">
+            <p>Ready to schedule your visit?</p>
+            <a href="booking.html" class="btn btn-primary">Book Now</a>
+        </div>
+    </div>
+
     <!-- JavaScript -->
-    <script src="assets/js/scripts.js"></script>
+    <script src="assets/js/vendors/swiper-bundle.min.js" defer></script>
+    <script src="assets/js/main.js" defer></script>
+    <script src="assets/js/animations.js" defer></script>
+    <script src="assets/js/virtual-tour.js" defer></script>
+    
+    <!-- Initialize current year for copyright -->
+    <script>
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+        
+        // Mark body as loaded when content is ready
+        window.addEventListener('load', function() {
+            document.body.classList.add('loaded');
+            setTimeout(function() {
+                document.querySelector('.loading-screen').style.display = 'none';
+            }, 500);
+        });
+    </script>
 </body>
-</html> 
+</html>

@@ -1,0 +1,688 @@
+/*
+ * Wisdom Bites Dental Clinic
+ * Animation Stylesheet
+ * Version: 3.0.0
+ */
+
+/* ===== Keyframes ===== */
+
+/* Fade In Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Fade Up Animation */
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Fade Down Animation */
+@keyframes fadeDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Fade Left Animation */
+@keyframes fadeLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Fade Right Animation */
+@keyframes fadeRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Zoom In Animation */
+@keyframes zoomIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Zoom Out Animation */
+@keyframes zoomOut {
+    from {
+        opacity: 0;
+        transform: scale(1.05);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Bounce Animation */
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-15px);
+    }
+    60% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Pulse Animation */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Shake Animation */
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-5px);
+    }
+    20%, 40%, 60%, 80% {
+        transform: translateX(5px);
+    }
+}
+
+/* Spin Animation */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Float Animation */
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+/* Ripple Animation */
+@keyframes ripple {
+    0% {
+        box-shadow: 0 0 0 0 rgba(74, 144, 226, 0.3),
+                   0 0 0 1px rgba(74, 144, 226, 0.3);
+    }
+    100% {
+        box-shadow: 0 0 0 10px rgba(74, 144, 226, 0),
+                   0 0 0 4px rgba(74, 144, 226, 0);
+    }
+}
+
+/* Slide In From Top Animation */
+@keyframes slideInFromTop {
+    from {
+        transform: translateY(-100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+/* Slide In From Bottom Animation */
+@keyframes slideInFromBottom {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+/* Slide In From Left Animation */
+@keyframes slideInFromLeft {
+    from {
+        transform: translateX(-100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+/* Slide In From Right Animation */
+@keyframes slideInFromRight {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+/* Jello Animation */
+@keyframes jello {
+    0%, 11.1%, 100% {
+        transform: none;
+    }
+    22.2% {
+        transform: skewX(-12.5deg) skewY(-12.5deg);
+    }
+    33.3% {
+        transform: skewX(6.25deg) skewY(6.25deg);
+    }
+    44.4% {
+        transform: skewX(-3.125deg) skewY(-3.125deg);
+    }
+    55.5% {
+        transform: skewX(1.5625deg) skewY(1.5625deg);
+    }
+    66.6% {
+        transform: skewX(-0.78125deg) skewY(-0.78125deg);
+    }
+    77.7% {
+        transform: skewX(0.390625deg) skewY(0.390625deg);
+    }
+    88.8% {
+        transform: skewX(-0.1953125deg) skewY(-0.1953125deg);
+    }
+}
+
+/* Heart Beat Animation */
+@keyframes heartBeat {
+    0% {
+        transform: scale(1);
+    }
+    14% {
+        transform: scale(1.1);
+    }
+    28% {
+        transform: scale(1);
+    }
+    42% {
+        transform: scale(1.1);
+    }
+    70% {
+        transform: scale(1);
+    }
+}
+
+/* Flip Animation */
+@keyframes flip {
+    from {
+        transform: perspective(400px) rotate3d(0, 1, 0, -360deg);
+        animation-timing-function: ease-out;
+    }
+    40% {
+        transform: perspective(400px) translate3d(0, 0, 150px) rotate3d(0, 1, 0, -190deg);
+        animation-timing-function: ease-out;
+    }
+    50% {
+        transform: perspective(400px) translate3d(0, 0, 150px) rotate3d(0, 1, 0, -170deg);
+        animation-timing-function: ease-in;
+    }
+    80% {
+        transform: perspective(400px) scale3d(.95, .95, .95);
+        animation-timing-function: ease-in;
+    }
+    to {
+        transform: perspective(400px);
+        animation-timing-function: ease-in;
+    }
+}
+
+/* Text Shadow Pulse Animation */
+@keyframes textShadowPulse {
+    0% {
+        text-shadow: 0 0 0 rgba(74, 144, 226, 0);
+    }
+    50% {
+        text-shadow: 0 0 10px rgba(74, 144, 226, 0.5);
+    }
+    100% {
+        text-shadow: 0 0 0 rgba(74, 144, 226, 0);
+    }
+}
+
+/* ===== Animation Classes ===== */
+
+/* Fade Animations */
+.fade-in {
+    animation: fadeIn 0.8s ease forwards;
+}
+
+.fade-up {
+    animation: fadeUp 0.8s ease forwards;
+}
+
+.fade-down {
+    animation: fadeDown 0.8s ease forwards;
+}
+
+.fade-left {
+    animation: fadeLeft 0.8s ease forwards;
+}
+
+.fade-right {
+    animation: fadeRight 0.8s ease forwards;
+}
+
+/* Zoom Animations */
+.zoom-in {
+    animation: zoomIn 0.8s ease forwards;
+}
+
+.zoom-out {
+    animation: zoomOut 0.8s ease forwards;
+}
+
+/* Motion Animations */
+.bounce {
+    animation: bounce 1s ease infinite;
+}
+
+.pulse {
+    animation: pulse 2s ease infinite;
+}
+
+.shake {
+    animation: shake 0.8s ease;
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+.float {
+    animation: float 3s ease-in-out infinite;
+}
+
+.ripple {
+    animation: ripple 1.5s ease-out infinite;
+}
+
+/* Slide Animations */
+.slide-in-top {
+    animation: slideInFromTop 0.5s ease forwards;
+}
+
+.slide-in-bottom {
+    animation: slideInFromBottom 0.5s ease forwards;
+}
+
+.slide-in-left {
+    animation: slideInFromLeft 0.5s ease forwards;
+}
+
+.slide-in-right {
+    animation: slideInFromRight 0.5s ease forwards;
+}
+
+/* Special Animations */
+.jello {
+    animation: jello 1s both;
+}
+
+.heart-beat {
+    animation: heartBeat 1.3s ease-in-out;
+}
+
+.flip {
+    animation: flip 1s ease-in-out;
+    backface-visibility: visible;
+}
+
+.text-shadow-pulse {
+    animation: textShadowPulse 2s ease-in-out infinite;
+}
+
+/* ===== Animation Modifiers ===== */
+
+/* Animation Delays */
+.delay-100 {
+    animation-delay: 100ms;
+}
+
+.delay-200 {
+    animation-delay: 200ms;
+}
+
+.delay-300 {
+    animation-delay: 300ms;
+}
+
+.delay-400 {
+    animation-delay: 400ms;
+}
+
+.delay-500 {
+    animation-delay: 500ms;
+}
+
+.delay-600 {
+    animation-delay: 600ms;
+}
+
+.delay-700 {
+    animation-delay: 700ms;
+}
+
+.delay-800 {
+    animation-delay: 800ms;
+}
+
+.delay-900 {
+    animation-delay: 900ms;
+}
+
+.delay-1000 {
+    animation-delay: 1000ms;
+}
+
+/* Animation Durations */
+.duration-300 {
+    animation-duration: 300ms;
+}
+
+.duration-500 {
+    animation-duration: 500ms;
+}
+
+.duration-700 {
+    animation-duration: 700ms;
+}
+
+.duration-1000 {
+    animation-duration: 1000ms;
+}
+
+.duration-1500 {
+    animation-duration: 1500ms;
+}
+
+.duration-2000 {
+    animation-duration: 2000ms;
+}
+
+.duration-2500 {
+    animation-duration: 2500ms;
+}
+
+.duration-3000 {
+    animation-duration: 3000ms;
+}
+
+/* Animation Timing Functions */
+.ease {
+    animation-timing-function: ease;
+}
+
+.ease-in {
+    animation-timing-function: ease-in;
+}
+
+.ease-out {
+    animation-timing-function: ease-out;
+}
+
+.ease-in-out {
+    animation-timing-function: ease-in-out;
+}
+
+.linear {
+    animation-timing-function: linear;
+}
+
+/* Animation Fill Modes */
+.forwards {
+    animation-fill-mode: forwards;
+}
+
+.backwards {
+    animation-fill-mode: backwards;
+}
+
+.both {
+    animation-fill-mode: both;
+}
+
+/* Animation Iteration Counts */
+.once {
+    animation-iteration-count: 1;
+}
+
+.twice {
+    animation-iteration-count: 2;
+}
+
+.infinite {
+    animation-iteration-count: infinite;
+}
+
+/* Animation Directions */
+.normal {
+    animation-direction: normal;
+}
+
+.reverse {
+    animation-direction: reverse;
+}
+
+.alternate {
+    animation-direction: alternate;
+}
+
+.alternate-reverse {
+    animation-direction: alternate-reverse;
+}
+
+/* ===== Scroll-Triggered Animations ===== */
+[data-animation] {
+    opacity: 0;
+}
+
+[data-animation].animated {
+    opacity: 1;
+}
+
+/* Define animations based on data-animation attribute */
+[data-animation="fade-up"].animated {
+    animation: fadeUp 0.8s ease forwards;
+}
+
+[data-animation="fade-down"].animated {
+    animation: fadeDown 0.8s ease forwards;
+}
+
+[data-animation="fade-left"].animated {
+    animation: fadeLeft 0.8s ease forwards;
+}
+
+[data-animation="fade-right"].animated {
+    animation: fadeRight 0.8s ease forwards;
+}
+
+[data-animation="fade-in"].animated {
+    animation: fadeIn 0.8s ease forwards;
+}
+
+[data-animation="zoom-in"].animated {
+    animation: zoomIn 0.8s ease forwards;
+}
+
+[data-animation="zoom-out"].animated {
+    animation: zoomOut 0.8s ease forwards;
+}
+
+/* ===== Hover Animations ===== */
+
+/* Hover Scale */
+.hover-scale {
+    transition: transform 0.3s ease;
+}
+
+.hover-scale:hover {
+    transform: scale(1.05);
+}
+
+/* Hover Lift */
+.hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Hover Rotate */
+.hover-rotate {
+    transition: transform 0.3s ease;
+}
+
+.hover-rotate:hover {
+    transform: rotate(5deg);
+}
+
+/* Hover Color Shift */
+.hover-color-shift {
+    transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+.hover-color-shift:hover {
+    color: var(--primary);
+    background-color: var(--primary-ultra-light);
+}
+
+/* Hover Underline */
+.hover-underline {
+    position: relative;
+}
+
+.hover-underline::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: var(--primary);
+    transition: width 0.3s ease;
+}
+
+.hover-underline:hover::after {
+    width: 100%;
+}
+
+/* Hover Glow */
+.hover-glow {
+    transition: box-shadow 0.3s ease;
+}
+
+.hover-glow:hover {
+    box-shadow: 0 0 10px var(--primary);
+}
+
+/* Hover Bounce */
+.hover-bounce:hover {
+    animation: bounce 0.5s ease;
+}
+
+/* Hover Pulse */
+.hover-pulse:hover {
+    animation: pulse 1s ease infinite;
+}
+
+/* Hover Shake */
+.hover-shake:hover {
+    animation: shake 0.5s ease;
+}
+
+/* ===== Page Transition Animations ===== */
+
+/* Page Entry Animation */
+.page-enter {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.page-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+/* Page Exit Animation */
+.page-exit {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.page-exit-active {
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+/* ===== Animation Prefers Reduced Motion ===== */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+    
+    [data-animation] {
+        opacity: 1;
+        transform: none !important;
+    }
+    
+    .hover-scale:hover,
+    .hover-lift:hover,
+    .hover-rotate:hover {
+        transform: none !important;
+    }
+}

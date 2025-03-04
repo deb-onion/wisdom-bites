@@ -3,48 +3,187 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Comprehensive general dentistry services at Wisdom Bites Dental Clinic including check-ups, cleanings, fillings, and preventive care.">
-    <meta name="keywords" content="general dentistry, dental check-up, teeth cleaning, dental fillings, preventive dental care">
-    <title>General Dentistry | Wisdom Bites Dental Clinic</title>
+    <meta name="description" content="Comprehensive general dentistry services at Wisdom Bites Dental Clinic include check-ups, cleanings, fillings, and preventive care to maintain your oral health.">
+    <meta name="keywords" content="general dentistry, dental checkup, teeth cleaning, dental fillings, preventive dental care">
+    <title>General Dentistry Services | Wisdom Bites Dental Clinic</title>
     
     <!-- Favicon -->
     <link rel="icon" href="../assets/images/favicon.ico" type="image/x-icon">
     
-    <!-- CSS -->
-    <link rel="stylesheet" href="../assets/css/styles.css">
-    <link rel="stylesheet" href="../assets/css/animations.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Critical CSS -->
+    <style>
+        :root {
+            /* Modern color palette */
+            --primary: #4a90e2;
+            --primary-dark: #3a7abd;
+            --secondary: #50c878;
+            --secondary-dark: #3ca45e;
+            --accent: #f5a623;
+            --dark: #2d3748;
+            --light: #f8fafc;
+            --white: #ffffff;
+            
+            /* Typography */
+            --font-heading: 'Montserrat', sans-serif;
+            --font-body: 'Open Sans', sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-body);
+            color: var(--dark);
+            background-color: var(--light);
+            overflow-x: hidden;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        body.loaded {
+            opacity: 1;
+        }
+        
+        .site-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background-color: transparent;
+            transition: background-color 0.3s ease, padding 0.3s ease;
+            padding: 1.5rem 0;
+        }
+        
+        .site-header.scrolled {
+            background-color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 0.75rem 0;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+    </style>
+    
+    <!-- Main CSS (loaded asynchronously) -->
+    <link rel="stylesheet" href="../assets/css/styles.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="../assets/css/animations.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="../assets/css/responsive.css" media="print" onload="this.media='all'">
+    
+    <!-- Preload critical assets -->
+    <link rel="preload" href="../assets/images/general-dentistry-hero.webp" as="image">
+    <link rel="preload" href="../assets/fonts/icons.woff2" as="font" type="font/woff2" crossorigin>
+    
+    <!-- Schema Markup for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "MedicalService",
+        "name": "General Dentistry Services - Wisdom Bites Dental Clinic",
+        "provider": {
+            "@type": "Dentist",
+            "name": "Wisdom Bites Dental Clinic",
+            "image": "../assets/images/logo.png",
+            "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "123 Dental Avenue",
+                "addressLocality": "Smile City",
+                "addressRegion": "SC",
+                "postalCode": "12345",
+                "addressCountry": "US"
+            }
+        },
+        "description": "Comprehensive general dentistry services including check-ups, cleanings, fillings, and preventive care to maintain your optimal oral health.",
+        "serviceType": "General Dentistry",
+        "medicalSpecialty": "Dentistry",
+        "relevantSpecialty": "General Dentistry",
+        "image": "../assets/images/general-dentistry-hero.jpg",
+        "url": "https://wisdombites.com/services/general-dentistry.html",
+        "telephone": "+1-555-123-4567",
+        "availableService": [
+            {
+                "@type": "MedicalProcedure",
+                "name": "Dental Check-up & Cleaning",
+                "procedureType": "Preventive",
+                "howPerformed": "Professional examination of teeth, gums, and oral tissues followed by cleaning to remove plaque and tartar."
+            },
+            {
+                "@type": "MedicalProcedure",
+                "name": "Dental Fillings",
+                "procedureType": "Therapeutic",
+                "howPerformed": "Removal of decayed tooth material followed by filling with composite resin or other dental materials."
+            },
+            {
+                "@type": "MedicalProcedure",
+                "name": "Root Canal Therapy",
+                "procedureType": "Therapeutic",
+                "howPerformed": "Removal of infected pulp, cleaning of root canal, and sealing to preserve the tooth."
+            },
+            {
+                "@type": "MedicalProcedure",
+                "name": "Tooth Extraction",
+                "procedureType": "Therapeutic",
+                "howPerformed": "Professional removal of severely damaged or problematic teeth."
+            }
+        ]
+    }
+    </script>
 </head>
 <body>
+    <!-- Loading Screen -->
+    <div class="loading-screen">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Header -->
     <header class="site-header">
         <div class="container">
-            <div class="logo">
-                <a href="../index.html">
-                    <img src="../assets/images/logo.png" alt="Wisdom Bites Dental Clinic Logo">
-                </a>
-            </div>
-            <nav class="main-nav">
-                <button class="menu-toggle" aria-label="Toggle menu">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-                <ul class="nav-list">
-                    <li class="nav-item"><a href="../index.html">Home</a></li>
-                    <li class="nav-item"><a href="../about.html">About Us</a></li>
-                    <li class="nav-item has-dropdown">
-                        <a href="#" class="dropdown-toggle active">Services</a>
-                        <ul class="dropdown-menu">
-                            <li><a href="general-dentistry.html" class="active">General Dentistry</a></li>
-                            <li><a href="cosmetic-dentistry.html">Cosmetic Dentistry</a></li>
-                            <li><a href="emergency-care.html">Emergency Care</a></li>
+            <div class="header-wrapper">
+                <div class="logo">
+                    <a href="../index.html" aria-label="Wisdom Bites Dental Clinic">
+                        <img src="../assets/images/logo.svg" alt="Wisdom Bites Dental Clinic Logo" width="180" height="45">
+                    </a>
+                </div>
+                
+                <nav class="main-nav">
+                    <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false">
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                    </button>
+                    
+                    <div class="nav-container">
+                        <ul class="nav-list">
+                            <li class="nav-item"><a href="../index.html">Home</a></li>
+                            <li class="nav-item"><a href="../about.html">About Us</a></li>
+                            <li class="nav-item has-dropdown">
+                                <a href="#" class="dropdown-toggle active">Services</a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="general-dentistry.html" class="active">General Dentistry</a></li>
+                                    <li><a href="cosmetic-dentistry.html">Cosmetic Dentistry</a></li>
+                                    <li><a href="emergency-care.html">Emergency Care</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item"><a href="../booking.html">Book Appointment</a></li>
+                            <li class="nav-item"><a href="../contact.html">Contact</a></li>
                         </ul>
-                    </li>
-                    <li class="nav-item"><a href="../booking.html">Book Appointment</a></li>
-                    <li class="nav-item"><a href="../contact.html">Contact</a></li>
-                </ul>
-            </nav>
-            <div class="header-cta">
-                <a href="../booking.html" class="btn btn-primary">Book Now</a>
+                        
+                        <div class="nav-cta">
+                            <a href="tel:+15551234567" class="phone-link">
+                                <i class="icon icon-phone"></i>
+                                <span>(555) 123-4567</span>
+                            </a>
+                            <a href="../booking.html" class="btn btn-primary">Book Now</a>
+                        </div>
+                    </div>
+                </nav>
             </div>
         </div>
     </header>
@@ -52,93 +191,217 @@
     <main>
         <!-- Hero Section -->
         <section class="page-hero service-hero">
+            <div class="hero-background">
+                <picture>
+                    <source srcset="../assets/images/general-dentistry-hero.webp" type="image/webp">
+                    <source srcset="../assets/images/general-dentistry-hero.jpg" type="image/jpeg">
+                    <img src="../assets/images/general-dentistry-hero.jpg" alt="Dentist examining patient during general dentistry check-up" loading="eager">
+                </picture>
+                <div class="hero-overlay"></div>
+            </div>
+            
             <div class="container">
                 <div class="page-hero-content">
-                    <h1 class="page-title">General Dentistry</h1>
-                    <p class="page-subtitle">Comprehensive care for your dental health</p>
+                    <h1 class="page-title" data-animation="fade-up">General Dentistry</h1>
+                    <p class="page-subtitle" data-animation="fade-up" data-delay="0.2">Comprehensive care for your dental health</p>
+                    <div class="hero-cta" data-animation="fade-up" data-delay="0.4">
+                        <a href="../booking.html?service=general" class="btn btn-primary btn-lg">Book an Appointment</a>
+                        <a href="#service-details" class="btn btn-outline btn-lg">Learn More</a>
+                    </div>
                 </div>
+            </div>
+            
+            <div class="hero-waves">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+                    <path fill="#ffffff" fill-opacity="1" d="M0,64L48,80C96,96,192,128,288,133.3C384,139,480,117,576,122.7C672,128,768,160,864,186.7C960,213,1056,235,1152,229.3C1248,224,1344,192,1392,176L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+                </svg>
             </div>
         </section>
 
         <!-- Service Overview Section -->
         <section class="service-overview">
             <div class="container">
-                <div class="service-content">
-                    <div class="service-image">
-                        <img src="../assets/images/general-dentistry-main.jpg" alt="General Dentistry at Wisdom Bites" loading="lazy">
-                    </div>
-                    <div class="service-description">
-                        <div class="service-icon">
-                            <img src="../assets/images/icon-general.svg" alt="General Dentistry Icon">
+                <div class="section-header" data-animation="fade-up">
+                    <span class="section-tagline">Preventive & Restorative Care</span>
+                    <h2 class="section-title">Keeping Your Smile Healthy</h2>
+                    <p class="section-subtitle">Comprehensive general dental services for patients of all ages</p>
+                </div>
+                
+                <div class="overview-content">
+                    <div class="overview-text" data-animation="fade-right">
+                        <p>General dentistry forms the foundation of good oral health. At Wisdom Bites Dental Clinic, our skilled team provides comprehensive preventive and restorative services to help maintain healthy teeth and gums throughout your life.</p>
+                        
+                        <p>Regular check-ups and professional cleanings are essential for preventing dental problems before they start. Our general dentistry services focus on regular preventive care, early detection of issues, and timely intervention when necessary.</p>
+                        
+                        <p>From routine examinations and cleanings to fillings, root canals, and extractions, we provide complete care using the latest techniques and materials. Our goal is to preserve your natural teeth whenever possible and provide treatments that are durable, comfortable, and aesthetically pleasing.</p>
+                        
+                        <div class="overview-features">
+                            <div class="feature">
+                                <i class="icon icon-check-circle"></i>
+                                <span>Advanced diagnostic technology</span>
+                            </div>
+                            <div class="feature">
+                                <i class="icon icon-check-circle"></i>
+                                <span>Personalized preventive care plans</span>
+                            </div>
+                            <div class="feature">
+                                <i class="icon icon-check-circle"></i>
+                                <span>Tooth-colored fillings and restorations</span>
+                            </div>
+                            <div class="feature">
+                                <i class="icon icon-check-circle"></i>
+                                <span>Gentle, patient-centered approach</span>
+                            </div>
                         </div>
-                        <h2>Comprehensive Dental Care</h2>
-                        <p>General dentistry is the foundation of good oral health. At Wisdom Bites Dental Clinic, our general dentistry services focus on prevention, early detection, and treatment of dental issues before they become more serious problems.</p>
-                        <p>Our comprehensive approach includes regular check-ups, professional cleanings, diagnostics, and treatments designed to maintain your oral health and protect your smile for years to come.</p>
-                        <a href="../booking.html" class="btn btn-primary">Book an Appointment</a>
+                    </div>
+                    
+                    <div class="overview-image" data-animation="fade-left">
+                        <div class="image-wrapper">
+                            <img src="../assets/images/general-dentistry-overview.jpg" alt="Dentist explaining dental care to patient" width="540" height="400" loading="lazy">
+                            <div class="image-badge">
+                                <span>Modern Techniques</span>
+                                <span>Advanced Technology</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Services Details Section -->
-        <section class="services-details">
+        <!-- Service Details Section -->
+        <section class="service-details" id="service-details">
             <div class="container">
-                <div class="section-header">
-                    <h2 class="section-title">Our General Dentistry Services</h2>
-                    <p class="section-subtitle">Comprehensive care for every aspect of your dental health</p>
+                <div class="section-header" data-animation="fade-up">
+                    <span class="section-tagline">Our Services</span>
+                    <h2 class="section-title">General Dentistry Services</h2>
+                    <p class="section-subtitle">Comprehensive solutions for your oral health needs</p>
                 </div>
+                
                 <div class="services-grid">
-                    <div class="service-detail-card">
-                        <div class="service-detail-icon">
-                            <img src="../assets/images/icon-checkup.svg" alt="Dental Check-ups Icon">
+                    <!-- Service Item 1 -->
+                    <div class="service-item" data-animation="fade-up">
+                        <div class="service-icon">
+                            <i class="icon icon-examination"></i>
                         </div>
-                        <h3>Dental Check-ups & Examinations</h3>
-                        <p>Regular comprehensive examinations to assess your oral health, detect potential issues early, and create personalized treatment plans.</p>
-                        <ul class="service-features">
-                            <li>Thorough visual examination</li>
-                            <li>Digital X-rays when needed</li>
-                            <li>Oral cancer screening</li>
-                            <li>Gum disease assessment</li>
-                        </ul>
+                        <div class="service-content">
+                            <h3>Dental Check-ups & Cleanings</h3>
+                            <p>Regular examinations allow us to detect potential issues early, while professional cleanings remove plaque and tartar buildup that regular brushing can't reach. We recommend check-ups and cleanings every six months for optimal oral health.</p>
+                            <ul class="service-features">
+                                <li>Comprehensive oral examination</li>
+                                <li>Digital X-rays as needed</li>
+                                <li>Professional teeth cleaning</li>
+                                <li>Oral cancer screening</li>
+                                <li>Personalized oral hygiene instruction</li>
+                            </ul>
+                            <div class="service-action">
+                                <a href="../booking.html?service=checkup" class="btn btn-primary">Book This Service</a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="service-detail-card">
-                        <div class="service-detail-icon">
-                            <img src="../assets/images/icon-cleaning.svg" alt="Professional Cleanings Icon">
+                    
+                    <!-- Service Item 2 -->
+                    <div class="service-item" data-animation="fade-up" data-delay="0.2">
+                        <div class="service-icon">
+                            <i class="icon icon-filling"></i>
                         </div>
-                        <h3>Professional Cleanings</h3>
-                        <p>Thorough cleaning to remove plaque and tartar buildup, helping prevent tooth decay and gum disease while leaving your smile refreshed.</p>
-                        <ul class="service-features">
-                            <li>Removal of plaque and tartar</li>
-                            <li>Teeth polishing</li>
-                            <li>Fluoride treatment</li>
-                            <li>Personalized oral hygiene advice</li>
-                        </ul>
+                        <div class="service-content">
+                            <h3>Dental Fillings</h3>
+                            <p>When decay damages a tooth, we remove the affected area and fill it with a durable, tooth-colored composite material. Our modern fillings are virtually invisible, mercury-free, and preserve more of your natural tooth structure.</p>
+                            <ul class="service-features">
+                                <li>Tooth-colored composite fillings</li>
+                                <li>Mercury-free materials</li>
+                                <li>Minimally invasive techniques</li>
+                                <li>Long-lasting results</li>
+                                <li>Same-day treatment available</li>
+                            </ul>
+                            <div class="service-action">
+                                <a href="../booking.html?service=fillings" class="btn btn-primary">Book This Service</a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="service-detail-card">
-                        <div class="service-detail-icon">
-                            <img src="../assets/images/icon-fillings.svg" alt="Dental Fillings Icon">
+                    
+                    <!-- Service Item 3 -->
+                    <div class="service-item" data-animation="fade-up" data-delay="0.4">
+                        <div class="service-icon">
+                            <i class="icon icon-root-canal"></i>
                         </div>
-                        <h3>Dental Fillings</h3>
-                        <p>Tooth-colored composite fillings to repair cavities and damaged teeth with natural-looking results that blend seamlessly with your smile.</p>
-                        <ul class="service-features">
-                            <li>Composite (tooth-colored) fillings</li>
-                            <li>Amalgam fillings if preferred</li>
-                            <li>Cavity prevention education</li>
-                            <li>Long-lasting materials</li>
-                        </ul>
+                        <div class="service-content">
+                            <h3>Root Canal Therapy</h3>
+                            <p>When infection or inflammation develops inside a tooth, root canal therapy can save it from extraction. Despite their reputation, modern root canals are no more uncomfortable than getting a filling and can preserve your natural tooth for years to come.</p>
+                            <ul class="service-features">
+                                <li>Advanced techniques for patient comfort</li>
+                                <li>Preservation of natural tooth</li>
+                                <li>Relief from pain and infection</li>
+                                <li>Protection against future problems</li>
+                                <li>Restoration with dental crown</li>
+                            </ul>
+                            <div class="service-action">
+                                <a href="../booking.html?service=root-canal" class="btn btn-primary">Book This Service</a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="service-detail-card">
-                        <div class="service-detail-icon">
-                            <img src="../assets/images/icon-prevention.svg" alt="Preventive Care Icon">
+                    
+                    <!-- Service Item 4 -->
+                    <div class="service-item" data-animation="fade-up" data-delay="0.6">
+                        <div class="service-icon">
+                            <i class="icon icon-extraction"></i>
                         </div>
-                        <h3>Preventive Care</h3>
-                        <p>Proactive treatments to protect your teeth and prevent future problems, saving you time, discomfort, and expense down the road.</p>
-                        <ul class="service-features">
-                            <li>Dental sealants</li>
-                            <li>Fluoride treatments</li>
-                            <li>Custom mouth guards</li>
-                            <li>Oral health education</li>
-                        </ul>
+                        <div class="service-content">
+                            <h3>Tooth Extractions</h3>
+                            <p>When a tooth is severely damaged or poses a risk to your oral health, extraction may be necessary. We prioritize tooth preservation, but when extraction is the best option, we ensure a comfortable experience and discuss replacement options.</p>
+                            <ul class="service-features">
+                                <li>Simple and surgical extractions</li>
+                                <li>Wisdom tooth removal</li>
+                                <li>Sedation options available</li>
+                                <li>Detailed aftercare instructions</li>
+                                <li>Tooth replacement consultation</li>
+                            </ul>
+                            <div class="service-action">
+                                <a href="../booking.html?service=extraction" class="btn btn-primary">Book This Service</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Service Item 5 -->
+                    <div class="service-item" data-animation="fade-up" data-delay="0.8">
+                        <div class="service-icon">
+                            <i class="icon icon-crown"></i>
+                        </div>
+                        <div class="service-content">
+                            <h3>Dental Crowns & Bridges</h3>
+                            <p>Crowns restore severely damaged teeth, while bridges replace one or more missing teeth. Both restorations are custom-crafted to match your natural teeth in appearance and function, providing durable, long-lasting solutions.</p>
+                            <ul class="service-features">
+                                <li>Porcelain or ceramic materials</li>
+                                <li>Custom shade matching</li>
+                                <li>Preservation of tooth structure</li>
+                                <li>Restoration of bite function</li>
+                                <li>Long-lasting results</li>
+                            </ul>
+                            <div class="service-action">
+                                <a href="../booking.html?service=crowns" class="btn btn-primary">Book This Service</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Service Item 6 -->
+                    <div class="service-item" data-animation="fade-up" data-delay="1.0">
+                        <div class="service-icon">
+                            <i class="icon icon-denture"></i>
+                        </div>
+                        <div class="service-content">
+                            <h3>Dentures & Partial Dentures</h3>
+                            <p>For patients missing multiple teeth, full or partial dentures provide an effective solution. Our modern dentures are comfortable, natural-looking, and custom-designed to complement your facial features and restore your smile.</p>
+                            <ul class="service-features">
+                                <li>Full and partial dentures</li>
+                                <li>Implant-supported options</li>
+                                <li>Natural-looking appearance</li>
+                                <li>Comfortable fit</li>
+                                <li>Regular adjustments and maintenance</li>
+                            </ul>
+                            <div class="service-action">
+                                <a href="../booking.html?service=dentures" class="btn btn-primary">Book This Service</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -147,84 +410,196 @@
         <!-- What to Expect Section -->
         <section class="what-to-expect">
             <div class="container">
-                <div class="section-header">
+                <div class="section-header" data-animation="fade-up">
+                    <span class="section-tagline">Patient Experience</span>
                     <h2 class="section-title">What to Expect</h2>
-                    <p class="section-subtitle">Your general dentistry visit experience</p>
+                    <p class="section-subtitle">Your journey to better oral health</p>
                 </div>
-                <div class="process-timeline">
-                    <div class="process-step">
-                        <div class="step-number">1</div>
+                
+                <div class="process-steps">
+                    <div class="process-step" data-animation="fade-up">
+                        <div class="step-number">01</div>
                         <div class="step-content">
                             <h3>Initial Consultation</h3>
-                            <p>We'll discuss your dental history, concerns, and goals for your oral health. For new patients, we'll complete necessary paperwork and make you comfortable with our clinic.</p>
+                            <p>Your first visit includes a comprehensive examination, digital X-rays, and discussion of your dental history and concerns. We'll evaluate your oral health and explain our findings in clear, easy-to-understand terms.</p>
                         </div>
                     </div>
-                    <div class="process-step">
-                        <div class="step-number">2</div>
+                    
+                    <div class="process-step" data-animation="fade-up" data-delay="0.2">
+                        <div class="step-number">02</div>
                         <div class="step-content">
-                            <h3>Comprehensive Examination</h3>
-                            <p>Your dentist will thoroughly examine your teeth, gums, and mouth, looking for signs of decay, gum disease, or other oral health issues. Digital X-rays may be taken if needed.</p>
+                            <h3>Treatment Planning</h3>
+                            <p>Based on your examination, we'll develop a personalized treatment plan addressing your specific needs. We'll discuss all treatment options, answer your questions, and provide transparent cost information.</p>
                         </div>
                     </div>
-                    <div class="process-step">
-                        <div class="step-number">3</div>
+                    
+                    <div class="process-step" data-animation="fade-up" data-delay="0.4">
+                        <div class="step-number">03</div>
                         <div class="step-content">
-                            <h3>Professional Cleaning</h3>
-                            <p>Our skilled hygienist will carefully remove plaque and tartar, polish your teeth, and may apply fluoride treatment to protect against decay.</p>
+                            <h3>Preventive Care</h3>
+                            <p>Regular dental cleaning and preventive services help maintain your oral health and prevent future problems. Our hygienists provide gentle, thorough cleanings and personalized oral hygiene instruction.</p>
                         </div>
                     </div>
-                    <div class="process-step">
-                        <div class="step-number">4</div>
+                    
+                    <div class="process-step" data-animation="fade-up" data-delay="0.6">
+                        <div class="step-number">04</div>
                         <div class="step-content">
-                            <h3>Treatment Discussion</h3>
-                            <p>Your dentist will discuss any findings with you, answer questions, and recommend a personalized treatment plan if needed. We'll provide transparent information about costs and procedures.</p>
+                            <h3>Treatment Procedures</h3>
+                            <p>When treatment is needed, our focus is on your comfort and care. We use the latest techniques and technologies to ensure efficient, effective procedures with minimal discomfort and faster healing.</p>
                         </div>
                     </div>
-                    <div class="process-step">
-                        <div class="step-number">5</div>
+                    
+                    <div class="process-step" data-animation="fade-up" data-delay="0.8">
+                        <div class="step-number">05</div>
                         <div class="step-content">
-                            <h3>Follow-Up Care</h3>
-                            <p>We'll schedule your next routine visit (typically every 6 months) and any treatment appointments if necessary. Our team will provide at-home care instructions to maintain your oral health between visits.</p>
+                            <h3>Follow-Up & Maintenance</h3>
+                            <p>Ongoing care is essential for long-term oral health. We'll create a maintenance schedule tailored to your needs and provide regular check-ups to ensure your teeth and gums remain healthy.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="process-image" data-animation="fade-up">
+                    <img src="../assets/images/general-dentistry-process.jpg" alt="Comfortable dental examination room at Wisdom Bites Dental Clinic" width="100%" loading="lazy">
+                </div>
+            </div>
+        </section>
+
+        <!-- Technology Section -->
+        <section class="technology-section">
+            <div class="container">
+                <div class="section-header" data-animation="fade-up">
+                    <span class="section-tagline">Advanced Technology</span>
+                    <h2 class="section-title">State-of-the-Art Dental Care</h2>
+                    <p class="section-subtitle">Modern solutions for better diagnostics and treatment</p>
+                </div>
+                
+                <div class="technology-grid">
+                    <!-- Technology Item 1 -->
+                    <div class="technology-item" data-animation="fade-up">
+                        <div class="technology-image">
+                            <img src="../assets/images/tech-digital-xray.jpg" alt="Digital X-ray technology" loading="lazy">
+                        </div>
+                        <div class="technology-content">
+                            <h3>Digital X-rays</h3>
+                            <p>Our digital X-ray technology provides detailed images with up to 90% less radiation than traditional X-rays. The instant results allow for immediate diagnosis and treatment planning.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Technology Item 2 -->
+                    <div class="technology-item" data-animation="fade-up" data-delay="0.2">
+                        <div class="technology-image">
+                            <img src="../assets/images/tech-intraoral-camera.jpg" alt="Intraoral camera technology" loading="lazy">
+                        </div>
+                        <div class="technology-content">
+                            <h3>Intraoral Cameras</h3>
+                            <p>Tiny intraoral cameras allow you to see exactly what we see inside your mouth. These high-resolution images help you better understand your oral health and treatment recommendations.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Technology Item 3 -->
+                    <div class="technology-item" data-animation="fade-up" data-delay="0.4">
+                        <div class="technology-image">
+                            <img src="../assets/images/tech-laser-dentistry.jpg" alt="Dental laser technology" loading="lazy">
+                        </div>
+                        <div class="technology-content">
+                            <h3>Laser Dentistry</h3>
+                            <p>Advanced dental lasers allow us to perform certain procedures with greater precision, less discomfort, and faster healing times compared to traditional methods.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Before & After Section -->
-        <section class="before-after">
+        <!-- Testimonials Section -->
+        <section class="testimonials testimonials-compact">
             <div class="container">
-                <div class="section-header">
-                    <h2 class="section-title">Before & After Results</h2>
-                    <p class="section-subtitle">Transformations through general dentistry</p>
+                <div class="section-header" data-animation="fade-up">
+                    <span class="section-tagline">Patient Reviews</span>
+                    <h2 class="section-title">Happy Smiles, Happy Patients</h2>
+                    <p class="section-subtitle">Experience the Wisdom Bites difference</p>
                 </div>
-                <div class="before-after-slider">
-                    <div class="slider-container">
-                        <div class="before-after-slide">
-                            <div class="ba-image-container">
-                                <div class="ba-image before">
-                                    <img src="../assets/images/before-cavity.jpg" alt="Before dental filling treatment" loading="lazy">
-                                    <span class="label">Before</span>
+                
+                <div class="testimonials-slider" data-animation="fade-up">
+                    <div class="swiper-container">
+                        <div class="swiper-wrapper">
+                            <!-- Testimonial 1 -->
+                            <div class="swiper-slide">
+                                <div class="testimonial-card">
+                                    <div class="testimonial-rating">
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                    </div>
+                                    <blockquote class="testimonial-quote">
+                                        <p>I've been seeing Dr. Chen for my regular check-ups for years, and I couldn't be happier with the care I receive. They're thorough, professional, and make sure I understand everything about my dental health.</p>
+                                    </blockquote>
+                                    <div class="testimonial-author">
+                                        <img src="../assets/images/patient-7.jpg" alt="Robert Taylor" class="author-image" width="60" height="60" loading="lazy">
+                                        <div class="author-details">
+                                            <p class="author-name">Robert Taylor</p>
+                                            <p class="author-info">Patient for 5 years</p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="ba-image after">
-                                    <img src="../assets/images/after-filling.jpg" alt="After dental filling treatment" loading="lazy">
-                                    <span class="label">After</span>
-                                </div>
-                                <div class="slider-handle"></div>
                             </div>
-                            <div class="treatment-description">
-                                <h3>Composite Filling Treatment</h3>
-                                <p>This patient had a visible cavity that was affecting both appearance and function. We used tooth-colored composite filling material to restore the tooth, providing a natural look that's virtually undetectable.</p>
+                            
+                            <!-- Testimonial 2 -->
+                            <div class="swiper-slide">
+                                <div class="testimonial-card">
+                                    <div class="testimonial-rating">
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                    </div>
+                                    <blockquote class="testimonial-quote">
+                                        <p>I was terrified of having a root canal, but Dr. Wilson made the process comfortable and painless. She explained everything, checked on me throughout, and the results have been fantastic. No more pain!</p>
+                                    </blockquote>
+                                    <div class="testimonial-author">
+                                        <img src="../assets/images/patient-8.jpg" alt="Jennifer Adams" class="author-image" width="60" height="60" loading="lazy">
+                                        <div class="author-details">
+                                            <p class="author-name">Jennifer Adams</p>
+                                            <p class="author-info">Root Canal Patient</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Testimonial 3 -->
+                            <div class="swiper-slide">
+                                <div class="testimonial-card">
+                                    <div class="testimonial-rating">
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                        <i class="icon icon-star"></i>
+                                    </div>
+                                    <blockquote class="testimonial-quote">
+                                        <p>As someone who's been neglecting dental check-ups for years, I was nervous about what they might find. The team was non-judgmental and focused on solutions, not making me feel bad about past habits.</p>
+                                    </blockquote>
+                                    <div class="testimonial-author">
+                                        <img src="../assets/images/patient-9.jpg" alt="Michael Chen" class="author-image" width="60" height="60" loading="lazy">
+                                        <div class="author-details">
+                                            <p class="author-name">Michael Chen</p>
+                                            <p class="author-info">New Patient</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="slider-controls">
-                        <button class="control-prev" aria-label="Previous result">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                    
+                    <div class="testimonials-navigation">
+                        <button class="slider-button prev" aria-label="Previous testimonial">
+                            <i class="icon icon-arrow-left"></i>
                         </button>
-                        <div class="control-dots"></div>
-                        <button class="control-next" aria-label="Next result">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                        <div class="swiper-pagination"></div>
+                        <button class="slider-button next" aria-label="Next testimonial">
+                            <i class="icon icon-arrow-right"></i>
                         </button>
                     </div>
                 </div>
@@ -234,129 +609,227 @@
         <!-- FAQ Section -->
         <section class="faq-section">
             <div class="container">
-                <div class="section-header">
+                <div class="section-header" data-animation="fade-up">
+                    <span class="section-tagline">Common Questions</span>
                     <h2 class="section-title">Frequently Asked Questions</h2>
-                    <p class="section-subtitle">Common questions about general dentistry</p>
+                    <p class="section-subtitle">Everything you need to know about general dentistry</p>
                 </div>
-                <div class="faq-container">
+                
+                <div class="faq-container" data-animation="fade-up">
                     <div class="faq-item">
                         <button class="faq-question">
                             How often should I have a dental check-up and cleaning?
-                            <span class="icon-plus"></span>
+                            <i class="icon icon-arrow-down"></i>
                         </button>
                         <div class="faq-answer">
-                            <p>For most patients, we recommend dental check-ups and professional cleanings every six months. However, some individuals with specific dental concerns or conditions may benefit from more frequent visits. Your dentist will recommend the optimal schedule for your unique needs.</p>
+                            <p>Most people benefit from having a dental check-up and professional cleaning every six months. However, depending on your specific oral health needs, our dentists may recommend more frequent visits. Patients with gum disease, a history of frequent cavities, or certain medical conditions may need to be seen every 3-4 months to maintain optimal oral health.</p>
                         </div>
                     </div>
+                    
                     <div class="faq-item">
                         <button class="faq-question">
                             Are dental X-rays safe?
-                            <span class="icon-plus"></span>
+                            <i class="icon icon-arrow-down"></i>
                         </button>
                         <div class="faq-answer">
-                            <p>Yes, dental X-rays are very safe. At Wisdom Bites, we use digital X-ray technology that exposes patients to significantly less radiation than traditional X-rays. We also provide protective lead aprons for additional safety. The minimal radiation exposure from dental X-rays is far outweighed by the benefits of detecting and treating dental problems early.</p>
+                            <p>Yes, dental X-rays are very safe. At Wisdom Bites, we use digital X-ray technology, which reduces radiation exposure by up to 90% compared to traditional film X-rays. We also use protective lead aprons and thyroid collars as additional safety measures. The amount of radiation from a full set of dental X-rays is less than the radiation exposure from a day of natural background radiation or a short airplane flight.</p>
                         </div>
                     </div>
-                    <div class="faq-item">
-                        <button class="faq-question">
-                            What causes tooth decay and how can I prevent it?
-                            <span class="icon-plus"></span>
-                        </button>
-                        <div class="faq-answer">
-                            <p>Tooth decay is caused by acids created when bacteria in your mouth break down sugars from food and drinks. To prevent decay: brush twice daily with fluoride toothpaste, floss daily, limit sugary foods and drinks, visit your dentist regularly, and consider preventive treatments like fluoride applications and dental sealants.</p>
-                        </div>
-                    </div>
+                    
                     <div class="faq-item">
                         <button class="faq-question">
                             Do tooth-colored fillings last as long as silver fillings?
-                            <span class="icon-plus"></span>
+                            <i class="icon icon-arrow-down"></i>
                         </button>
                         <div class="faq-answer">
-                            <p>Modern composite (tooth-colored) fillings are very durable and can last 7-10 years or longer with proper care. While traditional amalgam (silver) fillings may have a slight longevity advantage in some cases, composite fillings offer superior aesthetics and don't contain mercury. They also bond directly to the tooth structure, often allowing for more conservative preparations that preserve more of your natural tooth.</p>
+                            <p>Modern composite (tooth-colored) fillings can last just as long as traditional amalgam (silver) fillings when properly placed and maintained. Composite fillings have the added benefits of being mercury-free, bonding directly to the tooth structure for added strength, and requiring less removal of healthy tooth structure. With good oral hygiene and regular dental check-ups, tooth-colored fillings can last 7-10 years or longer.</p>
                         </div>
                     </div>
+                    
                     <div class="faq-item">
                         <button class="faq-question">
-                            My teeth don't hurt - do I still need regular check-ups?
-                            <span class="icon-plus"></span>
+                            Is root canal treatment painful?
+                            <i class="icon icon-arrow-down"></i>
                         </button>
                         <div class="faq-answer">
-                            <p>Absolutely! Many dental problems, including cavities and gum disease, develop gradually and may not cause pain until they're quite advanced. Regular check-ups allow us to detect and address issues when they're smaller, simpler, and less expensive to treat. Prevention and early intervention are the cornerstones of good dental health.</p>
+                            <p>The perception that root canal therapy is extremely painful is outdated. With modern techniques, effective anesthesia, and gentle approaches, most patients report that having a root canal is no more uncomfortable than getting a filling. In fact, root canal therapy relieves pain by removing the infected or inflamed pulp that is causing discomfort. After the procedure, you might experience some mild tenderness for a few days, which can typically be managed with over-the-counter pain relievers.</p>
                         </div>
                     </div>
+                    
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            How can I prevent cavities and gum disease?
+                            <i class="icon icon-arrow-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>The best way to prevent cavities and gum disease is to maintain a consistent oral hygiene routine:
+                            <ul>
+                                <li>Brush your teeth twice daily with fluoride toothpaste for two minutes each time</li>
+                                <li>Floss daily to remove plaque between teeth where brushing can't reach</li>
+                                <li>Maintain a balanced diet and limit sugary foods and drinks</li>
+                                <li>Avoid tobacco products</li>
+                                <li>Visit your dentist for regular check-ups and professional cleanings</li>
+                                <li>Consider preventive treatments like fluoride applications or dental sealants</li>
+                            </ul>
+                            Our dental team can provide personalized recommendations based on your specific needs.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            What should I do if I have a dental emergency?
+                            <i class="icon icon-arrow-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>If you experience a dental emergency such as severe pain, swelling, bleeding, or a knocked-out tooth, contact our office immediately at (555) 123-4567. We reserve time in our daily schedule for emergency patients. Outside of office hours, our answering service will connect you with the on-call dentist who can provide guidance. For knocked-out teeth, gently rinse the tooth without scrubbing, try to reposition it in the socket, or store it in milk or saliva and seek immediate dental care, as quick action can often save the tooth.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="faq-cta" data-animation="fade-up">
+                    <p>Have more questions? We're here to help!</p>
+                    <a href="../contact.html" class="btn btn-primary">Contact Us</a>
                 </div>
             </div>
         </section>
 
-        <!-- CTA Section -->
+        <!-- Call to Action Section -->
         <section class="cta-section">
             <div class="container">
-                <div class="cta-content">
-                    <h2 class="cta-title">Ready for Your Healthiest Smile?</h2>
-                    <p class="cta-description">Schedule your general dentistry appointment today and take a proactive step toward optimal oral health.</p>
-                    <a href="../booking.html" class="btn btn-primary btn-large">Book Your Appointment</a>
+                <div class="cta-wrapper" data-animation="fade-up">
+                    <div class="cta-content">
+                        <h2 class="cta-title">Ready to Schedule Your Visit?</h2>
+                        <p class="cta-description">Book an appointment today and take the first step toward your healthiest smile.</p>
+                        
+                        <div class="cta-actions">
+                            <a href="../booking.html?service=general" class="btn btn-primary btn-lg">Book an Appointment</a>
+                            <div class="cta-contact">
+                                <span>or call us at</span>
+                                <a href="tel:+15551234567" class="phone-link">(555) 123-4567</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
     </main>
 
+    <!-- Footer -->
     <footer class="site-footer">
-        <div class="container">
-            <div class="footer-top">
-                <div class="footer-logo">
-                    <img src="../assets/images/logo-white.png" alt="Wisdom Bites Dental Clinic Logo">
-                </div>
-                <div class="footer-contact">
-                    <h3 class="footer-heading">Contact Us</h3>
-                    <address>
-                        <p>123 Dental Avenue, Smile City, SC 12345</p>
-                        <p>Phone: <a href="tel:+15551234567">+1 (555) 123-4567</a></p>
-                        <p>Email: <a href="mailto:info@wisdombites.com">info@wisdombites.com</a></p>
-                    </address>
-                </div>
-                <div class="footer-hours">
-                    <h3 class="footer-heading">Hours</h3>
-                    <ul class="hours-list">
-                        <li><span>Monday - Friday:</span> 9:00 AM - 6:00 PM</li>
-                        <li><span>Saturday:</span> 10:00 AM - 3:00 PM</li>
-                        <li><span>Sunday:</span> Closed</li>
-                    </ul>
-                </div>
-                <div class="footer-links">
-                    <h3 class="footer-heading">Quick Links</h3>
-                    <ul class="footer-nav">
-                        <li><a href="../index.html">Home</a></li>
-                        <li><a href="../about.html">About Us</a></li>
-                        <li><a href="general-dentistry.html">Services</a></li>
-                        <li><a href="../booking.html">Book Appointment</a></li>
-                        <li><a href="../contact.html">Contact</a></li>
-                    </ul>
+        <div class="footer-top">
+            <div class="container">
+                <div class="footer-widgets">
+                    <div class="footer-widget">
+                        <div class="footer-logo">
+                            <img src="../assets/images/logo-white.svg" alt="Wisdom Bites Dental Clinic" width="180" height="45">
+                        </div>
+                        <p class="footer-description">Providing exceptional dental care in a comfortable, modern environment. Our mission is to help you achieve and maintain optimal oral health.</p>
+                        <div class="social-links">
+                            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                                <i class="icon icon-facebook"></i>
+                            </a>
+                            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                                <i class="icon icon-instagram"></i>
+                            </a>
+                            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+                                <i class="icon icon-twitter"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-widget">
+                        <h3 class="footer-heading">Contact Us</h3>
+                        <address>
+                            <div class="contact-item">
+                                <i class="icon icon-map"></i>
+                                <span>123 Dental Avenue, Smile City, SC 12345</span>
+                            </div>
+                            <div class="contact-item">
+                                <i class="icon icon-phone"></i>
+                                <a href="tel:+15551234567">+1 (555) 123-4567</a>
+                            </div>
+                            <div class="contact-item">
+                                <i class="icon icon-email"></i>
+                                <a href="mailto:info@wisdombites.com">info@wisdombites.com</a>
+                            </div>
+                        </address>
+                    </div>
+                    
+                    <div class="footer-widget">
+                        <h3 class="footer-heading">Office Hours</h3>
+                        <ul class="hours-list">
+                            <li><span>Monday - Friday:</span> 9:00 AM - 6:00 PM</li>
+                            <li><span>Saturday:</span> 10:00 AM - 3:00 PM</li>
+                            <li><span>Sunday:</span> Closed</li>
+                        </ul>
+                        <div class="emergency-info">
+                            <p><strong>Dental Emergency?</strong></p>
+                            <a href="emergency-care.html" class="btn btn-sm btn-primary">Emergency Information</a>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-widget">
+                        <h3 class="footer-heading">Quick Links</h3>
+                        <ul class="footer-links">
+                            <li><a href="../index.html">Home</a></li>
+                            <li><a href="../about.html">About Us</a></li>
+                            <li><a href="general-dentistry.html">Services</a></li>
+                            <li><a href="../booking.html">Book Appointment</a></li>
+                            <li><a href="../contact.html">Contact</a></li>
+                            <li><a href="../blog.html">Blog</a></li>
+                            <li><a href="../insurance.html">Insurance Information</a></li>
+                            <li><a href="../faq.html">FAQs</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-            <div class="footer-bottom">
-                <div class="social-links">
-                    <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
-                    </a>
-                    <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-                    </a>
-                    <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
-                    </a>
-                </div>
-                <div class="copyright">
-                    <p>&copy; <script>document.write(new Date().getFullYear())</script> Wisdom Bites Dental Clinic. All Rights Reserved.</p>
-                </div>
-                <div class="footer-legal">
-                    <a href="../privacy-policy.html">Privacy Policy</a>
-                    <a href="../terms-of-service.html">Terms of Service</a>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="container">
+                <div class="footer-bottom-content">
+                    <div class="copyright">
+                        <p>&copy; <span id="current-year">2025</span> Wisdom Bites Dental Clinic. All Rights Reserved.</p>
+                    </div>
+                    <div class="footer-legal">
+                        <a href="../privacy-policy.html">Privacy Policy</a>
+                        <a href="../terms-of-service.html">Terms of Service</a>
+                        <a href="../accessibility.html">Accessibility</a>
+                    </div>
                 </div>
             </div>
         </div>
     </footer>
 
+    <!-- Back to Top Button -->
+    <a href="#" class="back-to-top" aria-label="Back to top">
+        <i class="icon icon-arrow-up"></i>
+    </a>
+
+    <!-- Booking CTA Sticky -->
+    <div class="booking-sticky">
+        <div class="container">
+            <p>Ready to schedule your visit?</p>
+            <a href="../booking.html?service=general" class="btn btn-primary">Book Now</a>
+        </div>
+    </div>
+
     <!-- JavaScript -->
-    <script src="../assets/js/scripts.js"></script>
+    <script src="../assets/js/vendors/swiper-bundle.min.js" defer></script>
+    <script src="../assets/js/main.js" defer></script>
+    <script src="../assets/js/animations.js" defer></script>
+    
+    <!-- Initialize current year for copyright -->
+    <script>
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+        
+        // Mark body as loaded when content is ready
+        window.addEventListener('load', function() {
+            document.body.classList.add('loaded');
+            setTimeout(function() {
+                document.querySelector('.loading-screen').style.display = 'none';
+            }, 500);
+        });
+    </script>
 </body>
-</html> 
+</html>

@@ -1,6 +1,14 @@
 # Wisdom Bites Dental Clinic - Changelog
 
 
+## [3.0.0] - 2025-03-04
+
+### Major Update:
+- Major enhancement: Implemented comprehensive virtual tour feature with Google Maps API integration, responsive panorama viewer, interactive hotspots, place info panel, tour progression indicators, completion dialog, and fallback mechanisms. Also fixed CSS compatibility issues and accessibility problems.
+### Media Updates:
+- Updated media assets (see media-updates.log for details)
+
+
 ## [2.1.0] - 2025-03-04
 
 ### Feature Update:
