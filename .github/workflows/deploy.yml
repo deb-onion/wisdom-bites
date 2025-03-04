@@ -36,32 +36,25 @@ jobs:
       - name: Install dependencies
         run: npm ci
       
-      - name: Optimize images
+      - name: Optimize images (in-place)
         run: |
           npm install -g imagemin-cli
-          find assets/images -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" \) -exec imagemin {} --out-dir=./optimized-images \;
-          rsync -av --remove-source-files ./optimized-images/ ./assets/images/
-          rmdir optimized-images
+          find assets/images -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" \) -exec imagemin {} -o {} \;
       
-      - name: Minify CSS
+      - name: Minify CSS (in-place)
         run: |
           npm install -g clean-css-cli
           find assets/css -name "*.css" -exec cleancss -o {} {} \;
       
-      - name: Minify JavaScript
+      - name: Minify JavaScript (in-place)
         run: |
           npm install -g terser
           find assets/js -name "*.js" -exec terser {} -o {} \;
       
-      - name: Create optimized build directory
-        run: |
-          mkdir -p build
-          rsync -av --exclude=".git" --exclude=".github" --exclude="node_modules" --exclude="*.log" ./ ./build/
-      
       - name: Check HTML files
         run: |
           npm install -g html-validate
-          find build -name "*.html" -exec html-validate {} \;
+          find . -name "*.html" -exec html-validate {} \;
       
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1
@@ -69,7 +62,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           projectName: wisdom-bites-dental
-          directory: build
+          directory: .
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Update deployment status
