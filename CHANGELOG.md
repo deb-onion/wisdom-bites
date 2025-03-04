@@ -1,5 +1,13 @@
 # Wisdom Bites Dental Clinic - Changelog
 
+
+## [2.0.0] - 2025-03-04
+
+### Major Update:
+- Initial website setup
+### Media Updates:
+- Updated media assets (see media-updates.log for details)
+
 All notable changes to this website will be documented in this file.
 
 ## [1.0.0] - 2023-06-15

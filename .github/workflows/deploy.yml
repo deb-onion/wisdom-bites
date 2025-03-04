@@ -1,0 +1,90 @@
+name: Deploy Website
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version being deployed'
+        required: false
+        default: 'auto-detected'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Read version information
+        id: version
+        run: |
+          VERSION=$(cat version.json | jq -r '.version')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Deploying version $VERSION"
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Optimize images
+        run: |
+          npm install -g imagemin-cli
+          find assets/images -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" \) -exec imagemin {} --out-dir=./optimized-images \;
+          rsync -av --remove-source-files ./optimized-images/ ./assets/images/
+          rmdir optimized-images
+      
+      - name: Minify CSS
+        run: |
+          npm install -g clean-css-cli
+          find assets/css -name "*.css" -exec cleancss -o {} {} \;
+      
+      - name: Minify JavaScript
+        run: |
+          npm install -g terser
+          find assets/js -name "*.js" -exec terser {} -o {} \;
+      
+      - name: Create optimized build directory
+        run: |
+          mkdir -p build
+          rsync -av --exclude=".git" --exclude=".github" --exclude="node_modules" --exclude="*.log" ./ ./build/
+      
+      - name: Check HTML files
+        run: |
+          npm install -g html-validate
+          find build -name "*.html" -exec html-validate {} \;
+      
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: wisdom-bites-dental
+          directory: build
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Update deployment status
+        run: |
+          echo "Website version ${{ steps.version.outputs.version }} deployed successfully to Cloudflare Pages"
+          echo "Deployment completed at $(date)"
+          
+      - name: Send deployment notification
+        if: success()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_CHANNEL: website-deployments
+          SLACK_COLOR: '#36a64f'
+          SLACK_ICON: https://github.com/rtCamp.png?size=48
+          SLACK_MESSAGE: 'Wisdom Bites website v${{ steps.version.outputs.version }} deployed successfully :rocket:'
+          SLACK_TITLE: Deployment Success
+          SLACK_USERNAME: DeployBot 

@@ -180,7 +180,7 @@ function Update-Changelog {
     $changelogEntry = @"
 ## [$NewVersion] - $date
 
-### $changeType:
+### ${changeType}:
 - $Description$mediaChanges
 
 "@
@@ -251,7 +251,7 @@ function Deploy-Changes {
     # Commit all changes
     Write-ColorOutput "Committing changes..." $colorInfo
     git add .
-    git commit -m "v$NewVersion: $Description"
+    git commit -m "v${NewVersion}: ${Description}"
     
     # Push to GitHub
     Write-ColorOutput "Pushing to GitHub..." $colorInfo
