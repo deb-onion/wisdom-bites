@@ -1,6 +1,14 @@
 # Wisdom Bites Dental Clinic - Changelog
 
 
+## [3.0.7] - 2025-03-04
+
+### Patch Update:
+- Fixed MIME type issues, font loading errors, and enhanced Google Maps integration on contact page
+### Media Updates:
+- Updated media assets (see media-updates.log for details)
+
+
 ## [3.0.6] - 2025-03-04
 
 ### Patch Update:
