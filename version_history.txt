@@ -4,3 +4,4 @@ v1.0.0 (2023-06-15): Initial website release with responsive design and core fun
 v2.0.1 (2025-03-04): Cleaned up repository by removing node_modules from Git tracking and adding proper .gitignore file
 v2.0.2 (2025-03-04): Updated README with accurate Cloudflare Pages deployment instructions and troubleshooting
 v2.0.3 (2025-03-04): Updated README with accurate Cloudflare Pages deployment instructions and troubleshooting
+v2.1.0 (2025-03-04): Added AI_ASSISTANT_GUIDE.md for better AI-assisted debugging and development

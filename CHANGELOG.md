@@ -1,6 +1,14 @@
 # Wisdom Bites Dental Clinic - Changelog
 
 
+## [2.1.0] - 2025-03-04
+
+### Feature Update:
+- Added AI_ASSISTANT_GUIDE.md for better AI-assisted debugging and development
+### Media Updates:
+- Updated media assets (see media-updates.log for details)
+
+
 ## [2.0.3] - 2025-03-04
 
 ### Patch Update:
