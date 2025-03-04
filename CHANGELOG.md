@@ -1,6 +1,14 @@
 # Wisdom Bites Dental Clinic - Changelog
 
 
+## [2.0.1] - 2025-03-04
+
+### Patch Update:
+- Cleaned up repository by removing node_modules from Git tracking and adding proper .gitignore file
+### Media Updates:
+- Updated media assets (see media-updates.log for details)
+
+
 ## [2.0.0] - 2025-03-04
 
 ### Major Update:
