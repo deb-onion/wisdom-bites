@@ -1,6 +1,14 @@
 # Wisdom Bites Dental Clinic - Changelog
 
 
+## [3.0.3] - 2025-03-04
+
+### Patch Update:
+- Ensured all tour fallbacks use exact clinic location data: Replaced the Static Map API fallback with the embedded Google Maps iframe for reliability, updated clinic data with precise coordinates (22.496391851463255, 88.36915472944189), and ensured all fallback mechanisms refer specifically to Wisdom Bites Dental Clinic at 1/4A, North Road, Poddar Nagar, Jadavpur, Kolkata. Added better styling for embedded maps and updated clinic service information.
+### Media Updates:
+- Updated media assets (see media-updates.log for details)
+
+
 ## [3.0.2] - 2025-03-04
 
 ### Patch Update:

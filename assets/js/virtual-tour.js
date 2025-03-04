@@ -296,6 +296,59 @@ const VirtualTour = {
     },
     
     /**
+     * Handle Maps API error
+     */
+    handleMapsError: function() {
+        this.hideLoading();
+        
+        console.error("Google Maps failed to load or encountered an error.");
+        
+        // Check console logs for API activation errors
+        const isApiNotActivatedError = document.documentElement.innerHTML.includes('ApiNotActivatedMapError') || 
+                                      document.documentElement.innerHTML.includes('This API project is not authorized');
+        
+        // Show error message in panorama view
+        if (this.elements.panoramaView) {
+            this.elements.panoramaView.innerHTML = `
+                <div class="maps-error-notice">
+                    <h3>Virtual Tour Unavailable</h3>
+                    <p>We're experiencing technical difficulties with our virtual tour feature.</p>
+                    ${isApiNotActivatedError ? 
+                    `<p class="error-details">Error: Google Maps Places API is not activated for this API key. 
+                     This feature requires the following APIs to be enabled in the Google Cloud Console:
+                     <ul>
+                        <li>Maps JavaScript API</li>
+                        <li>Places API</li>
+                        <li>Street View API</li>
+                        <li>Geocoding API</li>
+                     </ul>
+                     </p>` : 
+                    `<p class="error-details">Error: Google Maps API could not be initialized. This may be due to network issues.</p>`}
+                    <div class="error-actions">
+                        <button class="error-action-btn" id="try-interior-btn">View Interior Images Instead</button>
+                        <button class="error-action-btn" id="try-static-map-btn">View Static Map</button>
+                    </div>
+                </div>
+            `;
+            
+            // Add event listener to switch to interior view
+            const tryInteriorBtn = document.getElementById('try-interior-btn');
+            if (tryInteriorBtn) {
+                tryInteriorBtn.addEventListener('click', this.switchToInteriorView.bind(this));
+            }
+            
+            // Add event listener to show static map
+            const tryStaticMapBtn = document.getElementById('try-static-map-btn');
+            if (tryStaticMapBtn) {
+                tryStaticMapBtn.addEventListener('click', this.useStaticMapFallback.bind(this));
+            }
+        }
+        
+        // Update buttons visibility
+        this.updateNavigationButtons();
+    },
+    
+    /**
      * Initialize Google Maps services
      */
     initServices: function() {
@@ -306,9 +359,17 @@ const VirtualTour = {
             const map = new google.maps.Map(document.createElement('div'));
             this.state.placesService = new google.maps.places.PlacesService(map);
             this.state.directionsService = new google.maps.DirectionsService();
+            
+            // Try to fetch place details, but handle potential API activation errors
             this.fetchPlaceDetails();
         } catch (error) {
             console.warn('Could not initialize Maps services:', error);
+            // Continue with the tour even if services fail
+            // Use local data as a fallback
+            if (this.state.localClinicData) {
+                this.state.placeDetails = this.convertLocalDataToPlaceDetails(this.state.localClinicData);
+                this.updatePlaceInfoPanel();
+            }
         }
     },
     
@@ -316,7 +377,14 @@ const VirtualTour = {
      * Fetch place details using Places API
      */
     fetchPlaceDetails: function() {
-        if (!this.state.placesService) return;
+        if (!this.state.placesService) {
+            // If Places service isn't available, use local data
+            if (this.state.localClinicData) {
+                this.state.placeDetails = this.convertLocalDataToPlaceDetails(this.state.localClinicData);
+                this.updatePlaceInfoPanel();
+            }
+            return;
+        }
         
         this.state.placesService.getDetails({
             placeId: this.config.placeId,
@@ -337,6 +405,20 @@ const VirtualTour = {
                 // Use place photos if available
                 if (place.photos && place.photos.length > 0) {
                     this.updateGalleryWithPhotos(place.photos);
+                }
+            } else {
+                console.warn('Places API request failed with status:', status);
+                console.log('Using local clinic data as fallback...');
+                
+                // Use local data as fallback
+                if (this.state.localClinicData) {
+                    this.state.placeDetails = this.convertLocalDataToPlaceDetails(this.state.localClinicData);
+                    this.updatePlaceInfoPanel();
+                }
+                
+                // If it's an API not enabled error, log helpful information
+                if (status === 'REQUEST_DENIED') {
+                    console.error('Places API request was denied. Please ensure Places API is enabled for your API key: https://console.cloud.google.com/apis/library/places-backend.googleapis.com');
                 }
             }
         });
@@ -499,53 +581,34 @@ const VirtualTour = {
     },
     
     /**
-     * Handle Maps API loading error
-     */
-    handleMapsError: function() {
-        this.hideLoading();
-        
-        // Try to use static map as fallback
-        this.useStaticMapFallback();
-        
-        // Show a notification to the user
-        if (this.elements.panoramaView) {
-            const errorNotice = document.createElement('div');
-            errorNotice.className = 'maps-error-notice';
-            errorNotice.textContent = 'Street view could not be loaded. Showing static map instead.';
-            this.elements.panoramaView.appendChild(errorNotice);
-            
-            // Auto-hide after a few seconds
-            setTimeout(() => {
-                errorNotice.style.opacity = '0';
-                setTimeout(() => {
-                    errorNotice.remove();
-                }, 500);
-            }, 3000);
-        }
-    },
-    
-    /**
      * Use Static Maps API as fallback
      */
     useStaticMapFallback: function() {
         if (!this.elements.panoramaView) return;
         
-        const options = this.config.staticMapOptions;
-        const markers = options.markers.map(marker => 
-            `markers=color:${marker.color}|label:${marker.label}|${marker.position}`
-        ).join('&');
-        
-        const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${this.config.panoramaOptions.position.lat},${this.config.panoramaOptions.position.lng}&zoom=${options.zoom}&size=${options.width}x${options.height}&maptype=${options.maptype}&${markers}&key=AIzaSyDY7pn8Bkb9dxMKX6pKgldH1a2acVjmWsw`;
-        
-        this.elements.panoramaView.innerHTML = `
+        // First try the embedded iframe from Google Maps directly
+        // This is the most reliable fallback as it's directly from Google Maps with the exact location
+        const embeddedMapHtml = `
             <div class="static-map-container">
-                <img src="${staticMapUrl}" alt="Map of Wisdom Bites Dental Clinic" class="static-map-img">
+                <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d230.38789888717423!2d88.36900519629518!3d22.496438625641858!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a027123b8369c11%3A0x680b559dbec9f1ac!2sWisdom%20Bites%20Dental%20Clinic%20-%20Best%20Dental%20Clinic%20in%20Jadavpur%20%7C%20Top%20Dentist%20%7C%20Best%20Dental%20Implants%20Clinic%20in%20Kolkata!5e0!3m2!1sen!2sin!4v1741070479092!5m2!1sen!2sin" 
+                    width="100%" 
+                    height="100%" 
+                    style="border:0;" 
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade"
+                    title="Map of Wisdom Bites Dental Clinic"
+                    class="embedded-map">
+                </iframe>
                 <div class="static-map-overlay">
                     <p>Interactive Street View not available</p>
                     <button class="static-map-btn switch-interior-btn">View Interior Photos</button>
                 </div>
             </div>
         `;
+        
+        this.elements.panoramaView.innerHTML = embeddedMapHtml;
         
         // Add event listener to switch to interior view
         const switchBtn = this.elements.panoramaView.querySelector('.switch-interior-btn');
@@ -592,67 +655,67 @@ const VirtualTour = {
             console.log("Using Place ID:", this.config.placeId);
             console.log("Using coordinates:", this.config.panoramaOptions.position);
             
+            // Check if Street View Service is available
+            if (!google.maps.StreetViewService) {
+                console.error("Street View Service is not available. The API may not be activated.");
+                this.switchToInteriorView();
+                return;
+            }
+            
+            // Create panorama with direct position to start (even if not exact)
+            // This ensures something shows while we look for more precise location
+            this.state.panorama = new google.maps.StreetViewPanorama(
+                this.elements.panoramaView,
+                this.config.panoramaOptions
+            );
+            
+            // Set up event listeners immediately
+            this.setupStreetViewEventListeners();
+            
             // Try to get panorama directly by place ID first (most accurate)
             const sv = new google.maps.StreetViewService();
             
-            // Create the request with explicit placeId
-            const request = {
-                placeId: this.config.placeId,
-                radius: 50,
-                source: google.maps.StreetViewSource.DEFAULT
-            };
-            
-            // First attempt: Try with Place ID
-            sv.getPanorama(request, (data, status) => {
-                if (status === google.maps.StreetViewStatus.OK) {
-                    console.log("Successfully found Street View panorama using Place ID!");
-                    
-                    // Create panorama with the returned data
-                    this.createPanorama(data);
-                    this.hideLoading();
-                    
-                    // Add the entrance marker
-                    this.addEntranceMarker(data.location.latLng);
-                } else {
-                    console.warn("Could not find Street View panorama using Place ID. Status:", status);
-                    console.log("Falling back to coordinate-based lookup...");
-                    
-                    // Fallback: Try with exact coordinates
-                    this.initStreetViewByExactLocation();
-                }
-            });
+            // Try with Place ID first - wrapped in try/catch to handle API errors
+            try {
+                // Create the request with explicit placeId
+                const request = {
+                    placeId: this.config.placeId,
+                    radius: 50,
+                    source: google.maps.StreetViewSource.DEFAULT
+                };
+                
+                // First attempt: Try with Place ID
+                sv.getPanorama(request, (data, status) => {
+                    if (status === google.maps.StreetViewStatus.OK) {
+                        console.log("Successfully found Street View panorama using Place ID!");
+                        
+                        // Update panorama
+                        if (this.state.panorama) {
+                            this.state.panorama.setPano(data.location.pano);
+                            this.state.panorama.setPosition(data.location.latLng);
+                        }
+                        
+                        this.hideLoading();
+                        
+                        // Add the entrance marker
+                        this.addEntranceMarker(data.location.latLng);
+                    } else {
+                        console.warn("Could not find Street View panorama using Place ID. Status:", status);
+                        console.log("Falling back to coordinate-based lookup...");
+                        
+                        // Fallback: Try with exact coordinates
+                        this.initStreetViewByExactLocation();
+                    }
+                });
+            } catch (error) {
+                console.error("Error using Place ID lookup, possibly API not activated:", error);
+                // Skip to coordinate lookup if Place ID lookup throws an error
+                this.initStreetViewByExactLocation();
+            }
         } catch (error) {
             console.error("Error initializing Street View:", error);
             this.handleMapsError();
         }
-    },
-    
-    /**
-     * Create the panorama object with specific data
-     */
-    createPanorama: function(data) {
-        // Create panorama with the returned data
-        this.state.panorama = new google.maps.StreetViewPanorama(
-            this.elements.panoramaView,
-            {
-                pano: data.location.pano,
-                position: data.location.latLng,
-                pov: { heading: 0, pitch: 0 },
-                zoom: 1,
-                addressControl: true,
-                showRoadLabels: true,
-                clickToGo: true,
-                panControl: true,
-                linksControl: true,
-                fullscreenControl: true,
-                enableCloseButton: false,
-                motionTracking: true,
-                motionTrackingControl: true
-            }
-        );
-        
-        // Set up event listeners
-        this.setupStreetViewEventListeners();
     },
     
     /**
