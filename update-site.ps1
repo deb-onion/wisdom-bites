@@ -169,11 +169,21 @@ function Update-Changelog {
     if (Test-Path $mediaUpdatesLog) {
         $mediaUpdates = Get-Content $mediaUpdatesLog
         if ($mediaUpdates.Count -gt 0) {
-            $mediaChanges = @"
+            # Filter out any header lines and empty lines
+            $relevantMediaUpdates = $mediaUpdates | Where-Object { $_ -match '^\[.*\]' } | Select-Object -First 10
+            
+            if ($relevantMediaUpdates.Count -gt 0) {
+                $mediaChangesList = ($relevantMediaUpdates | ForEach-Object { "- $_" }) -join "`n"
+                $mediaChanges = @"
 
 ### Media Updates:
-- Updated media assets (see media-updates.log for details)
+$mediaChangesList
 "@
+                # If there are more updates than we're showing
+                if ($relevantMediaUpdates.Count -lt ($mediaUpdates | Where-Object { $_ -match '^\[.*\]' }).Count) {
+                    $mediaChanges += "`n- _(additional media updates omitted for brevity)_"
+                }
+            }
         }
     }
     
@@ -227,13 +237,15 @@ function Update-VersionHistory {
 # Function to clear media updates log after deployment
 function Clear-MediaUpdatesLog {
     if (Test-Path $mediaUpdatesLog) {
-        # Create backup of the media log before clearing
-        $logDate = Get-Date -Format "yyyyMMdd_HHmmss"
-        $logBackup = "media-updates.$logDate.bak"
+        # Create a single backup file that gets overwritten each time
+        $logBackup = "media-updates.bak"
+        if (Test-Path $logBackup) {
+            Remove-Item $logBackup -Force
+        }
         Copy-Item $mediaUpdatesLog $logBackup
         
         # Clear the log
-        "" | Set-Content $mediaUpdatesLog
+        "# Media Asset Updates Log" | Set-Content $mediaUpdatesLog
         Write-ColorOutput "Media updates log cleared. Backup saved to $logBackup" $colorInfo
     }
 }
@@ -247,6 +259,10 @@ function Deploy-Changes {
         [Parameter(Mandatory=$true)]
         [string]$Description
     )
+    
+    # Clean up old backup files
+    Write-ColorOutput "Cleaning up old backup files..." $colorInfo
+    Get-ChildItem -Path "media-updates.*.bak" | Remove-Item -Force
     
     # Commit all changes
     Write-ColorOutput "Committing changes..." $colorInfo

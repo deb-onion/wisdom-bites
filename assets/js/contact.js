@@ -12,6 +12,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Add console logging for debugging
     console.log('Contact page scripts initialized');
+    
+    // Initialize the "Get Directions" button
+    initDirectionsButton();
 });
 
 /**
@@ -375,4 +378,128 @@ function validateEmail(email) {
 function validatePhone(phone) {
     const re = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/;
     return re.test(String(phone));
+}
+
+/**
+ * Initialize the Get Directions button functionality
+ */
+function initDirectionsButton() {
+    const directionsButton = document.querySelector('.get-directions-btn');
+    
+    if (!directionsButton) {
+        console.error('Get Directions button not found');
+        return;
+    }
+    
+    // Remove the hardcoded URL and add a click event listener
+    directionsButton.setAttribute('href', '#');
+    directionsButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Check if Google Maps is loaded
+        if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
+            console.error('Google Maps not loaded');
+            alert('Unable to get directions. Please try again later.');
+            return;
+        }
+        
+        // Try to get user's current location
+        if (navigator.geolocation) {
+            console.log('Getting user location for directions');
+            directionsButton.textContent = 'Getting your location...';
+            directionsButton.disabled = true;
+            
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    // Success - user allowed location access
+                    const userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    
+                    console.log('User location obtained:', userLocation);
+                    openDirections(userLocation);
+                    
+                    // Reset button
+                    directionsButton.textContent = 'Get Directions';
+                    directionsButton.disabled = false;
+                },
+                function(error) {
+                    // Error or user denied location access
+                    console.error('Geolocation error:', error);
+                    
+                    // Open directions without start location
+                    openDirections(null);
+                    
+                    // Reset button
+                    directionsButton.textContent = 'Get Directions';
+                    directionsButton.disabled = false;
+                }
+            );
+        } else {
+            // Geolocation not supported
+            console.warn('Geolocation not supported by this browser');
+            openDirections(null);
+        }
+    });
+    
+    console.log('Get Directions button initialized');
+}
+
+/**
+ * Open Google Maps directions
+ * @param {Object|null} startLocation - User's location or null if unavailable
+ */
+function openDirections(startLocation) {
+    try {
+        // First try to use place ID if available
+        let directionsUrl;
+        
+        if (businessData.placeId) {
+            directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(businessData.name)}&destination_place_id=${businessData.placeId}`;
+        } else {
+            // Fallback to coordinates
+            const destination = `${businessData.coordinates.lat},${businessData.coordinates.lng}`;
+            directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${destination}`;
+        }
+        
+        // Add origin if we have the user's location
+        if (startLocation) {
+            directionsUrl += `&origin=${startLocation.lat},${startLocation.lng}`;
+        }
+        
+        // Add travel mode
+        directionsUrl += `&travelmode=driving`;
+        
+        console.log('Opening directions URL:', directionsUrl);
+        
+        // Open directions in a new tab
+        const newWindow = window.open(directionsUrl, '_blank');
+        
+        // Check if popup was blocked
+        if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+            console.warn('Popup blocked or failed to open');
+            // Provide a message and fallback option
+            const mapOverlay = document.querySelector('.map-overlay');
+            if (mapOverlay) {
+                const fallbackMsg = document.createElement('div');
+                fallbackMsg.className = 'directions-fallback';
+                fallbackMsg.innerHTML = `
+                    <p>Your browser blocked the popup. Please click the link below:</p>
+                    <a href="${directionsUrl}" target="_blank" class="btn btn-sm btn-primary">Open Directions</a>
+                `;
+                mapOverlay.appendChild(fallbackMsg);
+                
+                // Remove the message after 10 seconds
+                setTimeout(() => {
+                    if (fallbackMsg.parentNode) {
+                        fallbackMsg.parentNode.removeChild(fallbackMsg);
+                    }
+                }, 10000);
+            }
+        }
+    } catch (error) {
+        console.error('Error opening directions:', error);
+        alert('Unable to open directions. Please try again later.');
+    }
 } 

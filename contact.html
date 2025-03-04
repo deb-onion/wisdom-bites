@@ -70,6 +70,22 @@
             max-width: 1200px;
             margin: 0 auto;
         }
+        
+        /* Directions related styles */
+        .directions-fallback {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 15px;
+            text-align: center;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .directions-fallback p {
+            margin: 0 0 10px;
+            font-weight: 500;
+        }
     </style>
     
     <!-- Main CSS (loaded asynchronously) -->
@@ -277,7 +293,7 @@
                             <div class="directions-card">
                                 <h3>Find Us</h3>
                                 <p>Located in downtown Smile City, just 2 blocks from Central Park and easily accessible by public transportation.</p>
-                                <a href="https://goo.gl/maps/QvKHK3RnVr8PHtFs7" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Get Directions</a>
+                                <a href="#" class="btn btn-primary get-directions-btn">Get Directions</a>
                             </div>
                         </div>
                     </div>

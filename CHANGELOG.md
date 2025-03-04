@@ -1,6 +1,12 @@
 # Wisdom Bites Dental Clinic - Changelog
 
 
+## [3.0.8] - 2025-03-04
+
+### Patch Update:
+- Fixed Get Directions button functionality, added dynamic directions based on user location, and improved error handling
+
+
 ## [3.0.7] - 2025-03-04
 
 ### Patch Update:
