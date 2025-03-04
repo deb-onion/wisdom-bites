@@ -1,6 +1,14 @@
 # Wisdom Bites Dental Clinic - Changelog
 
 
+## [3.0.5] - 2025-03-04
+
+### Patch Update:
+- Fixed virtual tour Street View location issue: Implemented direct panorama ID targeting (fGMVDjDFNHlkGsTF-HuMoQ) to ensure the virtual tour always opens at Wisdom Bites Dental Clinic instead of 'Excellent Tutorial'. Added comprehensive fallback strategy with Place ID, coordinate-based, and embedded map options. Fixed CSS animation errors causing console warnings. Created detailed documentation explaining all attempted fixes, their results, and the final successful solution.
+### Media Updates:
+- Updated media assets (see media-updates.log for details)
+
+
 ## [3.0.4] - 2025-03-04
 
 ### Patch Update:
