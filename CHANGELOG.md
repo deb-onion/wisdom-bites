@@ -1,6 +1,14 @@
 # Wisdom Bites Dental Clinic - Changelog
 
 
+## [2.0.2] - 2025-03-04
+
+### Patch Update:
+- Updated README with accurate Cloudflare Pages deployment instructions and troubleshooting
+### Media Updates:
+- Updated media assets (see media-updates.log for details)
+
+
 ## [2.0.1] - 2025-03-04
 
 ### Patch Update:
