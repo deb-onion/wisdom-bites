@@ -589,57 +589,130 @@ const VirtualTour = {
         try {
             this.showLoading();
             
-            this.state.panorama = new google.maps.StreetViewPanorama(
-                this.elements.panoramaView,
-                this.config.panoramaOptions
-            );
+            // First, try to use the Place ID directly for more accurate positioning
+            const sv = new google.maps.StreetViewService();
             
-            // Add event listeners
-            this.state.panorama.addListener('position_changed', () => {
-                // Update hotspots or other UI elements based on new position
-                this.checkForLocationUpdates();
+            // Try to get panorama by place ID first (more accurate)
+            const request = {
+                placeId: this.config.placeId,
+                preference: google.maps.StreetViewPreference.NEAREST
+            };
+            
+            sv.getPanorama(request, (data, status) => {
+                if (status === google.maps.StreetViewStatus.OK) {
+                    // Successfully found street view panorama for this place ID
+                    this.state.panorama = new google.maps.StreetViewPanorama(
+                        this.elements.panoramaView,
+                        {
+                            pano: data.location.pano,
+                            pov: { heading: 0, pitch: 0 },
+                            zoom: 1,
+                            addressControl: true,
+                            showRoadLabels: true,
+                            clickToGo: true,
+                            panControl: true,
+                            linksControl: true,
+                            fullscreenControl: true,
+                            enableCloseButton: false,
+                            motionTracking: true,
+                            motionTrackingControl: true
+                        }
+                    );
+                    
+                    this.setupStreetViewEventListeners();
+                    this.hideLoading();
+                    this.addEntranceMarker(data.location.latLng);
+                } else {
+                    // Fallback to location-based search
+                    this.initStreetViewByLocation();
+                }
             });
+        } catch (error) {
+            console.error("Error initializing Street View:", error);
+            this.handleMapsError();
+        }
+    },
+    
+    /**
+     * Initialize Street View by location coordinates (fallback method)
+     */
+    initStreetViewByLocation: function() {
+        try {
+            // Use exact coordinates from local data if available
+            const position = this.state.localClinicData && this.state.localClinicData.position 
+                ? this.state.localClinicData.position
+                : this.config.panoramaOptions.position;
             
-            this.state.panorama.addListener('pov_changed', () => {
-                // Update UI based on point of view changes
-                this.updateHotspotVisibility();
-            });
-            
-            // Attempt to load the place by ID
             const sv = new google.maps.StreetViewService();
             sv.getPanoramaByLocation(
-                this.config.panoramaOptions.position,
+                position,
                 50, // Search radius in meters
                 (data, status) => {
                     this.hideLoading();
                     
                     if (status === google.maps.StreetViewStatus.OK) {
-                        this.state.panorama.setPano(data.location.pano);
+                        this.state.panorama = new google.maps.StreetViewPanorama(
+                            this.elements.panoramaView,
+                            {
+                                pano: data.location.pano,
+                                pov: { heading: 0, pitch: 0 },
+                                zoom: 1,
+                                addressControl: true,
+                                showRoadLabels: true,
+                                clickToGo: true,
+                                panControl: true,
+                                linksControl: true,
+                                fullscreenControl: true,
+                                enableCloseButton: false,
+                                motionTracking: true,
+                                motionTrackingControl: true
+                            }
+                        );
                         
-                        // Add marker for entrance
-                        this.addEntranceMarker();
+                        this.setupStreetViewEventListeners();
+                        this.addEntranceMarker(data.location.latLng);
                     } else {
                         // Fall back to interior view if street view isn't available
                         this.switchToInteriorView();
                     }
                 }
             );
-            
-            // Update UI
-            this.updateNavigationButtons();
-            this.createTourIndicators();
         } catch (error) {
-            this.handleMapsError();
+            console.error("Error in fallback Street View initialization:", error);
+            this.switchToInteriorView();
         }
+    },
+    
+    /**
+     * Set up event listeners for Street View
+     */
+    setupStreetViewEventListeners: function() {
+        if (!this.state.panorama) return;
+        
+        // Add event listeners
+        this.state.panorama.addListener('position_changed', () => {
+            // Update hotspots or other UI elements based on new position
+            this.checkForLocationUpdates();
+        });
+        
+        this.state.panorama.addListener('pov_changed', () => {
+            // Update UI based on point of view changes
+            this.updateHotspotVisibility();
+        });
+        
+        // Update UI
+        this.updateNavigationButtons();
+        this.createTourIndicators();
     },
     
     /**
      * Add marker for clinic entrance
      */
-    addEntranceMarker: function() {
+    addEntranceMarker: function(position) {
         if (!this.state.panorama || !google || !google.maps) return;
         
-        const entrancePosition = new google.maps.LatLng(
+        // Use provided position or fall back to config position
+        const entrancePosition = position || new google.maps.LatLng(
             this.config.panoramaOptions.position.lat,
             this.config.panoramaOptions.position.lng
         );

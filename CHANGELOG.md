@@ -1,6 +1,14 @@
 # Wisdom Bites Dental Clinic - Changelog
 
 
+## [3.0.1] - 2025-03-04
+
+### Patch Update:
+- Fixed virtual tour location accuracy: The Street View was loading random locations instead of the clinic because the code was using a suboptimal location search method. Modified initStreetView() to prioritize Place ID-based lookup (which provides exact matching) rather than relying on coordinate-based search. Added a two-tier initialization approach with better error handling and logging to ensure visitors see the actual clinic location at 1/4A, North Road, Poddar Nagar, Jadavpur, Kolkata.
+### Media Updates:
+- Updated media assets (see media-updates.log for details)
+
+
 ## [3.0.0] - 2025-03-04
 
 ### Major Update:
