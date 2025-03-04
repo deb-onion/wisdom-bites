@@ -14,3 +14,4 @@ v3.0.5 (2025-03-04): Fixed virtual tour Street View location issue: Implemented 
 v3.0.6 (2025-03-04): Fixed virtual tour location accuracy: Applied direct panorama ID targeting (fGMVDjDFNHlkGSTF-HuMoQ) to ensure Street View opens at the exact dental clinic instead of 'Excellent Tutorial'. Created multi-level fallback system and fixed CSS animation errors.
 v3.0.7 (2025-03-04): Fixed MIME type issues, font loading errors, and enhanced Google Maps integration on contact page
 v3.0.8 (2025-03-04): Fixed Get Directions button functionality, added dynamic directions based on user location, and improved error handling
+v3.0.9 (2025-03-04): Updated README.md with accurate information about MIME type configuration, Google Maps integration, media tracking improvements, and folder structure

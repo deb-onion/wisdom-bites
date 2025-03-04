@@ -1,6 +1,12 @@
 # Wisdom Bites Dental Clinic - Changelog
 
 
+## [3.0.9] - 2025-03-04
+
+### Patch Update:
+- Updated README.md with accurate information about MIME type configuration, Google Maps integration, media tracking improvements, and folder structure
+
+
 ## [3.0.8] - 2025-03-04
 
 ### Patch Update:
