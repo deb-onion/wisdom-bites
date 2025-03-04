@@ -1,6 +1,14 @@
 # Wisdom Bites Dental Clinic - Changelog
 
 
+## [3.0.2] - 2025-03-04
+
+### Patch Update:
+- Fixed virtual tour location accuracy: The Street View was loading at 'Staff Canteen (Aahar Canteen)' instead of the dental clinic due to imprecise coordinates (22.4969, 88.3722) and suboptimal Google Maps Street View initialization. Updated to exact clinic coordinates (22.496391851463255, 88.36915472944189), implemented a three-tier Street View initialization approach that prioritizes Place ID-based lookup, and added helpful navigation prompts and extensive error logging. This ensures visitors see the actual Wisdom Bites Dental Clinic at 1/4A, North Road, Poddar Nagar, Jadavpur, Kolkata.
+### Media Updates:
+- Updated media assets (see media-updates.log for details)
+
+
 ## [3.0.1] - 2025-03-04
 
 ### Patch Update:

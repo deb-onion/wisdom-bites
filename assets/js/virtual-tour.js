@@ -17,7 +17,7 @@ const VirtualTour = {
     config: {
         placeId: "ChIJEZw2uCNxAjoRrPHJvp1VC2g", // Wisdom Bites Dental Clinic Place ID
         panoramaOptions: {
-            position: { lat: 22.4969, lng: 88.3722 }, // Position for Jadavpur, Kolkata
+            position: { lat: 22.496391851463255, lng: 88.36915472944189 }, // Exact position for Wisdom Bites Dental Clinic
             pov: { heading: 0, pitch: 0 },
             zoom: 1,
             addressControl: true,
@@ -101,7 +101,7 @@ const VirtualTour = {
                 {
                     color: "red",
                     label: "W",
-                    position: "22.4969,88.3722"
+                    position: "22.496391851463255,88.36915472944189"
                 }
             ]
         }
@@ -588,43 +588,37 @@ const VirtualTour = {
         
         try {
             this.showLoading();
+            console.log("Initializing Street View for Wisdom Bites Dental Clinic...");
+            console.log("Using Place ID:", this.config.placeId);
+            console.log("Using coordinates:", this.config.panoramaOptions.position);
             
-            // First, try to use the Place ID directly for more accurate positioning
+            // Try to get panorama directly by place ID first (most accurate)
             const sv = new google.maps.StreetViewService();
             
-            // Try to get panorama by place ID first (more accurate)
+            // Create the request with explicit placeId
             const request = {
                 placeId: this.config.placeId,
-                preference: google.maps.StreetViewPreference.NEAREST
+                radius: 50,
+                source: google.maps.StreetViewSource.DEFAULT
             };
             
+            // First attempt: Try with Place ID
             sv.getPanorama(request, (data, status) => {
                 if (status === google.maps.StreetViewStatus.OK) {
-                    // Successfully found street view panorama for this place ID
-                    this.state.panorama = new google.maps.StreetViewPanorama(
-                        this.elements.panoramaView,
-                        {
-                            pano: data.location.pano,
-                            pov: { heading: 0, pitch: 0 },
-                            zoom: 1,
-                            addressControl: true,
-                            showRoadLabels: true,
-                            clickToGo: true,
-                            panControl: true,
-                            linksControl: true,
-                            fullscreenControl: true,
-                            enableCloseButton: false,
-                            motionTracking: true,
-                            motionTrackingControl: true
-                        }
-                    );
+                    console.log("Successfully found Street View panorama using Place ID!");
                     
-                    this.setupStreetViewEventListeners();
+                    // Create panorama with the returned data
+                    this.createPanorama(data);
                     this.hideLoading();
+                    
+                    // Add the entrance marker
                     this.addEntranceMarker(data.location.latLng);
                 } else {
-                    // Fallback to location-based search
-                    this.initStreetViewByLocation();
+                    console.warn("Could not find Street View panorama using Place ID. Status:", status);
+                    console.log("Falling back to coordinate-based lookup...");
+                    
+                    // Fallback: Try with exact coordinates
+                    this.initStreetViewByExactLocation();
                 }
             });
         } catch (error) {
@@ -634,51 +628,106 @@ const VirtualTour = {
     },
     
     /**
-     * Initialize Street View by location coordinates (fallback method)
+     * Create the panorama object with specific data
      */
-    initStreetViewByLocation: function() {
+    createPanorama: function(data) {
+        // Create panorama with the returned data
+        this.state.panorama = new google.maps.StreetViewPanorama(
+            this.elements.panoramaView,
+            {
+                pano: data.location.pano,
+                position: data.location.latLng,
+                pov: { heading: 0, pitch: 0 },
+                zoom: 1,
+                addressControl: true,
+                showRoadLabels: true,
+                clickToGo: true,
+                panControl: true,
+                linksControl: true,
+                fullscreenControl: true,
+                enableCloseButton: false,
+                motionTracking: true,
+                motionTrackingControl: true
+            }
+        );
+        
+        // Set up event listeners
+        this.setupStreetViewEventListeners();
+    },
+    
+    /**
+     * Initialize Street View by exact location coordinates (fallback method)
+     */
+    initStreetViewByExactLocation: function() {
         try {
-            // Use exact coordinates from local data if available
-            const position = this.state.localClinicData && this.state.localClinicData.position 
-                ? this.state.localClinicData.position
-                : this.config.panoramaOptions.position;
-            
             const sv = new google.maps.StreetViewService();
-            sv.getPanoramaByLocation(
-                position,
-                50, // Search radius in meters
-                (data, status) => {
+            
+            const exactPosition = new google.maps.LatLng(
+                this.config.panoramaOptions.position.lat,
+                this.config.panoramaOptions.position.lng
+            );
+            
+            console.log("Trying exact coordinates lookup...");
+            
+            // Look up panorama by exact position with small radius
+            sv.getPanoramaByLocation(exactPosition, 25, (data, status) => {
+                if (status === google.maps.StreetViewStatus.OK) {
+                    console.log("Successfully found Street View panorama using exact coordinates!");
+                    
+                    // Create panorama with the returned data
+                    this.createPanorama(data);
                     this.hideLoading();
                     
-                    if (status === google.maps.StreetViewStatus.OK) {
-                        this.state.panorama = new google.maps.StreetViewPanorama(
-                            this.elements.panoramaView,
-                            {
-                                pano: data.location.pano,
-                                pov: { heading: 0, pitch: 0 },
-                                zoom: 1,
-                                addressControl: true,
-                                showRoadLabels: true,
-                                clickToGo: true,
-                                panControl: true,
-                                linksControl: true,
-                                fullscreenControl: true,
-                                enableCloseButton: false,
-                                motionTracking: true,
-                                motionTrackingControl: true
-                            }
-                        );
-                        
-                        this.setupStreetViewEventListeners();
-                        this.addEntranceMarker(data.location.latLng);
-                    } else {
-                        // Fall back to interior view if street view isn't available
-                        this.switchToInteriorView();
-                    }
+                    // Add the entrance marker
+                    this.addEntranceMarker(data.location.latLng);
+                } else {
+                    console.warn("Could not find Street View panorama using exact coordinates. Status:", status);
+                    console.log("Trying with increased search radius...");
+                    
+                    // Final attempt: Try with wider search radius
+                    this.initStreetViewByWiderArea();
                 }
-            );
+            });
         } catch (error) {
-            console.error("Error in fallback Street View initialization:", error);
+            console.error("Error in exact location Street View initialization:", error);
+            this.switchToInteriorView();
+        }
+    },
+    
+    /**
+     * Initialize Street View with a wider search area (last resort)
+     */
+    initStreetViewByWiderArea: function() {
+        try {
+            const sv = new google.maps.StreetViewService();
+            
+            const exactPosition = new google.maps.LatLng(
+                this.config.panoramaOptions.position.lat,
+                this.config.panoramaOptions.position.lng
+            );
+            
+            console.log("Trying wider area search...");
+            
+            // Try with a much larger radius as a last resort
+            sv.getPanoramaByLocation(exactPosition, 100, (data, status) => {
+                this.hideLoading();
+                
+                if (status === google.maps.StreetViewStatus.OK) {
+                    console.log("Found Street View panorama in wider area!");
+                    
+                    // Create panorama with the returned data
+                    this.createPanorama(data);
+                    
+                    // Add the entrance marker and message to guide users
+                    this.addEntranceMarker(exactPosition);
+                    this.showEntrancePrompt("Our clinic is nearby! Look for the marker and navigate toward it.");
+                } else {
+                    console.warn("All Street View lookup methods failed. Switching to interior view.");
+                    this.switchToInteriorView();
+                }
+            });
+        } catch (error) {
+            console.error("Error in wider area Street View initialization:", error);
             this.switchToInteriorView();
         }
     },
@@ -1183,6 +1232,49 @@ const VirtualTour = {
             this.elements.toggleInfoButton.textContent = 
                 this.elements.placeInfoPanel.classList.contains('active') ? 'Hide Info' : 'Clinic Info';
         }
+    },
+    
+    /**
+     * Show an entrance prompt with custom message
+     */
+    showEntrancePrompt: function(message) {
+        // Check if we already have a prompt
+        let promptElement = document.getElementById('entrance-prompt');
+        
+        if (!promptElement) {
+            // Create a new prompt element
+            promptElement = document.createElement('div');
+            promptElement.id = 'entrance-prompt';
+            promptElement.className = 'entrance-prompt';
+            this.elements.panoramaView.appendChild(promptElement);
+        }
+        
+        // Set prompt message
+        promptElement.innerHTML = `
+            <div class="prompt-content">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                    <path fill="currentColor" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+                <p>${message}</p>
+            </div>
+        `;
+        
+        // Add active class after a short delay for animation
+        setTimeout(() => {
+            promptElement.classList.add('active');
+        }, 100);
+        
+        // Hide prompt after 8 seconds
+        setTimeout(() => {
+            promptElement.classList.remove('active');
+            
+            // Remove element after animation finishes
+            setTimeout(() => {
+                if (promptElement.parentNode) {
+                    promptElement.parentNode.removeChild(promptElement);
+                }
+            }, 500);
+        }, 8000);
     }
 };
 
