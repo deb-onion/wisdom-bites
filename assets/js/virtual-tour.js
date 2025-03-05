@@ -288,6 +288,16 @@ const VirtualTour = {
     },
     
     /**
+     * Callback when Maps API is loaded
+     */
+    mapsCallback: function() {
+        this.state.mapsLoaded = true;
+        this.hideLoading();
+        this.initServices();
+        this.initStreetView();
+    },
+    
+    /**
      * Initialize services when Maps API is loaded
      */
     initServices: function() {

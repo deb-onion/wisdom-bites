@@ -1,6 +1,12 @@
 # Wisdom Bites Dental Clinic - Changelog
 
 
+## [4.1.9] - 2025-03-06
+
+### Patch Update:
+- Fixed mapsCallback function in virtual-tour.js
+
+
 ## [4.1.8] - 2025-03-06
 
 ### Patch Update:
