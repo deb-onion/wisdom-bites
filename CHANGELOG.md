@@ -1,6 +1,12 @@
 # Wisdom Bites Dental Clinic - Changelog
 
 
+## [4.1.2] - 2025-03-06
+
+### Patch Update:
+- Added additional security headers and CORS configuration
+
+
 ## [4.1.1] - 2025-03-06
 
 ### Patch Update:
