@@ -56,14 +56,7 @@ jobs:
           npm install -g html-validate
           find . -name "*.html" -exec html-validate {} \;
       
-      - name: Deploy to Cloudflare Pages
-        uses: cloudflare/pages-action@v1
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: wisdom-bites-dental
-          directory: .
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+  
       
       - name: Update deployment status
         run: |
