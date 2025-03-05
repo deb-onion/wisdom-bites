@@ -257,7 +257,7 @@ const VirtualTour = {
     },
     
     /**
-     * Load the Google Maps API
+     * Load the Google Maps API with enhanced capabilities
      */
     loadMapsAPI: function() {
         if (this.state.mapsLoaded) {
@@ -269,8 +269,9 @@ const VirtualTour = {
             // Show loading indicator
             this.showLoading();
             
+            // Create script with all the APIs we want to use
             const script = document.createElement('script');
-            script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDY7pn8Bkb9dxMKX6pKgldH1a2acVjmWsw&libraries=places&callback=VirtualTour.mapsCallback';
+            script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDY7pn8Bkb9dxMKX6pKgldH1a2acVjmWsw&libraries=places,visualization,geometry&callback=VirtualTour.mapsCallback';
             script.async = true;
             script.defer = true;
             document.head.appendChild(script);
@@ -287,339 +288,354 @@ const VirtualTour = {
     },
     
     /**
-     * Callback when Maps API is loaded
-     */
-    mapsCallback: function() {
-        this.state.mapsLoaded = true;
-        this.hideLoading();
-        this.initServices();
-        this.initStreetView();
-    },
-    
-    /**
-     * Handle Maps API error
-     */
-    handleMapsError: function() {
-        this.hideLoading();
-        
-        console.error("Google Maps failed to load or encountered an error.");
-        
-        // Check console logs for API activation errors
-        const isApiNotActivatedError = document.documentElement.innerHTML.includes('ApiNotActivatedMapError') || 
-                                      document.documentElement.innerHTML.includes('This API project is not authorized');
-        
-        // Show error message in panorama view
-        if (this.elements.panoramaView) {
-            this.elements.panoramaView.innerHTML = `
-                <div class="maps-error-notice">
-                    <h3>Virtual Tour Unavailable</h3>
-                    <p>We're experiencing technical difficulties with our virtual tour feature.</p>
-                    ${isApiNotActivatedError ? 
-                    `<p class="error-details">Error: Google Maps Places API is not activated for this API key. 
-                     This feature requires the following APIs to be enabled in the Google Cloud Console:
-                     <ul>
-                        <li>Maps JavaScript API</li>
-                        <li>Places API</li>
-                        <li>Street View API</li>
-                        <li>Geocoding API</li>
-                     </ul>
-                     </p>` : 
-                    `<p class="error-details">Error: Google Maps API could not be initialized. This may be due to network issues.</p>`}
-                    <div class="error-actions">
-                        <button class="error-action-btn" id="try-interior-btn">View Interior Images Instead</button>
-                        <button class="error-action-btn" id="try-static-map-btn">View Static Map</button>
-                    </div>
-                </div>
-            `;
-            
-            // Add event listener to switch to interior view
-            const tryInteriorBtn = document.getElementById('try-interior-btn');
-            if (tryInteriorBtn) {
-                tryInteriorBtn.addEventListener('click', this.switchToInteriorView.bind(this));
-            }
-            
-            // Add event listener to show static map
-            const tryStaticMapBtn = document.getElementById('try-static-map-btn');
-            if (tryStaticMapBtn) {
-                tryStaticMapBtn.addEventListener('click', this.useStaticMapFallback.bind(this));
-            }
-        }
-        
-        // Update buttons visibility
-        this.updateNavigationButtons();
-    },
-    
-    /**
-     * Initialize Google Maps services
+     * Initialize services when Maps API is loaded
      */
     initServices: function() {
         if (!google || !google.maps) return;
         
-        // Initialize Places service
         try {
-            const map = new google.maps.Map(document.createElement('div'));
-            this.state.placesService = new google.maps.places.PlacesService(map);
-            this.state.directionsService = new google.maps.DirectionsService();
+            // Initialize Places service for enhanced place details
+            this.placesService = new google.maps.places.PlacesService(document.createElement('div'));
             
-            // Try to fetch place details, but handle potential API activation errors
-            this.fetchPlaceDetails();
-        } catch (error) {
-            console.warn('Could not initialize Maps services:', error);
-            // Continue with the tour even if services fail
-            // Use local data as a fallback
-            if (this.state.localClinicData) {
-                this.state.placeDetails = this.convertLocalDataToPlaceDetails(this.state.localClinicData);
-                this.updatePlaceInfoPanel();
+            // Initialize Geocoding service for address lookups
+            this.geocoder = new google.maps.Geocoder();
+            
+            // Initialize autocomplete for enhanced search
+            if (this.elements.searchInput) {
+                const autocomplete = new google.maps.places.Autocomplete(this.elements.searchInput, {
+                    fields: ['place_id', 'geometry', 'name', 'formatted_address'],
+                    strictBounds: false,
+                    types: ['establishment']
+                });
+                
+                autocomplete.addListener('place_changed', () => {
+                    const place = autocomplete.getPlace();
+                    if (place.geometry && place.geometry.location) {
+                        this.navigateToLocation(place.geometry.location, place.place_id);
+                    }
+                });
             }
+            
+            console.log("Maps services initialized successfully");
+        } catch (error) {
+            console.error("Error initializing services:", error);
         }
     },
     
     /**
-     * Fetch place details using Places API
+     * Navigate to a specific location on the map
+     * @param {google.maps.LatLng} location - The location to navigate to
+     * @param {string} placeId - Optional Place ID for additional details
      */
-    fetchPlaceDetails: function() {
-        if (!this.state.placesService) {
-            // If Places service isn't available, use local data
-            if (this.state.localClinicData) {
-                this.state.placeDetails = this.convertLocalDataToPlaceDetails(this.state.localClinicData);
-                this.updatePlaceInfoPanel();
-            }
-            return;
+    navigateToLocation: function(location, placeId) {
+        if (!this.state.panorama || !location) return;
+        
+        console.log(`Navigating to location: ${location.lat()},${location.lng()}`);
+        
+        // Update panorama position
+        this.state.panorama.setPosition(location);
+        
+        // If we have a place ID, get additional details
+        if (placeId) {
+            this.fetchPlaceDetails(placeId);
         }
         
-        this.state.placesService.getDetails({
-            placeId: this.config.placeId,
-            fields: [
-                'name', 'formatted_address', 'geometry', 'phone_number', 'photos',
-                'opening_hours', 'rating', 'reviews', 'website', 'price_level'
-            ]
-        }, (place, status) => {
+        // Create a new marker at this position
+        this.addEntranceMarker(location);
+    },
+    
+    /**
+     * Fetch enhanced place details using Places API
+     * @param {string} placeId - The place ID to look up
+     */
+    fetchPlaceDetails: function(placeId) {
+        if (!this.placesService) return;
+        
+        const fields = [
+            'name', 'formatted_address', 'geometry', 'photo', 
+            'formatted_phone_number', 'opening_hours', 'website',
+            'rating', 'review', 'price_level', 'user_ratings_total',
+            'business_status', 'wheelchair_accessible_entrance'
+        ];
+        
+        this.placesService.getDetails({ placeId, fields }, (place, status) => {
             if (status === google.maps.places.PlacesServiceStatus.OK) {
-                this.state.placeDetails = place;
-                this.updatePlaceInfoPanel();
+                console.log("Fetched enhanced place details:", place);
                 
-                // Update panorama position with precise location
-                if (place.geometry && place.geometry.location && this.state.panorama) {
-                    this.state.panorama.setPosition(place.geometry.location);
+                // Store place details for use in UI
+                this.placeDetails = place;
+                
+                // Update place info panel if present
+                this.updatePlaceInfoPanel(place);
+                
+                // Cache the result for offline use
+                if (window.localStorage) {
+                    try {
+                        localStorage.setItem(`place_${placeId}`, JSON.stringify({
+                            timestamp: new Date().getTime(),
+                            data: {
+                                name: place.name,
+                                address: place.formatted_address,
+                                phone: place.formatted_phone_number,
+                                hours: place.opening_hours ? place.opening_hours.weekday_text : null,
+                                rating: place.rating,
+                                totalRatings: place.user_ratings_total,
+                                status: place.business_status,
+                                accessible: place.wheelchair_accessible_entrance
+                            }
+                        }));
+                    } catch (e) {
+                        console.warn("Could not cache place details:", e);
+                    }
                 }
                 
-                // Use place photos if available
+                // If the place has photos, preload them
                 if (place.photos && place.photos.length > 0) {
-                    this.updateGalleryWithPhotos(place.photos);
+                    this.preloadPlacePhotos(place.photos);
                 }
             } else {
-                console.warn('Places API request failed with status:', status);
-                console.log('Using local clinic data as fallback...');
-                
-                // Use local data as fallback
-                if (this.state.localClinicData) {
-                    this.state.placeDetails = this.convertLocalDataToPlaceDetails(this.state.localClinicData);
-                    this.updatePlaceInfoPanel();
-                }
-                
-                // If it's an API not enabled error, log helpful information
-                if (status === 'REQUEST_DENIED') {
-                    console.error('Places API request was denied. Please ensure Places API is enabled for your API key: https://console.cloud.google.com/apis/library/places-backend.googleapis.com');
-                }
+                console.error("Places API request failed with status:", status);
+                // Fall back to local data
+                this.useLocalClinicData();
             }
         });
     },
     
     /**
-     * Load local clinic data from JSON
+     * Preload place photos for faster display
+     * @param {Array} photos - Array of photo references
      */
-    loadClinicData: function() {
-        const dataScript = document.getElementById('clinic-data');
-        if (dataScript) {
-            try {
-                const clinicData = JSON.parse(dataScript.textContent);
-                this.state.localClinicData = clinicData;
-                
-                // Use local data if available
-                if (!this.state.placeDetails) {
-                    this.state.placeDetails = this.convertLocalDataToPlaceDetails(clinicData);
+    preloadPlacePhotos: function(photos) {
+        // Limit to first 5 photos to avoid excessive requests
+        const photosToLoad = photos.slice(0, 5);
+        
+        photosToLoad.forEach((photo, index) => {
+            const img = new Image();
+            img.src = photo.getUrl({ maxWidth: 800, maxHeight: 600 });
+            img.onload = () => {
+                console.log(`Preloaded photo ${index + 1}/${photosToLoad.length}`);
+            };
+            
+            // Store in cache for later use
+            this.photoCache = this.photoCache || [];
+            this.photoCache.push(img);
+        });
+    },
+    
+    /**
+     * Update the place info panel with enhanced details
+     * @param {Object} place - The place details from Places API
+     */
+    updatePlaceInfoPanel: function(place) {
+        const panel = this.elements.placeInfoPanel;
+        if (!panel) return;
+        
+        // Clear previous content
+        panel.innerHTML = '';
+        
+        // Create header with name and rating
+        const header = document.createElement('div');
+        header.className = 'place-header';
+        
+        const title = document.createElement('h2');
+        title.textContent = place.name;
+        header.appendChild(title);
+        
+        if (place.rating) {
+            const ratingContainer = document.createElement('div');
+            ratingContainer.className = 'place-rating';
+            
+            // Create stars based on rating
+            const fullStars = Math.floor(place.rating);
+            const halfStar = place.rating % 1 >= 0.5;
+            
+            for (let i = 0; i < 5; i++) {
+                const star = document.createElement('span');
+                if (i < fullStars) {
+                    star.className = 'star full';
+                } else if (i === fullStars && halfStar) {
+                    star.className = 'star half';
+                } else {
+                    star.className = 'star empty';
                 }
-            } catch (error) {
-                console.warn('Could not parse clinic data:', error);
+                ratingContainer.appendChild(star);
             }
+            
+            const ratingText = document.createElement('span');
+            ratingText.className = 'rating-text';
+            ratingText.textContent = `${place.rating.toFixed(1)} (${place.user_ratings_total} reviews)`;
+            ratingContainer.appendChild(ratingText);
+            
+            header.appendChild(ratingContainer);
         }
+        
+        panel.appendChild(header);
+        
+        // Add address
+        if (place.formatted_address) {
+            const address = document.createElement('div');
+            address.className = 'place-address';
+            address.innerHTML = `<i class="icon icon-map"></i> ${place.formatted_address}`;
+            panel.appendChild(address);
+        }
+        
+        // Add phone
+        if (place.formatted_phone_number) {
+            const phone = document.createElement('div');
+            phone.className = 'place-phone';
+            phone.innerHTML = `<i class="icon icon-phone"></i> <a href="tel:${place.formatted_phone_number.replace(/\s/g, '')}">${place.formatted_phone_number}</a>`;
+            panel.appendChild(phone);
+        }
+        
+        // Add hours if available
+        if (place.opening_hours) {
+            const hours = document.createElement('div');
+            hours.className = 'place-hours';
+            
+            const hoursHeader = document.createElement('h3');
+            hoursHeader.textContent = 'Hours';
+            hours.appendChild(hoursHeader);
+            
+            const hoursStatus = document.createElement('div');
+            hoursStatus.className = 'hours-status';
+            hoursStatus.textContent = place.opening_hours.isOpen() ? 'Open Now' : 'Closed Now';
+            hoursStatus.classList.add(place.opening_hours.isOpen() ? 'open' : 'closed');
+            hours.appendChild(hoursStatus);
+            
+            if (place.opening_hours.weekday_text) {
+                const hoursList = document.createElement('ul');
+                hoursList.className = 'hours-list';
+                
+                place.opening_hours.weekday_text.forEach(day => {
+                    const dayItem = document.createElement('li');
+                    dayItem.textContent = day;
+                    hoursList.appendChild(dayItem);
+                });
+                
+                hours.appendChild(hoursList);
+            }
+            
+            panel.appendChild(hours);
+        }
+        
+        // Add accessibility information if available
+        if (place.wheelchair_accessible_entrance !== undefined) {
+            const accessibility = document.createElement('div');
+            accessibility.className = 'place-accessibility';
+            accessibility.innerHTML = place.wheelchair_accessible_entrance ? 
+                '<i class="icon icon-wheelchair"></i> Wheelchair accessible entrance' : 
+                '<i class="icon icon-wheelchair"></i> Not wheelchair accessible';
+            panel.appendChild(accessibility);
+        }
+        
+        // Show panel
+        panel.classList.add('active');
     },
     
     /**
-     * Convert local clinic data to Google Place Details format
+     * Find nearby places that might be of interest to visitors
      */
-    convertLocalDataToPlaceDetails: function(localData) {
-        if (!localData) return null;
+    findNearbyPlaces: function() {
+        if (!google || !google.maps || !google.maps.places || !this.state.panorama) {
+            console.error("Places API not available or panorama not initialized");
+            return;
+        }
         
-        return {
-            name: localData.name,
-            formatted_address: localData.address,
-            geometry: {
-                location: {
-                    lat: () => localData.position.lat,
-                    lng: () => localData.position.lng
-                }
-            },
-            phone_number: localData.phone,
-            opening_hours: {
-                weekday_text: localData.hours
-            },
-            website: 'https://wisdombites.com',
-            rating: 4.9,
-            reviews: [
-                {
-                    author_name: 'Sarah Johnson',
-                    rating: 5,
-                    text: 'Wisdom Bites transformed my dental experience! The staff is incredibly friendly, and the doctors made my procedure painless and comfortable.'
-                },
-                {
-                    author_name: 'James Wilson',
-                    rating: 5,
-                    text: 'After years of dental anxiety, I finally found a place where I feel comfortable. The team is patient, understanding, and genuinely cares about your wellbeing.'
-                }
-            ]
+        console.log("Finding nearby places...");
+        
+        // Initialize Places service if not already done
+        if (!this.placesService) {
+            this.placesService = new google.maps.places.PlacesService(document.createElement('div'));
+        }
+        
+        const position = this.state.panorama.getPosition();
+        
+        const request = {
+            location: position,
+            radius: '500',
+            type: ['restaurant', 'cafe', 'parking', 'pharmacy']
         };
+        
+        this.placesService.nearbySearch(request, (results, status) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK) {
+                console.log(`Found ${results.length} nearby places`);
+                this.nearbyPlaces = results;
+                
+                // Add markers for nearby places
+                this.showNearbyPlaceMarkers(results);
+            } else {
+                console.error("Nearby places search failed:", status);
+            }
+        });
     },
     
     /**
-     * Update place info panel with fetched details
+     * Add markers for nearby places on the map
+     * @param {Array} places - Array of place results
      */
-    updatePlaceInfoPanel: function() {
-        if (!this.elements.placeInfoPanel) return;
+    showNearbyPlaceMarkers: function(places) {
+        if (!this.state.panorama) return;
         
-        const place = this.state.placeDetails || this.convertLocalDataToPlaceDetails(this.state.localClinicData);
-        if (!place) return;
-        
-        let hoursHtml = '';
-        
-        if (place.opening_hours && place.opening_hours.weekday_text) {
-            hoursHtml = `
-                <h4>Opening Hours</h4>
-                <ul class="hours-list">
-                    ${place.opening_hours.weekday_text.map(day => `<li>${day}</li>`).join('')}
-                </ul>
-            `;
+        // Clear existing markers
+        if (this.nearbyMarkers) {
+            this.nearbyMarkers.forEach(marker => marker.setMap(null));
         }
         
-        let reviewsHtml = '';
-        if (place.reviews && place.reviews.length > 0) {
-            reviewsHtml = `
-                <h4>Reviews</h4>
-                <div class="place-reviews">
-                    ${place.reviews.slice(0, 3).map(review => `
-                        <div class="place-review">
-                            <div class="review-rating">${'★'.repeat(review.rating)}</div>
-                            <p>${review.text.substring(0, 100)}${review.text.length > 100 ? '...' : ''}</p>
-                            <span>- ${review.author_name}</span>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
+        this.nearbyMarkers = [];
         
-        this.elements.placeInfoPanel.innerHTML = `
-            <div class="place-info-header">
-                <h3>${place.name}</h3>
-                ${place.rating ? `<div class="place-rating">${place.rating} ★</div>` : ''}
-            </div>
-            <div class="place-info-content">
-                <p class="place-address">${place.formatted_address}</p>
-                <p class="place-phone">${place.phone_number || ''}</p>
-                ${place.website ? `<p class="place-website"><a href="${place.website}" target="_blank">Visit Website</a></p>` : ''}
-                ${hoursHtml}
-                ${reviewsHtml}
-            </div>
-            <div class="place-actions">
-                <button class="place-action-btn get-directions-btn">Get Directions</button>
-                <button class="place-action-btn call-btn">Call</button>
-                <button class="place-action-btn book-btn">Book Appointment</button>
-            </div>
-        `;
-        
-        // Add event listeners to buttons
-        const directionsBtn = this.elements.placeInfoPanel.querySelector('.get-directions-btn');
-        if (directionsBtn) {
-            directionsBtn.addEventListener('click', this.openDirections.bind(this));
-        }
-        
-        const callBtn = this.elements.placeInfoPanel.querySelector('.call-btn');
-        if (callBtn && place.phone_number) {
-            callBtn.addEventListener('click', () => {
-                window.location.href = `tel:${place.phone_number.replace(/\s/g, '')}`;
+        // Create markers for each place
+        places.forEach(place => {
+            const marker = new google.maps.Marker({
+                position: place.geometry.location,
+                map: this.state.panorama,
+                title: place.name,
+                icon: {
+                    url: place.icon,
+                    scaledSize: new google.maps.Size(24, 24)
+                }
             });
-        }
-        
-        const bookBtn = this.elements.placeInfoPanel.querySelector('.book-btn');
-        if (bookBtn) {
-            bookBtn.addEventListener('click', this.bookAppointment.bind(this));
-        }
+            
+            // Add click listener to show info window
+            marker.addListener('click', () => {
+                // Create info window
+                const infoWindow = new google.maps.InfoWindow({
+                    content: `
+                        <div class="nearby-place-info">
+                            <h3>${place.name}</h3>
+                            <p>${place.vicinity}</p>
+                            ${place.rating ? `<p>Rating: ${place.rating} ⭐ (${place.user_ratings_total} reviews)</p>` : ''}
+                        </div>
+                    `
+                });
+                
+                infoWindow.open(this.state.panorama, marker);
+            });
+            
+            this.nearbyMarkers.push(marker);
+        });
     },
     
     /**
-     * Update gallery with place photos
+     * Show detailed view for a nearby place
+     * @param {Object} place - The place to show details for
      */
-    updateGalleryWithPhotos: function(photos) {
-        if (!photos || photos.length === 0) return;
+    showPlaceDetails: function(place) {
+        console.log(`Showing details for ${place.name}`);
         
-        // Replace fallback images with actual Google photos
-        this.config.fallbackImages = photos.slice(0, 4).map(photo => photo.getUrl({ maxWidth: 1200, maxHeight: 800 }));
-        
-        // If we're currently showing an interior view, update it
-        if (this.state.isOpen && this.state.currentView === 'interior') {
-            this.initInteriorView();
-        }
-    },
-    
-    /**
-     * Open Google Maps directions
-     */
-    openDirections: function() {
-        if (!this.state.placeDetails || !this.state.placeDetails.geometry) return;
-        
-        const destination = `${this.state.placeDetails.geometry.location.lat()},${this.state.placeDetails.geometry.location.lng()}`;
-        const url = `https://www.google.com/maps/dir/?api=1&destination=${destination}&destination_place_id=${this.config.placeId}`;
-        window.open(url, '_blank');
-    },
-    
-    /**
-     * Use Static Maps API as fallback
-     */
-    useStaticMapFallback: function() {
-        if (!this.elements.panoramaView) return;
-        
-        // First try the embedded iframe from Google Maps directly
-        // This is the most reliable fallback as it's directly from Google Maps with the exact location
-        const embeddedMapHtml = `
-            <div class="static-map-container">
-                <iframe 
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d230.38789888717423!2d88.36900519629518!3d22.496438625641858!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a027123b8369c11%3A0x680b559dbec9f1ac!2sWisdom%20Bites%20Dental%20Clinic%20-%20Best%20Dental%20Clinic%20in%20Jadavpur%20%7C%20Top%20Dentist%20%7C%20Best%20Dental%20Implants%20Clinic%20in%20Kolkata!5e0!3m2!1sen!2sin!4v1741070479092!5m2!1sen!2sin" 
-                    width="100%" 
-                    height="100%" 
-                    style="border:0;" 
-                    allowfullscreen="" 
-                    loading="lazy" 
-                    referrerpolicy="no-referrer-when-downgrade"
-                    title="Map of Wisdom Bites Dental Clinic"
-                    class="embedded-map">
-                </iframe>
-                <div class="static-map-overlay">
-                    <p>Interactive Street View not available</p>
-                    <button class="static-map-btn switch-interior-btn">View Interior Photos</button>
-                </div>
-            </div>
-        `;
-        
-        this.elements.panoramaView.innerHTML = embeddedMapHtml;
-        
-        // Add event listener to switch to interior view
-        const switchBtn = this.elements.panoramaView.querySelector('.switch-interior-btn');
-        if (switchBtn) {
-            switchBtn.addEventListener('click', this.switchToInteriorView.bind(this));
-        }
-        
-        // Update button text
-        if (this.elements.switchViewButton) {
-            this.elements.switchViewButton.textContent = 'View Clinic Interior';
+        // If we have a details modal, populate and show it
+        const detailsModal = document.getElementById('place-details-modal');
+        if (detailsModal) {
+            // Populate modal content with place details
+            detailsModal.querySelector('.modal-title').textContent = place.name;
+            
+            // Show the modal
+            detailsModal.classList.add('active');
+            
+            // Fetch and show complete details
+            this.fetchPlaceDetails(place.place_id);
+        } else {
+            // If no modal exists, navigate to the place
+            this.navigateToLocation(place.geometry.location, place.place_id);
         }
     },
     

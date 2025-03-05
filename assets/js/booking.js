@@ -65,7 +65,7 @@ const EnhancedBookingSystem = {
         // Initialize components
         this.initFormSteps();
         this.initServiceSelection();
-        this.initEnhancedCalendar();
+        this.initCalendar();
         this.initFormValidation();
         this.fetchAvailableTimeSlots();
         
@@ -584,6 +584,10 @@ const EnhancedBookingSystem = {
             setTimeout(() => {
                 // Generate and use mock data
                 this.generateMockAvailableSlots();
+                // Make sure calendar is initialized
+if (this.elements.calendarGrid && this.elements.calendarGrid.querySelectorAll('.calendar-day').length === 0) {
+    this.initCalendar();
+}
                 
                 // Show mock data in calendar
                 if (this.elements.calendarGrid) {
@@ -618,7 +622,7 @@ const EnhancedBookingSystem = {
                 console.log('Received data from Google Sheets:', data);
                 
                 if (data && data.slots) {
-                    this.state.availableTimeSlots = data.slots;
+                this.state.availableTimeSlots = data.slots;
                 } else {
                     // If data format is incorrect, use mock data
                     console.warn('Data format from API was unexpected, using mock data instead');
@@ -726,7 +730,7 @@ const EnhancedBookingSystem = {
      */
     initCalendar: function() {
         if (!this.elements.calendarGrid || !this.elements.calendarMonth) return;
-
+        
         const today = new Date();
         let currentMonth = today.getMonth();
         let currentYear = today.getFullYear();
@@ -1004,13 +1008,13 @@ const EnhancedBookingSystem = {
             
             // Only add click listener if available
             if (isAvailable) {
-                timeSlot.addEventListener('click', () => {
-                    this.selectTimeSlot(timeSlot, timeString);
-                });
-                
-                // Highlight selected time slot
-                if (timeString === this.state.selectedTime) {
-                    timeSlot.classList.add('selected');
+            timeSlot.addEventListener('click', () => {
+                this.selectTimeSlot(timeSlot, timeString);
+            });
+            
+            // Highlight selected time slot
+            if (timeString === this.state.selectedTime) {
+                timeSlot.classList.add('selected');
                 }
             }
             

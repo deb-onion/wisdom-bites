@@ -25,3 +25,4 @@ v4.1.4 (2025-03-06): Fixed booking calendar to enable date and time selection
 v4.1.5 (2025-03-06): Fixed booking calendar to enable date and time selection
 v4.1.6 (2025-03-06): Fixed virtual tour marker issue and improved booking calendar
 v4.1.7 (2025-03-06): Fixed virtual tour marker issue and improved booking calendar
+v4.1.8 (2025-03-06): configuration updated
