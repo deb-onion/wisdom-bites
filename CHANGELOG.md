@@ -1,6 +1,12 @@
 # Wisdom Bites Dental Clinic - Changelog
 
 
+## [3.0.10] - 2025-03-06
+
+### Patch Update:
+- configuration upfated
+
+
 ## [3.0.9] - 2025-03-04
 
 ### Patch Update:

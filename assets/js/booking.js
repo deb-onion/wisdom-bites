@@ -842,6 +842,18 @@ const BookingSystem = {
      * Show booking confirmation message
      */
     showBookingConfirmation: function() {
+        // Set booking flag in localStorage to allow access to directions page
+        localStorage.setItem('wbdc_has_booking', 'true');
+        
+        // Store appointment details if needed for the directions page
+        const appointmentDetails = {
+            name: this.elements.summaryName.textContent,
+            service: this.elements.summaryService.textContent,
+            dentist: this.elements.summaryDentist.textContent,
+            datetime: this.elements.summaryDatetime.textContent
+        };
+        localStorage.setItem('wbdc_appointment_details', JSON.stringify(appointmentDetails));
+        
         // Replace form with confirmation message
         if (this.elements.bookingForm) {
             const confirmationMessage = document.createElement('div');
@@ -860,7 +872,8 @@ const BookingSystem = {
                 </div>
                 <p>We've sent a confirmation email to your inbox with these details. If you need to make any changes to your appointment, please contact us at (555) 123-4567.</p>
                 <div class="confirmation-actions">
-                    <a href="index.html" class="btn btn-primary">Return to Home</a>
+                    <a href="directions.html" class="btn btn-primary">Get Directions</a>
+                    <a href="index.html" class="btn btn-outline">Return to Home</a>
                     <a href="contact.html" class="btn btn-outline">Contact Us</a>
                 </div>
             `;

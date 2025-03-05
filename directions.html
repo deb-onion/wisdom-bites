@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Get detailed directions to Wisdom Bites Dental Clinic. Plan your route to your dental appointment with our interactive map and directions tool.">
+    <meta name="keywords" content="dental clinic directions, dentist location, dental office map, route to dentist, dental appointment directions">
+    <title>Directions | Wisdom Bites Dental Clinic</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Critical CSS -->
+    <style>
+        :root {
+            /* Modern color palette */
+            --primary: #4a90e2;
+            --primary-dark: #3a7abd;
+            --secondary: #50c878;
+            --secondary-dark: #3ca45e;
+            --accent: #f5a623;
+            --dark: #2d3748;
+            --light: #f8fafc;
+            --white: #ffffff;
+            
+            /* Typography */
+            --font-heading: 'Montserrat', sans-serif;
+            --font-body: 'Open Sans', sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-body);
+            color: var(--dark);
+            background-color: var(--light);
+            overflow-x: hidden;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        body.loaded {
+            opacity: 1;
+        }
+        
+        .site-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background-color: transparent;
+            transition: background-color 0.3s ease, padding 0.3s ease;
+            padding: 1.5rem 0;
+        }
+        
+        .site-header.scrolled {
+            background-color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 0.75rem 0;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* Directions related styles */
+        .directions-fallback {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 15px;
+            text-align: center;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .directions-fallback p {
+            margin: 0 0 10px;
+            font-weight: 500;
+        }
+
+        /* Enhanced map styles */
+        .map-container {
+            position: relative;
+            height: 600px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .google-map {
+            height: 100%;
+            width: 100%;
+        }
+        
+        .map-controls {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .map-control-btn {
+            background-color: var(--white);
+            border: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        
+        .map-control-btn:hover {
+            background-color: var(--light);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .street-view-container {
+            height: 300px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+        
+        .directions-panel {
+            background-color: var(--white);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-top: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .waypoint-container {
+            margin-bottom: 15px;
+        }
+        
+        .waypoint-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        
+        .waypoint-btn {
+            background-color: var(--light);
+            border: none;
+            border-radius: 4px;
+            padding: 5px 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .waypoint-btn:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .travel-mode-toggle {
+            display: flex;
+            margin-bottom: 15px;
+            background-color: var(--light);
+            border-radius: 8px;
+            padding: 5px;
+            width: fit-content;
+        }
+        
+        .travel-mode-btn {
+            border: none;
+            background: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .travel-mode-btn.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .access-denied-container {
+            text-align: center;
+            padding: 50px 20px;
+            display: none;
+        }
+        
+        .access-denied-icon {
+            font-size: 60px;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+    </style>
+    
+    <!-- Main CSS (loaded asynchronously) -->
+    <link rel="stylesheet" href="assets/css/styles.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="assets/css/animations.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="assets/css/responsive.css" media="print" onload="this.media='all'">
+    
+    <!-- Preload critical assets -->
+    <link rel="preload" href="assets/images/directions-hero.webp" as="image">
+    <link rel="preload" href="assets/fonts/icons.woff2" as="font" type="font/woff2" crossorigin>
+    
+    <!-- Schema Markup for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Dentist",
+        "name": "Wisdom Bites Dental Clinic",
+        "image": "assets/images/logo.png",
+        "url": "https://wisdombites.com/directions.html",
+        "telephone": "+1-555-123-4567",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "123 Dental Avenue",
+            "addressLocality": "Smile City",
+            "addressRegion": "SC",
+            "postalCode": "12345",
+            "addressCountry": "US"
+        },
+        "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": "40.7128",
+            "longitude": "-74.0060"
+        },
+        "openingHoursSpecification": [
+            {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                "opens": "09:00",
+                "closes": "18:00"
+            },
+            {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": "Saturday",
+                "opens": "10:00",
+                "closes": "15:00"
+            }
+        ]
+    }
+    </script>
+</head>
+<body class="directions-page">
+    <!-- Loading Screen -->
+    <div class="loading-screen">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="site-header">
+        <div class="container">
+            <div class="header-wrapper">
+                <div class="logo">
+                    <a href="index.html" aria-label="Wisdom Bites Dental Clinic">
+                        <img src="assets/images/logo.svg" alt="Wisdom Bites Dental Clinic Logo" width="180" height="45">
+                    </a>
+                </div>
+                
+                <nav class="main-nav">
+                    <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false">
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                    </button>
+                    
+                    <div class="nav-container">
+                        <ul class="nav-list">
+                            <li class="nav-item"><a href="index.html">Home</a></li>
+                            <li class="nav-item"><a href="about.html">About Us</a></li>
+                            <li class="nav-item has-dropdown">
+                                <a href="#" class="dropdown-toggle">Services</a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="services/general-dentistry.html">General Dentistry</a></li>
+                                    <li><a href="services/cosmetic-dentistry.html">Cosmetic Dentistry</a></li>
+                                    <li><a href="services/emergency-care.html">Emergency Care</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item"><a href="booking.html">Book Appointment</a></li>
+                            <li class="nav-item"><a href="contact.html">Contact</a></li>
+                            <li class="nav-item"><a href="directions.html" class="active">Directions</a></li>
+                        </ul>
+                        
+                        <div class="nav-cta">
+                            <a href="tel:+15551234567" class="phone-link">
+                                <i class="icon icon-phone"></i>
+                                <span>(555) 123-4567</span>
+                            </a>
+                            <a href="booking.html" class="btn btn-primary">Book Now</a>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Access Denied Section (will be shown if user hasn't booked) -->
+        <section class="access-denied-container" id="access-denied-container">
+            <div class="container">
+                <div class="access-denied-icon">
+                    <i class="icon icon-lock"></i>
+                </div>
+                <h1>Access Restricted</h1>
+                <p>This page is only available after booking an appointment.</p>
+                <a href="booking.html" class="btn btn-primary">Book an Appointment</a>
+            </div>
+        </section>
+
+        <!-- Directions Content (will be shown only if user has booked) -->
+        <div id="directions-content">
+            <!-- Hero Section -->
+            <section class="page-hero directions-hero">
+                <div class="hero-background">
+                    <picture>
+                        <source srcset="assets/images/contact-hero.webp" type="image/webp">
+                        <source srcset="assets/images/contact-hero.jpg" type="image/jpeg">
+                        <img src="assets/images/contact-hero.jpg" alt="Map with directions to dental clinic" loading="eager">
+                    </picture>
+                    <div class="hero-overlay"></div>
+                </div>
+                
+                <div class="container">
+                    <div class="page-hero-content">
+                        <h1 class="page-title" data-animation="fade-up">Get Directions</h1>
+                        <p class="page-subtitle" data-animation="fade-up" data-delay="0.2">Plan your visit to our clinic</p>
+                    </div>
+                </div>
+                
+                <div class="hero-waves">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+                        <path fill="#ffffff" fill-opacity="1" d="M0,64L48,80C96,96,192,128,288,133.3C384,139,480,117,576,122.7C672,128,768,160,864,186.7C960,213,1056,235,1152,229.3C1248,224,1344,192,1392,176L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+                    </svg>
+                </div>
+            </section>
+
+            <!-- Directions Section -->
+            <section class="directions-section">
+                <div class="container">
+                    <div class="section-header" data-animation="fade-up">
+                        <span class="section-tagline">Plan Your Route</span>
+                        <h2 class="section-title">Directions to Our Clinic</h2>
+                        <p class="section-subtitle">Find the best route to your appointment</p>
+                    </div>
+                    
+                    <div class="directions-wrapper">
+                        <div class="directions-form" data-animation="fade-right">
+                            <div class="form-container">
+                                <form id="directionsForm" class="directions-form">
+                                    <div class="travel-mode-toggle">
+                                        <button type="button" class="travel-mode-btn active" data-mode="DRIVING">
+                                            <i class="icon icon-car"></i> Driving
+                                        </button>
+                                        <button type="button" class="travel-mode-btn" data-mode="TRANSIT">
+                                            <i class="icon icon-bus"></i> Transit
+                                        </button>
+                                        <button type="button" class="travel-mode-btn" data-mode="WALKING">
+                                            <i class="icon icon-walk"></i> Walking
+                                        </button>
+                                        <button type="button" class="travel-mode-btn" data-mode="BICYCLING">
+                                            <i class="icon icon-bike"></i> Cycling
+                                        </button>
+                                    </div>
+                                    
+                                    <div id="waypoints-container">
+                                        <div class="waypoint-container" id="origin-container">
+                                            <div class="form-group">
+                                                <label for="origin">Your Starting Point</label>
+                                                <input type="text" id="origin" name="origin" placeholder="Enter your location" required>
+                                                <button type="button" id="use-my-location" class="btn btn-sm btn-outline">
+                                                    <i class="icon icon-location"></i> Use My Location
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div id="intermediate-waypoints">
+                                            <!-- Additional waypoints will be added here dynamically -->
+                                        </div>
+                                        
+                                        <div class="waypoint-container" id="destination-container">
+                                            <div class="form-group">
+                                                <label for="destination">Destination</label>
+                                                <input type="text" id="destination" name="destination" value="Wisdom Bites Dental Clinic, 123 Dental Avenue, Smile City, SC 12345" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <button type="button" id="add-waypoint" class="btn btn-sm btn-outline">
+                                            <i class="icon icon-plus"></i> Add Stop
+                                        </button>
+                                        <button type="button" id="optimize-route" class="btn btn-sm btn-outline">
+                                            <i class="icon icon-route"></i> Optimize Route
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <button type="submit" class="btn btn-primary">Get Directions</button>
+                                    </div>
+                                </form>
+                            </div>
+                            
+                            <div class="directions-info">
+                                <div class="info-card">
+                                    <h3>Clinic Location</h3>
+                                    <address>
+                                        123 Dental Avenue<br>
+                                        Smile City, SC 12345
+                                    </address>
+                                    <p><strong>Phone:</strong> <a href="tel:+15551234567">(555) 123-4567</a></p>
+                                </div>
+                                
+                                <div class="info-card">
+                                    <h3>Office Hours</h3>
+                                    <ul class="hours-list">
+                                        <li><span>Monday - Friday:</span> 9:00 AM - 6:00 PM</li>
+                                        <li><span>Saturday:</span> 10:00 AM - 3:00 PM</li>
+                                        <li><span>Sunday:</span> Closed</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="info-card">
+                                    <h3>Parking Information</h3>
+                                    <p>Free parking is available in our clinic's parking lot. Additionally, street parking is available along Dental Avenue.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="directions-panel" id="directions-panel">
+                                <!-- Directions will be displayed here -->
+                                <p class="directions-placeholder">Enter your starting point and click "Get Directions" to see step-by-step instructions.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="map-container" data-animation="fade-left">
+                            <div id="map" class="google-map">
+                                <!-- Map will be inserted by JavaScript -->
+                                <div class="directions-fallback" id="map-fallback">
+                                    <img id="static-map" src="https://maps.googleapis.com/maps/api/staticmap?center=40.7128,-74.0060&zoom=15&size=600x400&markers=color:red%7C40.7128,-74.0060&key=AIzaSyDY7pn8Bkb9dxMKX6pKgldH1a2acVjmWsw" alt="Static map showing clinic location" style="max-width: 100%; height: auto; border-radius: 8px;">
+                                    <p>Interactive map loading...</p>
+                                    <a href="https://maps.google.com/?q=Wisdom+Bites+Dental+Clinic,+123+Dental+Avenue,+Smile+City,+SC+12345" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Open in Google Maps</a>
+                                </div>
+                            </div>
+                            
+                            <div class="map-controls">
+                                <button type="button" class="map-control-btn" id="toggle-street-view">
+                                    <i class="icon icon-street-view"></i> Street View
+                                </button>
+                                <button type="button" class="map-control-btn" id="toggle-traffic">
+                                    <i class="icon icon-traffic"></i> Traffic
+                                </button>
+                                <button type="button" class="map-control-btn" id="reset-map">
+                                    <i class="icon icon-reset"></i> Reset
+                                </button>
+                            </div>
+                            
+                            <div id="street-view" class="street-view-container">
+                                <!-- Street view panorama will be inserted here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Transportation Options Section -->
+            <section class="transportation-section">
+                <div class="container">
+                    <div class="section-header" data-animation="fade-up">
+                        <span class="section-tagline">Getting Here</span>
+                        <h2 class="section-title">Transportation Options</h2>
+                        <p class="section-subtitle">Multiple ways to reach our clinic</p>
+                    </div>
+                    
+                    <div class="transportation-grid">
+                        <!-- Driving Option -->
+                        <div class="transport-card" data-animation="fade-up">
+                            <div class="transport-icon">
+                                <i class="icon icon-car"></i>
+                            </div>
+                            <h3>By Car</h3>
+                            <p>Our clinic is easily accessible from major highways. We offer free parking in our dedicated lot with 25 spaces available for patients.</p>
+                            <ul class="transport-details">
+                                <li>From I-95: Take exit 23, then follow Main Street for 2 miles, turn right on Dental Avenue.</li>
+                                <li>From Highway 101: Take the Smile City exit, follow Central Avenue for 1 mile, then turn left on Dental Avenue.</li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Public Transit Option -->
+                        <div class="transport-card" data-animation="fade-up" data-delay="0.2">
+                            <div class="transport-icon">
+                                <i class="icon icon-bus"></i>
+                            </div>
+                            <h3>Public Transit</h3>
+                            <p>Several bus and subway lines stop within a short walking distance of our clinic.</p>
+                            <ul class="transport-details">
+                                <li>Bus Lines: 15, 22, and 38 stop directly in front of our building.</li>
+                                <li>Subway: Take the Green Line to Central Station, then walk 3 blocks north.</li>
+                                <li>The nearest transit stop is "Dental Avenue & 5th Street".</li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Walking/Biking Option -->
+                        <div class="transport-card" data-animation="fade-up" data-delay="0.4">
+                            <div class="transport-icon">
+                                <i class="icon icon-walk"></i>
+                            </div>
+                            <h3>Walking & Cycling</h3>
+                            <p>Our clinic is pedestrian-friendly and accessible via sidewalks and bike lanes.</p>
+                            <ul class="transport-details">
+                                <li>Bike racks are available in front of our building.</li>
+                                <li>The Smile City Greenway connects directly to our street.</li>
+                                <li>From downtown: 15-minute walk or 5-minute bike ride.</li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Ride Share Option -->
+                        <div class="transport-card" data-animation="fade-up" data-delay="0.6">
+                            <div class="transport-icon">
+                                <i class="icon icon-taxi"></i>
+                            </div>
+                            <h3>Rideshare & Taxi</h3>
+                            <p>Rideshare services like Uber and Lyft operate throughout the area and can drop you directly at our entrance.</p>
+                            <ul class="transport-details">
+                                <li>Our designated pickup/dropoff area is directly in front of the main entrance.</li>
+                                <li>Local taxi services are also available by calling (555) 789-0123.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Nearby Services Section -->
+            <section class="nearby-services-section">
+                <div class="container">
+                    <div class="section-header" data-animation="fade-up">
+                        <span class="section-tagline">Local Area</span>
+                        <h2 class="section-title">Nearby Services</h2>
+                        <p class="section-subtitle">Convenient amenities close to our clinic</p>
+                    </div>
+                    
+                    <div class="nearby-services-grid">
+                        <div class="nearby-card" data-animation="fade-up">
+                            <div class="nearby-icon">
+                                <i class="icon icon-parking"></i>
+                            </div>
+                            <h3>Parking</h3>
+                            <p>In addition to our on-site parking, the following options are available:</p>
+                            <ul>
+                                <li>City Center Garage (2 blocks west, $5/hour)</li>
+                                <li>Street parking with meters (2-hour limit)</li>
+                                <li>Central Parking Lot (4 blocks south, $10/day)</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="nearby-card" data-animation="fade-up" data-delay="0.2">
+                            <div class="nearby-icon">
+                                <i class="icon icon-food"></i>
+                            </div>
+                            <h3>Dining</h3>
+                            <p>Several dining options are within walking distance:</p>
+                            <ul>
+                                <li>Smile Café (next door, breakfast & lunch)</li>
+                                <li>Dental Delights Bakery (across the street)</li>
+                                <li>Healthy Bites Restaurant (1 block north)</li>
+                                <li>Green Smoothie Bar (2 blocks east)</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="nearby-card" data-animation="fade-up" data-delay="0.4">
+                            <div class="nearby-icon">
+                                <i class="icon icon-pharmacy"></i>
+                            </div>
+                            <h3>Pharmacy</h3>
+                            <p>Convenient pharmacies to fill prescriptions:</p>
+                            <ul>
+                                <li>MedExpress Pharmacy (in our building, ground floor)</li>
+                                <li>City Drug Store (3 blocks south)</li>
+                                <li>Health Plus Pharmacy (5 blocks east)</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="nearby-card" data-animation="fade-up" data-delay="0.6">
+                            <div class="nearby-icon">
+                                <i class="icon icon-hotel"></i>
+                            </div>
+                            <h3>Accommodations</h3>
+                            <p>For patients traveling from out of town:</p>
+                            <ul>
+                                <li>Comfort Inn (0.5 miles, shuttle available)</li>
+                                <li>Smile City Hotel (0.8 miles)</li>
+                                <li>Dental View Suites (1.2 miles, medical discount available)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CTA Section -->
+            <section class="cta-section">
+                <div class="container">
+                    <div class="cta-wrapper" data-animation="fade-up">
+                        <div class="cta-content">
+                            <h2 class="cta-title">Need Help Finding Us?</h2>
+                            <p class="cta-description">Our friendly staff is available to provide additional directions or assistance.</p>
+                            
+                            <div class="cta-actions">
+                                <a href="tel:+15551234567" class="btn btn-primary btn-lg">Call For Assistance</a>
+                                <a href="contact.html" class="btn btn-outline">Contact Us</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-top">
+            <div class="container">
+                <div class="footer-widgets">
+                    <div class="footer-widget">
+                        <div class="footer-logo">
+                            <img src="assets/images/logo-white.svg" alt="Wisdom Bites Dental Clinic" width="180" height="45">
+                        </div>
+                        <p class="footer-description">Providing exceptional dental care in a comfortable, modern environment. Our mission is to help you achieve and maintain optimal oral health.</p>
+                        <div class="social-links">
+                            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                                <i class="icon icon-facebook"></i>
+                            </a>
+                            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                                <i class="icon icon-instagram"></i>
+                            </a>
+                            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+                                <i class="icon icon-twitter"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-widget">
+                        <h3 class="footer-heading">Contact Us</h3>
+                        <address>
+                            <div class="contact-item">
+                                <i class="icon icon-map"></i>
+                                <span>123 Dental Avenue, Smile City, SC 12345</span>
+                            </div>
+                            <div class="contact-item">
+                                <i class="icon icon-phone"></i>
+                                <a href="tel:+15551234567">+1 (555) 123-4567</a>
+                            </div>
+                            <div class="contact-item">
+                                <i class="icon icon-email"></i>
+                                <a href="mailto:info@wisdombites.com">info@wisdombites.com</a>
+                            </div>
+                        </address>
+                    </div>
+                    
+                    <div class="footer-widget">
+                        <h3 class="footer-heading">Office Hours</h3>
+                        <ul class="hours-list">
+                            <li><span>Monday - Friday:</span> 9:00 AM - 6:00 PM</li>
+                            <li><span>Saturday:</span> 10:00 AM - 3:00 PM</li>
+                            <li><span>Sunday:</span> Closed</li>
+                        </ul>
+                        <div class="emergency-info">
+                            <p><strong>Dental Emergency?</strong></p>
+                            <a href="services/emergency-care.html" class="btn btn-sm btn-primary">Emergency Information</a>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-widget">
+                        <h3 class="footer-heading">Quick Links</h3>
+                        <ul class="footer-links">
+                            <li><a href="index.html">Home</a></li>
+                            <li><a href="about.html">About Us</a></li>
+                            <li><a href="services/general-dentistry.html">Services</a></li>
+                            <li><a href="booking.html">Book Appointment</a></li>
+                            <li><a href="contact.html">Contact</a></li>
+                            <li><a href="directions.html">Directions</a></li>
+                            <li><a href="blog.html">Blog</a></li>
+                            <li><a href="faq.html">FAQs</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="container">
+                <div class="footer-bottom-content">
+                    <div class="copyright">
+                        <p>&copy; <span id="current-year">2025</span> Wisdom Bites Dental Clinic. All Rights Reserved.</p>
+                    </div>
+                    <div class="footer-legal">
+                        <a href="privacy-policy.html">Privacy Policy</a>
+                        <a href="terms-of-service.html">Terms of Service</a>
+                        <a href="accessibility.html">Accessibility</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <a href="#" class="back-to-top" aria-label="Back to top">
+        <i class="icon icon-arrow-up"></i>
+    </a>
+
+    <!-- JavaScript -->
+    <script src="assets/js/vendors/swiper-bundle.min.js" defer></script>
+    <script src="assets/js/main.js" defer></script>
+    <script src="assets/js/animations.js" defer></script>
+    <script src="assets/js/directions.js" defer></script>
+    
+    <!-- Initialize current year for copyright -->
+    <script>
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+        
+        // Mark body as loaded when content is ready
+        window.addEventListener('load', function() {
+            document.body.classList.add('loaded');
+            setTimeout(function() {
+                document.querySelector('.loading-screen').style.display = 'none';
+            }, 500);
+        });
+    </script>
+</body>
+</html> 
