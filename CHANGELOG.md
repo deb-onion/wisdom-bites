@@ -1,6 +1,12 @@
 # Wisdom Bites Dental Clinic - Changelog
 
 
+## [4.1.12] - 2025-03-06
+
+### Patch Update:
+- Fixed syntax error in directions.js and updated GitHub workflow
+
+
 ## [4.1.11] - 2025-03-06
 
 ### Patch Update:
