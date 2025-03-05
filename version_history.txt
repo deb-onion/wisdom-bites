@@ -20,3 +20,4 @@ v4.0.0 (2025-03-06): Complete website redesign
 v4.1.0 (2025-03-06): Updated website with centralized clinic data management system
 v4.1.1 (2025-03-06): Fixed Content Security Policy for Google APIs and Maps
 v4.1.2 (2025-03-06): Added additional security headers and CORS configuration
+v4.1.3 (2025-03-06): Added additional security headers and CORS configuration
