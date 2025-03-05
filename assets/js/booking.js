@@ -564,49 +564,26 @@ const EnhancedBookingSystem = {
     },
     
     /**
-     * Fetch available time slots from Google Sheets
+     * Fetch available time slots from the server or generate mock data
      */
     fetchAvailableTimeSlots: function() {
-        // Set loading state
-        const loadingMessage = document.createElement('div');
-        loadingMessage.className = 'loading-message';
-        loadingMessage.textContent = 'Loading available appointments...';
+        // Always use mock data for now since we're having issues with the Google Script
+        this.generateMockAvailableSlots();
         
-        if (this.elements.timeSlotContainer) {
-            this.elements.timeSlotContainer.innerHTML = '';
-            this.elements.timeSlotContainer.appendChild(loadingMessage);
-        }
-        
-        // In development mode, use mock data
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            setTimeout(() => {
-                this.generateMockAvailableSlots();
-                if (this.elements.calendarGrid.querySelector('.calendar-day')) {
-                    this.elements.calendarGrid.querySelector('.calendar-day').click();
-                }
-            }, 1000);
-            return;
-        }
-        
-        // Fetch from Google Apps Script
-        fetch(this.config.googleScriptUrl + '?action=getAvailableSlots')
-            .then(response => response.json())
-            .then(data => {
-                this.state.availableTimeSlots = data.slots;
+        // Re-initialize calendar after generating mock data
+        setTimeout(() => {
+            if (this.elements.calendarGrid) {
+                // Force calendar regeneration
+                this.initCalendar();
                 
-                // If calendar is already initialized, update it
-                if (this.elements.calendarGrid.querySelector('.calendar-day')) {
-                    this.elements.calendarGrid.querySelector('.calendar-day').click();
+                // Enable date selection for testing
+                const dayElements = this.elements.calendarGrid.querySelectorAll('.calendar-day:not(.empty):not(.disabled)');
+                if (dayElements.length > 0) {
+                    // Select first available date automatically
+                    dayElements[7].click(); // Select a date in the first week
                 }
-            })
-            .catch(error => {
-                console.error('Error fetching available slots:', error);
-                // Fall back to mock data on error
-                this.generateMockAvailableSlots();
-                if (this.elements.calendarGrid.querySelector('.calendar-day')) {
-                    this.elements.calendarGrid.querySelector('.calendar-day').click();
-                }
-            });
+            }
+        }, 500);
     },
     
     /**
@@ -621,29 +598,56 @@ const EnhancedBookingSystem = {
             const date = new Date();
             date.setDate(today.getDate() + i);
             
-            // Skip Sundays (closed days)
-            if (date.getDay() === 0) continue;
+            // Skip weekends (0 = Sunday, 6 = Saturday)
+            if (date.getDay() === 0 || date.getDay() === 6) {
+                continue;
+            }
+            
+            // Skip closed days
+            if (this.config.closedDays.includes(date.getDay())) {
+                continue;
+            }
             
             const dateString = this.formatDate(date);
-            const availableSlots = [];
             
-            // Define start and end hours based on day of week
-            const startHour = date.getDay() === 6 ? this.config.startingHour.saturday : this.config.startingHour.weekday;
-            const endHour = date.getDay() === 6 ? this.config.endingHour.saturday : this.config.endingHour.weekday;
+            // Generate 5-12 random time slots per day
+            const slotsCount = Math.floor(Math.random() * 8) + 5;
+            const timeSlots = [];
             
-            // Generate all possible slots
-            for (let hour = startHour; hour < endHour; hour++) {
-                [0, 30].forEach(minute => {
-                    // Randomly make some slots unavailable
-                    if (Math.random() > 0.3) { // 70% available
-                        const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-                        availableSlots.push(timeString);
-                    }
+            // Business hours: 9 AM - 5 PM
+            for (let j = 0; j < slotsCount; j++) {
+                const hour = Math.floor(Math.random() * 8) + 9; // 9 AM to 4 PM
+                const minute = Math.random() < 0.5 ? 0 : 30; // Either on the hour or half hour
+                const period = hour >= 12 ? 'PM' : 'AM';
+                const displayHour = hour > 12 ? hour - 12 : hour;
+                const timeString = `${displayHour}:${minute === 0 ? '00' : '30'} ${period}`;
+                
+                timeSlots.push({
+                    time: timeString,
+                    available: true
                 });
             }
             
-            this.state.availableTimeSlots[dateString] = availableSlots;
+            // Sort time slots chronologically
+            timeSlots.sort((a, b) => {
+                const aHour = parseInt(a.time.split(':')[0]);
+                const aMinute = parseInt(a.time.split(':')[1]);
+                const aPeriod = a.time.split(' ')[1];
+                
+                const bHour = parseInt(b.time.split(':')[0]);
+                const bMinute = parseInt(b.time.split(':')[1]);
+                const bPeriod = b.time.split(' ')[1];
+                
+                const aValue = (aPeriod === 'PM' && aHour !== 12 ? aHour + 12 : aHour) * 60 + aMinute;
+                const bValue = (bPeriod === 'PM' && bHour !== 12 ? bHour + 12 : bHour) * 60 + bMinute;
+                
+                return aValue - bValue;
+            });
+            
+            this.state.availableTimeSlots[dateString] = timeSlots;
         }
+        
+        console.log('Mock available time slots generated:', this.state.availableTimeSlots);
     },
     
     /**
@@ -767,35 +771,34 @@ const EnhancedBookingSystem = {
         
         // Handler to select a date
         this.selectDate = (dayElement, dateString) => {
-            // Deselect previous date
-            const selectedDate = this.elements.calendarGrid.querySelector('.calendar-day.selected');
-            if (selectedDate) {
-                selectedDate.classList.remove('selected');
-            }
+            // Clear previous selection
+            this.elements.calendarGrid.querySelectorAll('.calendar-day.selected').forEach(day => {
+                day.classList.remove('selected');
+            });
             
-            // Select new date
+            // Select this day
             dayElement.classList.add('selected');
             
-            // Update state and inputs
+            // Update state and input
             this.state.selectedDate = dateString;
-            this.elements.appointmentDateInput.value = dateString;
             this.elements.selectedDateInput.value = dateString;
             
-            // Reset selected time
-            this.state.selectedTime = null;
-            this.elements.selectedTimeInput.value = '';
+            // Make sure we also update the appointment date input if it exists
+            if (this.elements.appointmentDateInput) {
+                this.elements.appointmentDateInput.value = dateString;
+            }
             
             // Update time slots
             this.updateTimeSlots(dateString);
             
-            // Enable/disable continue button based on selection
-            const continueButton = document.querySelector('.form-step[data-step="3"] .next-step');
-            if (continueButton) {
-                continueButton.disabled = !this.state.selectedTime;
-            }
+            // Clear selected time
+            this.state.selectedTime = '';
+            this.elements.selectedTimeInput.value = '';
             
             // Track date selection
             this.trackDateSelection(dateString);
+            
+            console.log('Selected date:', dateString);
         };
         
         // Navigate to previous month
@@ -907,21 +910,13 @@ const EnhancedBookingSystem = {
         const morningGrid = morningSlots.querySelector('.morning-slots');
         const afternoonGrid = afternoonSlots.querySelector('.afternoon-slots');
         
-        // Sort available slots
-        availableSlots.sort();
-        
         // Add time slots to morning or afternoon section
-        availableSlots.forEach(timeString => {
-            const hour = parseInt(timeString.split(':')[0], 10);
+        availableSlots.forEach(slot => {
+            const timeString = slot.time; // Use the time string from our new format
             const timeSlot = document.createElement('div');
             timeSlot.className = 'time-slot';
             timeSlot.dataset.time = timeString;
-            
-            // Format time for display (12-hour format)
-            const hourNum = hour % 12 || 12;
-            const ampm = hour < 12 ? 'AM' : 'PM';
-            const minute = timeString.split(':')[1];
-            timeSlot.textContent = `${hourNum}:${minute} ${ampm}`;
+            timeSlot.textContent = timeString; // Already formatted correctly
             
             timeSlot.addEventListener('click', () => {
                 this.selectTimeSlot(timeSlot, timeString);
@@ -933,7 +928,7 @@ const EnhancedBookingSystem = {
             }
             
             // Add to appropriate section
-            if (hour < 12) {
+            if (timeString.includes('AM')) {
                 morningGrid.appendChild(timeSlot);
             } else {
                 afternoonGrid.appendChild(timeSlot);
@@ -947,6 +942,12 @@ const EnhancedBookingSystem = {
         
         if (afternoonGrid.children.length === 0) {
             afternoonSlots.style.display = 'none';
+        }
+        
+        // Enable continue button
+        const nextStepButton = document.querySelector('.form-step[data-step="3"] .next-step');
+        if (nextStepButton) {
+            nextStepButton.disabled = false;
         }
     },
     

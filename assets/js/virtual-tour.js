@@ -838,14 +838,11 @@ const VirtualTour = {
         );
         
         // Create a custom marker
-        const entranceMarker = new google.maps.Marker({
+        const entranceMarker = new google.maps.marker.AdvancedMarkerElement({
             position: entrancePosition,
             map: this.state.panorama,
             title: 'Wisdom Bites Dental Clinic - Main Entrance',
-            icon: {
-                url: 'assets/images/entrance-marker.png', // Create this icon
-                scaledSize: new google.maps.Size(32, 32)
-            }
+            content: this.createEntranceMarkerElement()
         });
         
         // Add click event
@@ -864,12 +861,31 @@ const VirtualTour = {
         });
         
         // Show info window immediately
-        infoWindow.open(this.state.panorama, entranceMarker);
+        infoWindow.open({
+            anchor: entranceMarker,
+            map: this.state.panorama
+        });
         
         // Close after a few seconds
         setTimeout(() => {
             infoWindow.close();
         }, 5000);
+        
+        return entranceMarker;
+    },
+    
+    /**
+     * Create a custom marker element for the entrance
+     */
+    createEntranceMarkerElement: function() {
+        const markerElement = document.createElement('div');
+        markerElement.style.width = '32px';
+        markerElement.style.height = '32px';
+        markerElement.style.backgroundImage = 'url(assets/images/entrance-marker.png)';
+        markerElement.style.backgroundSize = 'contain';
+        markerElement.style.backgroundRepeat = 'no-repeat';
+        markerElement.style.backgroundPosition = 'center';
+        return markerElement;
     },
     
     /**
