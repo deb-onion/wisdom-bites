@@ -1,6 +1,12 @@
 # Wisdom Bites Dental Clinic - Changelog
 
 
+## [4.1.1] - 2025-03-06
+
+### Patch Update:
+- Fixed Content Security Policy for Google APIs and Maps
+
+
 ## [4.1.0] - 2025-03-06
 
 ### Feature Update:
