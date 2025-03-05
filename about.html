@@ -15,6 +15,37 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     
+    <!-- Clinic Data -->
+    <script id="clinic-data" type="application/json">
+    {
+        "name": "Wisdom Bites Dental Clinic",
+        "address": "1/4A, North Road, Poddar Nagar, Jadavpur, Kolkata, West Bengal 700032, India",
+        "phone": "+91 123 456 7890",
+        "placeId": "ChIJEZw2uCNxAjoRrPHJvp1VC2g",
+        "position": {
+            "lat": 22.496391851463255,
+            "lng": 88.36915472944189
+        },
+        "hours": [
+            "Monday: 9:00 AM – 8:00 PM",
+            "Tuesday: 9:00 AM – 8:00 PM",
+            "Wednesday: 9:00 AM – 8:00 PM",
+            "Thursday: 9:00 AM – 8:00 PM",
+            "Friday: 9:00 AM – 8:00 PM",
+            "Saturday: 9:00 AM – 6:00 PM",
+            "Sunday: Closed"
+        ],
+        "services": [
+            "General Dentistry",
+            "Cosmetic Dentistry",
+            "Emergency Dental Care",
+            "Dental Implants",
+            "Root Canal Treatment",
+            "Teeth Whitening"
+        ]
+    }
+    </script>
+    
     <!-- Critical CSS -->
     <style>
         :root {
@@ -187,7 +218,7 @@
                         </ul>
                         
                         <div class="nav-cta">
-                            <a href="tel:+15551234567" class="phone-link">
+                            <a href="tel:+911234567890" data-clinic-phone class="phone-link">
                                 <i class="icon icon-phone"></i>
                                 <span>(555) 123-4567</span>
                             </a>
@@ -829,7 +860,7 @@
                             <a href="booking.html" class="btn btn-primary btn-lg">Book Your Appointment</a>
                             <div class="cta-contact">
                                 <span>or call us at</span>
-                                <a href="tel:+15551234567" class="phone-link">(555) 123-4567</a>
+                                <a href="tel:+911234567890" data-clinic-phone class="phone-link" data-clinic-phone>+91 123 456 7890</a>
                             </div>
                         </div>
                     </div>
@@ -866,11 +897,11 @@
                         <address>
                             <div class="contact-item">
                                 <i class="icon icon-map"></i>
-                                <span>123 Dental Avenue, Smile City, SC 12345</span>
+                                <span data-clinic-address><span data-clinic-address>1/4A, North Road, Poddar Nagar, Jadavpur, Kolkata, West Bengal 700032, India</span>
                             </div>
                             <div class="contact-item">
                                 <i class="icon icon-phone"></i>
-                                <a href="tel:+15551234567">+1 (555) 123-4567</a>
+                                <a href="tel:+911234567890" data-clinic-phone data-clinic-phone>+91 123 456 7890</a>
                             </div>
                             <div class="contact-item">
                                 <i class="icon icon-email"></i>
@@ -881,9 +912,13 @@
                     
                     <div class="footer-widget">
                         <h3 class="footer-heading">Office Hours</h3>
-                        <ul class="hours-list">
-                            <li><span>Monday - Friday:</span> 9:00 AM - 6:00 PM</li>
-                            <li><span>Saturday:</span> 10:00 AM - 3:00 PM</li>
+                        <ul class="hours-list" data-clinic-hours>
+                            <li><span>Monday:</span> 9:00 AM – 8:00 PM</li>
+                            <li><span>Tuesday:</span> 9:00 AM – 8:00 PM</li>
+                            <li><span>Wednesday:</span> 9:00 AM – 8:00 PM</li>
+                            <li><span>Thursday:</span> 9:00 AM – 8:00 PM</li>
+                            <li><span>Friday:</span> 9:00 AM – 8:00 PM</li>
+                            <li><span>Saturday:</span> 9:00 AM – 6:00 PM</li>
                             <li><span>Sunday:</span> Closed</li>
                         </ul>
                         <div class="emergency-info">
@@ -940,6 +975,7 @@
 
     <!-- JavaScript -->
     <script src="assets/js/vendors/swiper-bundle.min.js" defer></script>
+    <script src="assets/js/utils/clinic-data.js"></script>
     <script src="assets/js/main.js" defer></script>
     <script src="assets/js/animations.js" defer></script>
     <script src="assets/js/about.js" defer></script>

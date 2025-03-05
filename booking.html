@@ -21,9 +21,17 @@
             /* Modern color palette */
             --primary: #4a90e2;
             --primary-dark: #3a7abd;
+            --primary-light: #6ba7e7;
+            --primary-ultra-light: #e8f2fd;
             --secondary: #50c878;
             --secondary-dark: #3ca45e;
+            --secondary-light: #72d495;
+            --secondary-ultra-light: #ebf9f0;
             --accent: #f5a623;
+            --accent-dark: #d28c10;
+            --accent-light: #f7ba55;
+            --error: #e53e3e;
+            --error-dark: #c53030;
             --dark: #2d3748;
             --light: #f8fafc;
             --white: #ffffff;
@@ -72,7 +80,7 @@
         }
     </style>
     
-    <!-- Main CSS (loaded asynchronously) -->
+    <!-- Main CSS -->
     <link rel="stylesheet" href="assets/css/styles.css" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="assets/css/animations.css" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="assets/css/responsive.css" media="print" onload="this.media='all'">
@@ -81,6 +89,37 @@
     <!-- Preload critical assets -->
     <link rel="preload" href="assets/images/booking-hero.webp" as="image">
     <link rel="preload" href="assets/fonts/icons.woff2" as="font" type="font/woff2" crossorigin>
+
+    <!-- Clinic Data -->
+    <script id="clinic-data" type="application/json">
+    {
+    "name": "Wisdom Bites Dental Clinic",
+    "address": "1/4A, North Road, Poddar Nagar, Jadavpur, Kolkata, West Bengal 700032, India",
+    "phone": "+91 123 456 7890",
+    "placeId": "ChIJEZw2uCNxAjoRrPHJvp1VC2g",
+    "position": {
+        "lat": 22.496391851463255,
+        "lng": 88.36915472944189
+    },
+    "hours": [
+        "Monday: 9:00 AM – 8:00 PM",
+        "Tuesday: 9:00 AM – 8:00 PM",
+        "Wednesday: 9:00 AM – 8:00 PM",
+        "Thursday: 9:00 AM – 8:00 PM",
+        "Friday: 9:00 AM – 8:00 PM",
+        "Saturday: 9:00 AM – 6:00 PM",
+        "Sunday: Closed"
+    ],
+    "services": [
+        "General Dentistry",
+        "Cosmetic Dentistry",
+        "Emergency Dental Care",
+        "Dental Implants",
+        "Root Canal Treatment",
+        "Teeth Whitening"
+    ]
+}
+    </script>
 </head>
 <body class="booking-page">
     <!-- Loading Screen -->
@@ -122,7 +161,7 @@
                         </ul>
                         
                         <div class="nav-cta">
-                            <a href="tel:+15551234567" class="phone-link">
+                            <a href="tel:+911234567890" data-clinic-phone class="phone-link">
                                 <i class="icon icon-phone"></i>
                                 <span>(555) 123-4567</span>
                             </a>
@@ -141,7 +180,7 @@
                 <picture>
                     <source srcset="assets/images/booking-hero.webp" type="image/webp">
                     <source srcset="assets/images/booking-hero.jpg" type="image/jpeg">
-                    <img src="assets/images/booking-hero.jpg" alt="" aria-hidden="true" loading="eager">
+                    <img src="assets/images/booking-hero.jpg" alt="Dental appointment booking" loading="eager">
                 </picture>
                 <div class="hero-overlay"></div>
             </div>
@@ -168,7 +207,7 @@
                         <div class="booking-text">
                             <h2>Simple Online Scheduling</h2>
                             <p>Book your appointment with Wisdom Bites Dental Clinic to receive expert dental care from our experienced team. Whether you need a routine check-up, cosmetic procedure, or emergency care, we're here to help.</p>
-                            <p>Fill out the form, choose your preferred date and time, and we'll confirm your appointment. If you have a dental emergency, please call us directly at <a href="tel:+15551234567" class="accent-link">(555) 123-4567</a> for immediate assistance.</p>
+                            <p>Fill out the form, choose your preferred date and time, and we'll confirm your appointment. If you have a dental emergency, please call us directly at <a href="tel:+911234567890" data-clinic-phone class="accent-link">(555) 123-4567</a> for immediate assistance.</p>
                         </div>
                         
                         <div class="booking-features">
@@ -211,7 +250,7 @@
                                 <div class="emergency-content">
                                     <h3>Dental Emergency?</h3>
                                     <p>Don't wait! Call our emergency line for immediate assistance.</p>
-                                    <a href="tel:+15551234567" class="btn btn-secondary">Call (555) 123-4567</a>
+                                    <a href="tel:+911234567890" data-clinic-phone class="btn btn-secondary">Call (555) 123-4567</a>
                                 </div>
                             </div>
                         </div>
@@ -504,7 +543,7 @@
                         <h3>Have Questions About Your Visit?</h3>
                         <p>Our team is happy to address any concerns you may have before your appointment.</p>
                         <div class="cta-buttons">
-                            <a href="tel:+15551234567" class="btn btn-primary">Call Us</a>
+                            <a href="tel:+911234567890" data-clinic-phone class="btn btn-primary">Call Us</a>
                             <a href="faq.html" class="btn btn-outline">View FAQs</a>
                         </div>
                     </div>
@@ -732,11 +771,11 @@
                         <address>
                             <div class="contact-item">
                                 <i class="icon icon-map"></i>
-                                <span>123 Dental Avenue, Smile City, SC 12345</span>
+                                <span><span data-clinic-address>1/4A, North Road, Poddar Nagar, Jadavpur, Kolkata, West Bengal 700032, India</span>
                             </div>
                             <div class="contact-item">
                                 <i class="icon icon-phone"></i>
-                                <a href="tel:+15551234567">+1 (555) 123-4567</a>
+                                <a href="tel:+911234567890" data-clinic-phone>+1 (555) 123-4567</a>
                             </div>
                             <div class="contact-item">
                                 <i class="icon icon-email"></i>
@@ -815,5 +854,6 @@
             }, 500);
         });
     </script>
-</body>
+    <script src="assets/js/utils/clinic-data.js"></script>
+    </body>
 </html>

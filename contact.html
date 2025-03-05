@@ -141,6 +141,37 @@
         }
     }
     </script>
+
+    <!-- Clinic Data -->
+    <script id="clinic-data" type="application/json">
+    {
+    "name": "Wisdom Bites Dental Clinic",
+    "address": "1/4A, North Road, Poddar Nagar, Jadavpur, Kolkata, West Bengal 700032, India",
+    "phone": "+91 123 456 7890",
+    "placeId": "ChIJEZw2uCNxAjoRrPHJvp1VC2g",
+    "position": {
+        "lat": 22.496391851463255,
+        "lng": 88.36915472944189
+    },
+    "hours": [
+        "Monday: 9:00 AM – 8:00 PM",
+        "Tuesday: 9:00 AM – 8:00 PM",
+        "Wednesday: 9:00 AM – 8:00 PM",
+        "Thursday: 9:00 AM – 8:00 PM",
+        "Friday: 9:00 AM – 8:00 PM",
+        "Saturday: 9:00 AM – 6:00 PM",
+        "Sunday: Closed"
+    ],
+    "services": [
+        "General Dentistry",
+        "Cosmetic Dentistry",
+        "Emergency Dental Care",
+        "Dental Implants",
+        "Root Canal Treatment",
+        "Teeth Whitening"
+    ]
+}
+    </script>
 </head>
 <body>
     <!-- Loading Screen -->
@@ -182,7 +213,7 @@
                         </ul>
                         
                         <div class="nav-cta">
-                            <a href="tel:+15551234567" class="phone-link">
+                            <a href="tel:+911234567890" data-clinic-phone class="phone-link">
                                 <i class="icon icon-phone"></i>
                                 <span>(555) 123-4567</span>
                             </a>
@@ -232,7 +263,7 @@
                         <h3>Call Us</h3>
                         <p>Our front desk team is available during office hours to assist with scheduling and questions.</p>
                         <div class="contact-detail">
-                            <a href="tel:+15551234567" class="contact-link">(555) 123-4567</a>
+                            <a href="tel:+911234567890" data-clinic-phone class="contact-link">(555) 123-4567</a>
                         </div>
                     </div>
                     
@@ -372,7 +403,7 @@
                         <h2>Dental Emergency?</h2>
                         <p>If you're experiencing severe pain, swelling, bleeding, or a knocked-out tooth, please call our emergency line immediately. We reserve time in our schedule for same-day emergency appointments.</p>
                         <div class="emergency-actions">
-                            <a href="tel:+15551234567" class="btn btn-primary">Call (555) 123-4567</a>
+                            <a href="tel:+911234567890" data-clinic-phone class="btn btn-primary">Call (555) 123-4567</a>
                             <a href="services/emergency-care.html" class="btn btn-outline">Emergency Care Information</a>
                         </div>
                     </div>
@@ -548,7 +579,7 @@
                 
                 <div class="faq-cta" data-animation="fade-up">
                     <p>Can't find the answer you're looking for? Contact us directly!</p>
-                    <a href="tel:+15551234567" class="btn btn-primary">Call Us</a>
+                    <a href="tel:+911234567890" data-clinic-phone class="btn btn-primary">Call Us</a>
                 </div>
             </div>
         </section>
@@ -606,7 +637,7 @@
                             <a href="booking.html" class="btn btn-primary btn-lg">Book an Appointment</a>
                             <div class="cta-contact">
                                 <span>or call us at</span>
-                                <a href="tel:+15551234567" class="phone-link">(555) 123-4567</a>
+                                <a href="tel:+911234567890" data-clinic-phone class="phone-link">(555) 123-4567</a>
                             </div>
                         </div>
                     </div>
@@ -643,11 +674,11 @@
                         <address>
                             <div class="contact-item">
                                 <i class="icon icon-map"></i>
-                                <span>123 Dental Avenue, Smile City, SC 12345</span>
+                                <span><span data-clinic-address>1/4A, North Road, Poddar Nagar, Jadavpur, Kolkata, West Bengal 700032, India</span>
                             </div>
                             <div class="contact-item">
                                 <i class="icon icon-phone"></i>
-                                <a href="tel:+15551234567">+1 (555) 123-4567</a>
+                                <a href="tel:+911234567890" data-clinic-phone>+1 (555) 123-4567</a>
                             </div>
                             <div class="contact-item">
                                 <i class="icon icon-email"></i>
@@ -734,6 +765,7 @@
             }, 500);
         });
     </script>
-</body>
+    <script src="assets/js/utils/clinic-data.js"></script>
+    </body>
 </html>
 

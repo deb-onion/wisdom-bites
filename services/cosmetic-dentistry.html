@@ -13,6 +13,37 @@
     <!-- CSS -->
     <link rel="stylesheet" href="../assets/css/styles.css">
     <link rel="stylesheet" href="../assets/css/animations.css">
+
+    <!-- Clinic Data -->
+    <script id="clinic-data" type="application/json">
+    {
+    "name": "Wisdom Bites Dental Clinic",
+    "address": "1/4A, North Road, Poddar Nagar, Jadavpur, Kolkata, West Bengal 700032, India",
+    "phone": "+91 123 456 7890",
+    "placeId": "ChIJEZw2uCNxAjoRrPHJvp1VC2g",
+    "position": {
+        "lat": 22.496391851463255,
+        "lng": 88.36915472944189
+    },
+    "hours": [
+        "Monday: 9:00 AM – 8:00 PM",
+        "Tuesday: 9:00 AM – 8:00 PM",
+        "Wednesday: 9:00 AM – 8:00 PM",
+        "Thursday: 9:00 AM – 8:00 PM",
+        "Friday: 9:00 AM – 8:00 PM",
+        "Saturday: 9:00 AM – 6:00 PM",
+        "Sunday: Closed"
+    ],
+    "services": [
+        "General Dentistry",
+        "Cosmetic Dentistry",
+        "Emergency Dental Care",
+        "Dental Implants",
+        "Root Canal Treatment",
+        "Teeth Whitening"
+    ]
+}
+    </script>
 </head>
 <body>
     <header class="site-header">
@@ -310,7 +341,7 @@
                     <h3 class="footer-heading">Contact Us</h3>
                     <address>
                         <p>123 Dental Avenue, Smile City, SC 12345</p>
-                        <p>Phone: <a href="tel:+15551234567">+1 (555) 123-4567</a></p>
+                        <p>Phone: <a href="tel:+911234567890" data-clinic-phone>+1 (555) 123-4567</a></p>
                         <p>Email: <a href="mailto:info@wisdombites.com">info@wisdombites.com</a></p>
                     </address>
                 </div>
@@ -358,5 +389,6 @@
 
     <!-- JavaScript -->
     <script src="../assets/js/scripts.js"></script>
-</body>
+    <script src="../assets/js/utils/clinic-data.js"></script>
+    </body>
 </html> 

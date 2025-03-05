@@ -154,6 +154,37 @@
         ]
     }
     </script>
+
+    <!-- Clinic Data -->
+    <script id="clinic-data" type="application/json">
+    {
+    "name": "Wisdom Bites Dental Clinic",
+    "address": "1/4A, North Road, Poddar Nagar, Jadavpur, Kolkata, West Bengal 700032, India",
+    "phone": "+91 123 456 7890",
+    "placeId": "ChIJEZw2uCNxAjoRrPHJvp1VC2g",
+    "position": {
+        "lat": 22.496391851463255,
+        "lng": 88.36915472944189
+    },
+    "hours": [
+        "Monday: 9:00 AM – 8:00 PM",
+        "Tuesday: 9:00 AM – 8:00 PM",
+        "Wednesday: 9:00 AM – 8:00 PM",
+        "Thursday: 9:00 AM – 8:00 PM",
+        "Friday: 9:00 AM – 8:00 PM",
+        "Saturday: 9:00 AM – 6:00 PM",
+        "Sunday: Closed"
+    ],
+    "services": [
+        "General Dentistry",
+        "Cosmetic Dentistry",
+        "Emergency Dental Care",
+        "Dental Implants",
+        "Root Canal Treatment",
+        "Teeth Whitening"
+    ]
+}
+    </script>
 </head>
 <body>
     <!-- Loading Screen -->
@@ -195,7 +226,7 @@
                         </ul>
                         
                         <div class="nav-cta">
-                            <a href="tel:+15551234567" class="phone-link">
+                            <a href="tel:+911234567890" data-clinic-phone class="phone-link">
                                 <i class="icon icon-phone"></i>
                                 <span>(555) 123-4567</span>
                             </a>
@@ -227,7 +258,7 @@
                     <h1 class="page-title" data-animation="fade-up">Emergency Dental Care</h1>
                     <p class="page-subtitle" data-animation="fade-up" data-delay="0.2">Immediate relief for dental emergencies</p>
                     <div class="hero-cta" data-animation="fade-up" data-delay="0.4">
-                        <a href="tel:+15551234567" class="btn btn-error btn-lg">Call Now: (555) 123-4567</a>
+                        <a href="tel:+911234567890" data-clinic-phone class="btn btn-error btn-lg">Call Now: (555) 123-4567</a>
                         <a href="../booking.html?service=emergency" class="btn btn-primary btn-lg">Book Emergency Visit</a>
                     </div>
                 </div>
@@ -249,7 +280,7 @@
                     </div>
                     <div class="alert-content">
                         <h2>Same-Day Emergency Care Available</h2>
-                        <p>We reserve time in our daily schedule for emergency patients. Call us immediately at <a href="tel:+15551234567" class="emergency-phone">(555) 123-4567</a> for prompt care.</p>
+                        <p>We reserve time in our daily schedule for emergency patients. Call us immediately at <a href="tel:+911234567890" data-clinic-phone class="emergency-phone">(555) 123-4567</a> for prompt care.</p>
                         <p><strong>After-hours emergencies:</strong> Call our emergency line and follow the prompts to reach our on-call dentist.</p>
                     </div>
                 </div>
@@ -331,7 +362,7 @@
                                 </ul>
                             </div>
                             <div class="emergency-action">
-                                <a href="tel:+15551234567" class="btn btn-error">Call Immediately</a>
+                                <a href="tel:+911234567890" data-clinic-phone class="btn btn-error">Call Immediately</a>
                             </div>
                         </div>
                     </div>
@@ -843,7 +874,7 @@
                         <p class="cta-description">Call us now for immediate assistance or book an emergency appointment online.</p>
                         
                         <div class="cta-actions">
-                            <a href="tel:+15551234567" class="btn btn-error btn-lg">Call (555) 123-4567</a>
+                            <a href="tel:+911234567890" data-clinic-phone class="btn btn-error btn-lg">Call (555) 123-4567</a>
                             <a href="../booking.html?service=emergency" class="btn btn-primary btn-lg">Book Emergency Visit</a>
                         </div>
                         
@@ -885,11 +916,11 @@
                         <address>
                             <div class="contact-item">
                                 <i class="icon icon-map"></i>
-                                <span>123 Dental Avenue, Smile City, SC 12345</span>
+                                <span><span data-clinic-address>1/4A, North Road, Poddar Nagar, Jadavpur, Kolkata, West Bengal 700032, India</span>
                             </div>
                             <div class="contact-item">
                                 <i class="icon icon-phone"></i>
-                                <a href="tel:+15551234567">+1 (555) 123-4567</a>
+                                <a href="tel:+911234567890" data-clinic-phone>+1 (555) 123-4567</a>
                             </div>
                             <div class="contact-item">
                                 <i class="icon icon-email"></i>
@@ -907,7 +938,7 @@
                         </ul>
                         <div class="emergency-info">
                             <p><strong>Dental Emergency?</strong></p>
-                            <a href="tel:+15551234567" class="btn btn-sm btn-error">Call (555) 123-4567</a>
+                            <a href="tel:+911234567890" data-clinic-phone class="btn btn-sm btn-error">Call (555) 123-4567</a>
                         </div>
                     </div>
                     
@@ -953,7 +984,7 @@
     <div class="emergency-sticky">
         <div class="container">
             <p>Dental Emergency? Don't wait!</p>
-            <a href="tel:+15551234567" class="btn btn-error">Call (555) 123-4567</a>
+            <a href="tel:+911234567890" data-clinic-phone class="btn btn-error">Call (555) 123-4567</a>
         </div>
     </div>
 
@@ -995,5 +1026,6 @@
             });
         });
     </script>
-</body>
+    <script src="../assets/js/utils/clinic-data.js"></script>
+    </body>
 </html>

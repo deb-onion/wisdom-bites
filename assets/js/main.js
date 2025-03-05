@@ -33,6 +33,7 @@ const WisdomBites = {
         isPageLoaded: false,
         lastScrollPosition: 0,
         isScrollingDown: false,
+        clinicData: null // Store clinic data here
     },
     
     /**
@@ -41,6 +42,9 @@ const WisdomBites = {
     init: function() {
         // Cache DOM elements
         this.cacheElements();
+        
+        // Load clinic data
+        this.loadClinicData();
         
         // Initialize components
         this.initNavigation();
@@ -62,6 +66,9 @@ const WisdomBites = {
         
         // Bind events
         this.bindEvents();
+        
+        // Apply clinic data to the page
+        this.applyClinicDataToPage();
         
         // Mark initialization as complete
         this.state.isPageLoaded = true;
@@ -1579,6 +1586,76 @@ const WisdomBites = {
             
             lazyImages.forEach(img => {
                 imageObserver.observe(img);
+            });
+        }
+    },
+    
+    /**
+     * Load clinic data
+     */
+    loadClinicData: function() {
+        // Try to get clinic data from ClinicDataUtil if available
+        if (window.ClinicDataUtil) {
+            this.state.clinicData = ClinicDataUtil.getClinicData();
+            return;
+        }
+        
+        // Fallback to direct loading if utility is not available
+        const dataScript = document.getElementById('clinic-data');
+        if (dataScript) {
+            try {
+                this.state.clinicData = JSON.parse(dataScript.textContent);
+            } catch (error) {
+                console.warn('Could not parse clinic data:', error);
+            }
+        }
+    },
+    
+    /**
+     * Apply clinic data to the page elements
+     */
+    applyClinicDataToPage: function() {
+        // Skip if ClinicDataUtil is handling this
+        if (window.ClinicDataUtil) {
+            return;
+        }
+        
+        // Skip if no clinic data is available
+        if (!this.state.clinicData) {
+            return;
+        }
+        
+        const data = this.state.clinicData;
+        
+        // Update clinic name elements
+        document.querySelectorAll('[data-clinic-name]').forEach(el => {
+            el.textContent = data.name || '';
+        });
+        
+        // Update clinic address elements
+        document.querySelectorAll('[data-clinic-address]').forEach(el => {
+            el.textContent = data.address || '';
+        });
+        
+        // Update clinic phone elements
+        document.querySelectorAll('[data-clinic-phone]').forEach(el => {
+            el.textContent = data.phone || '';
+            if (el.tagName === 'A') {
+                el.href = 'tel:' + (data.phone || '').replace(/\s/g, '');
+            }
+        });
+        
+        // Update clinic hours elements
+        if (data.hours && data.hours.length) {
+            document.querySelectorAll('[data-clinic-hours]').forEach(el => {
+                el.innerHTML = data.hours.map(hour => `<li>${hour}</li>`).join('');
+            });
+        }
+        
+        // Update clinic services list
+        if (data.services && data.services.length) {
+            document.querySelectorAll('[data-clinic-services]').forEach(el => {
+                el.innerHTML = data.services.map(service => `<li>${service}</li>`).join('');
             });
         }
     }
