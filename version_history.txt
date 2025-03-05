@@ -28,3 +28,4 @@ v4.1.7 (2025-03-06): Fixed virtual tour marker issue and improved booking calend
 v4.1.8 (2025-03-06): configuration updated
 v4.1.9 (2025-03-06): Fixed mapsCallback function in virtual-tour.js
 v4.1.10 (2025-03-06): configuration updated
+v4.1.11 (2025-03-06): Fixed syntax error in directions.js and updated GitHub workflow
