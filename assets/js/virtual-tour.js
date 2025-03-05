@@ -826,7 +826,9 @@ const VirtualTour = {
     },
     
     /**
-     * Add marker for clinic entrance
+     * Add entrance marker to panorama
+     * @param {google.maps.LatLng} position - Optional custom position
+     * @returns {google.maps.Marker} - The created marker
      */
     addEntranceMarker: function(position) {
         if (!this.state.panorama || !google || !google.maps) return;
@@ -837,12 +839,15 @@ const VirtualTour = {
             this.config.panoramaOptions.position.lng
         );
         
-        // Create a custom marker
-        const entranceMarker = new google.maps.marker.AdvancedMarkerElement({
+        // Create a custom marker using standard Marker class
+        const entranceMarker = new google.maps.Marker({
             position: entrancePosition,
             map: this.state.panorama,
             title: 'Wisdom Bites Dental Clinic - Main Entrance',
-            content: this.createEntranceMarkerElement()
+            icon: {
+                url: 'assets/images/entrance-marker.png',
+                scaledSize: new google.maps.Size(32, 32)
+            }
         });
         
         // Add click event
@@ -861,10 +866,7 @@ const VirtualTour = {
         });
         
         // Show info window immediately
-        infoWindow.open({
-            anchor: entranceMarker,
-            map: this.state.panorama
-        });
+        infoWindow.open(this.state.panorama, entranceMarker);
         
         // Close after a few seconds
         setTimeout(() => {
@@ -876,6 +878,7 @@ const VirtualTour = {
     
     /**
      * Create a custom marker element for the entrance
+     * @deprecated - Used with AdvancedMarkerElement which isn't available
      */
     createEntranceMarkerElement: function() {
         const markerElement = document.createElement('div');

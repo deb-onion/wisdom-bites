@@ -564,26 +564,101 @@ const EnhancedBookingSystem = {
     },
     
     /**
-     * Fetch available time slots from the server or generate mock data
+     * Fetch available time slots from Google Sheets
      */
     fetchAvailableTimeSlots: function() {
-        // Always use mock data for now since we're having issues with the Google Script
-        this.generateMockAvailableSlots();
+        // Set loading state
+        const loadingMessage = document.createElement('div');
+        loadingMessage.className = 'loading-message';
+        loadingMessage.textContent = 'Loading available appointments...';
         
-        // Re-initialize calendar after generating mock data
-        setTimeout(() => {
-            if (this.elements.calendarGrid) {
-                // Force calendar regeneration
-                this.initCalendar();
+        if (this.elements.timeSlotContainer) {
+            this.elements.timeSlotContainer.innerHTML = '';
+            this.elements.timeSlotContainer.appendChild(loadingMessage);
+        }
+        
+        // For development or if URL is not set, use mock data
+        if (!this.config.googleScriptUrl || 
+            window.location.hostname === 'localhost' || 
+            window.location.hostname === '127.0.0.1') {
+            setTimeout(() => {
+                // Generate and use mock data
+                this.generateMockAvailableSlots();
                 
-                // Enable date selection for testing
-                const dayElements = this.elements.calendarGrid.querySelectorAll('.calendar-day:not(.empty):not(.disabled)');
-                if (dayElements.length > 0) {
-                    // Select first available date automatically
-                    dayElements[7].click(); // Select a date in the first week
+                // Show mock data in calendar
+                if (this.elements.calendarGrid) {
+                    // Force calendar regeneration if needed
+                    if (this.elements.calendarGrid.querySelectorAll('.calendar-day').length === 0) {
+                        this.initCalendar();
+                    }
+                    
+                    // Find first available date
+                    const firstAvailableDay = this.elements.calendarGrid.querySelector('.calendar-day:not(.empty):not(.disabled)');
+                    if (firstAvailableDay) {
+                        // Simulate clicking on first available date
+                        firstAvailableDay.click();
+                    }
                 }
-            }
-        }, 500);
+            }, 500);
+            return;
+        }
+        
+        // Make real API call if URL is set
+        console.log('Fetching available slots from:', this.config.googleScriptUrl);
+        
+        const apiUrl = this.config.googleScriptUrl + '?action=getAvailableSlots';
+        fetch(apiUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Received data from Google Sheets:', data);
+                
+                if (data && data.slots) {
+                    this.state.availableTimeSlots = data.slots;
+                } else {
+                    // If data format is incorrect, use mock data
+                    console.warn('Data format from API was unexpected, using mock data instead');
+                    this.generateMockAvailableSlots();
+                }
+                
+                // Update calendar and select a date
+                if (this.elements.calendarGrid) {
+                    // Force calendar regeneration if needed
+                    if (this.elements.calendarGrid.querySelectorAll('.calendar-day').length === 0) {
+                        this.initCalendar();
+                    }
+                    
+                    // Find first available date
+                    const firstAvailableDay = this.elements.calendarGrid.querySelector('.calendar-day:not(.empty):not(.disabled)');
+                    if (firstAvailableDay) {
+                        firstAvailableDay.click();
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching available slots:', error);
+                
+                // Fall back to mock data
+                this.generateMockAvailableSlots();
+                
+                // Update calendar and select a date
+                if (this.elements.calendarGrid) {
+                    // Force calendar regeneration if needed
+                    if (this.elements.calendarGrid.querySelectorAll('.calendar-day').length === 0) {
+                        this.initCalendar();
+                    }
+                    
+                    // Find first available date
+                    const firstAvailableDay = this.elements.calendarGrid.querySelector('.calendar-day:not(.empty):not(.disabled)');
+                    if (firstAvailableDay) {
+                        firstAvailableDay.click();
+                    }
+                }
+            });
     },
     
     /**
@@ -598,13 +673,8 @@ const EnhancedBookingSystem = {
             const date = new Date();
             date.setDate(today.getDate() + i);
             
-            // Skip weekends (0 = Sunday, 6 = Saturday)
-            if (date.getDay() === 0 || date.getDay() === 6) {
-                continue;
-            }
-            
-            // Skip closed days
-            if (this.config.closedDays.includes(date.getDay())) {
+            // Skip Sundays (closed days)
+            if (date.getDay() === 0 || this.config.closedDays.includes(date.getDay())) {
                 continue;
             }
             
@@ -619,7 +689,7 @@ const EnhancedBookingSystem = {
                 const hour = Math.floor(Math.random() * 8) + 9; // 9 AM to 4 PM
                 const minute = Math.random() < 0.5 ? 0 : 30; // Either on the hour or half hour
                 const period = hour >= 12 ? 'PM' : 'AM';
-                const displayHour = hour > 12 ? hour - 12 : hour;
+                const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
                 const timeString = `${displayHour}:${minute === 0 ? '00' : '30'} ${period}`;
                 
                 timeSlots.push({
@@ -638,8 +708,9 @@ const EnhancedBookingSystem = {
                 const bMinute = parseInt(b.time.split(':')[1]);
                 const bPeriod = b.time.split(' ')[1];
                 
-                const aValue = (aPeriod === 'PM' && aHour !== 12 ? aHour + 12 : aHour) * 60 + aMinute;
-                const bValue = (bPeriod === 'PM' && bHour !== 12 ? bHour + 12 : bHour) * 60 + bMinute;
+                // Convert to 24-hour for comparison
+                const aValue = ((aPeriod === 'PM' && aHour !== 12) ? aHour + 12 : aHour) * 60 + aMinute;
+                const bValue = ((bPeriod === 'PM' && bHour !== 12) ? bHour + 12 : bHour) * 60 + bMinute;
                 
                 return aValue - bValue;
             });
@@ -647,16 +718,15 @@ const EnhancedBookingSystem = {
             this.state.availableTimeSlots[dateString] = timeSlots;
         }
         
-        console.log('Mock available time slots generated:', this.state.availableTimeSlots);
+        console.log('Mock available time slots generated:', Object.keys(this.state.availableTimeSlots).length, 'days');
     },
     
     /**
-     * Initialize enhanced calendar functionality
+     * Generate calendar for date selection
      */
-    initEnhancedCalendar: function() {
-        if (!this.elements.calendarContainer) return;
-        
-        // Current date variables
+    initCalendar: function() {
+        if (!this.elements.calendarGrid || !this.elements.calendarMonth) return;
+
         const today = new Date();
         let currentMonth = today.getMonth();
         let currentYear = today.getFullYear();
@@ -714,7 +784,7 @@ const EnhancedBookingSystem = {
                 
                 // Check if date has available slots
                 const hasAvailableSlots = this.state.availableTimeSlots[dateString] && 
-                                          this.state.availableTimeSlots[dateString].length > 0;
+                                        (this.state.availableTimeSlots[dateString].length > 0);
                 
                 // Check if date is selectable
                 const isBeforeMin = date < minDate;
@@ -747,8 +817,11 @@ const EnhancedBookingSystem = {
                     
                     // Only allow selection if has available slots
                     if (hasAvailableSlots) {
-                        dayElement.addEventListener('click', () => {
-                            this.selectDate(dayElement, dateString);
+                        // Make sure to use the correct 'this' context
+                        let self = this;
+                        dayElement.addEventListener('click', function() {
+                            console.log('Day clicked:', dateString);
+                            self.selectDate(this, dateString);
                         });
                     } else {
                         dayElement.classList.add('disabled');
@@ -767,41 +840,22 @@ const EnhancedBookingSystem = {
                 
                 this.elements.calendarGrid.appendChild(dayElement);
             }
-        };
-        
-        // Handler to select a date
-        this.selectDate = (dayElement, dateString) => {
-            // Clear previous selection
-            this.elements.calendarGrid.querySelectorAll('.calendar-day.selected').forEach(day => {
-                day.classList.remove('selected');
-            });
             
-            // Select this day
-            dayElement.classList.add('selected');
+            // Add empty cells for days after the last day to complete the grid
+            const totalCells = this.elements.calendarGrid.children.length;
+            const cellsInLastRow = totalCells % 7;
             
-            // Update state and input
-            this.state.selectedDate = dateString;
-            this.elements.selectedDateInput.value = dateString;
-            
-            // Make sure we also update the appointment date input if it exists
-            if (this.elements.appointmentDateInput) {
-                this.elements.appointmentDateInput.value = dateString;
+            if (cellsInLastRow > 0) {
+                const emptyCellsNeeded = 7 - cellsInLastRow;
+                for (let i = 0; i < emptyCellsNeeded; i++) {
+                    const emptyCell = document.createElement('div');
+                    emptyCell.className = 'calendar-day empty';
+                    this.elements.calendarGrid.appendChild(emptyCell);
+                }
             }
-            
-            // Update time slots
-            this.updateTimeSlots(dateString);
-            
-            // Clear selected time
-            this.state.selectedTime = '';
-            this.elements.selectedTimeInput.value = '';
-            
-            // Track date selection
-            this.trackDateSelection(dateString);
-            
-            console.log('Selected date:', dateString);
         };
         
-        // Navigate to previous month
+        // Go to previous month
         const goToPrevMonth = () => {
             currentMonth--;
             
@@ -813,7 +867,7 @@ const EnhancedBookingSystem = {
             generateCalendar();
         };
         
-        // Navigate to next month
+        // Go to next month
         const goToNextMonth = () => {
             currentMonth++;
             
@@ -831,6 +885,9 @@ const EnhancedBookingSystem = {
         
         // Initialize calendar
         generateCalendar();
+        
+        // Log calendar generation complete
+        console.log('Calendar generated');
     },
     
     /**
@@ -910,24 +967,54 @@ const EnhancedBookingSystem = {
         const morningGrid = morningSlots.querySelector('.morning-slots');
         const afternoonGrid = afternoonSlots.querySelector('.afternoon-slots');
         
-        // Add time slots to morning or afternoon section
+        // Handle both formats of time slots (objects with time property or simple strings)
         availableSlots.forEach(slot => {
-            const timeString = slot.time; // Use the time string from our new format
-            const timeSlot = document.createElement('div');
-            timeSlot.className = 'time-slot';
-            timeSlot.dataset.time = timeString;
-            timeSlot.textContent = timeString; // Already formatted correctly
+            // Handle different formats of time slots (from API or mock data)
+            let timeString = '';
+            let isAvailable = true;
             
-            timeSlot.addEventListener('click', () => {
-                this.selectTimeSlot(timeSlot, timeString);
-            });
-            
-            // Highlight selected time slot
-            if (timeString === this.state.selectedTime) {
-                timeSlot.classList.add('selected');
+            // If the slot is an object with a time property (new format from our mock data)
+            if (typeof slot === 'object' && slot.time) {
+                timeString = slot.time;
+                isAvailable = slot.available !== false; // Default to true if not specified
+            } 
+            // If the slot is a string (original format from Google Sheets API)
+            else if (typeof slot === 'string') {
+                timeString = slot;
+                
+                // Convert 24-hour format to 12-hour format if needed
+                if (timeString.match(/^\d{2}:\d{2}$/)) {
+                    const [hour, minute] = timeString.split(':').map(Number);
+                    const period = hour >= 12 ? 'PM' : 'AM';
+                    const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
+                    timeString = `${displayHour}:${minute === 0 ? '00' : minute} ${period}`;
+                }
             }
             
-            // Add to appropriate section
+            // Skip invalid time strings
+            if (!timeString) return;
+            
+            // Create time slot element
+            const timeSlot = document.createElement('div');
+            timeSlot.className = 'time-slot';
+            if (!isAvailable) timeSlot.classList.add('unavailable');
+            
+            timeSlot.dataset.time = timeString;
+            timeSlot.textContent = timeString;
+            
+            // Only add click listener if available
+            if (isAvailable) {
+                timeSlot.addEventListener('click', () => {
+                    this.selectTimeSlot(timeSlot, timeString);
+                });
+                
+                // Highlight selected time slot
+                if (timeString === this.state.selectedTime) {
+                    timeSlot.classList.add('selected');
+                }
+            }
+            
+            // Add to appropriate section based on AM/PM
             if (timeString.includes('AM')) {
                 morningGrid.appendChild(timeSlot);
             } else {
@@ -944,10 +1031,10 @@ const EnhancedBookingSystem = {
             afternoonSlots.style.display = 'none';
         }
         
-        // Enable continue button
+        // Enable continue button if user already selected a time
         const nextStepButton = document.querySelector('.form-step[data-step="3"] .next-step');
         if (nextStepButton) {
-            nextStepButton.disabled = false;
+            nextStepButton.disabled = !this.state.selectedTime;
         }
     },
     
@@ -1397,6 +1484,41 @@ const EnhancedBookingSystem = {
         };
         
         this.sendAnalyticsData(trackingData);
+    },
+    
+    /**
+     * Select a date on the calendar
+     */
+    selectDate: function(dayElement, dateString) {
+        console.log('Date selected:', dateString);
+        
+        // Clear previous selection
+        const prevSelected = this.elements.calendarGrid.querySelectorAll('.calendar-day.selected');
+        prevSelected.forEach(day => {
+            day.classList.remove('selected');
+        });
+        
+        // Select this day
+        dayElement.classList.add('selected');
+        
+        // Update state and inputs
+        this.state.selectedDate = dateString;
+        this.elements.selectedDateInput.value = dateString;
+        
+        // Make sure we also update the appointment date input if it exists
+        if (this.elements.appointmentDateInput) {
+            this.elements.appointmentDateInput.value = dateString;
+        }
+        
+        // Update time slots
+        this.updateTimeSlots(dateString);
+        
+        // Clear selected time
+        this.state.selectedTime = '';
+        this.elements.selectedTimeInput.value = '';
+        
+        // Track date selection for analytics
+        this.trackDateSelection(dateString);
     }
 };
 
