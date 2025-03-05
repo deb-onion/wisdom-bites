@@ -25275,4 +25275,6 @@ function createLayerToggles() {
             </button>
         </div>
     `;
-}
+ return layerControls;
+
+}}
