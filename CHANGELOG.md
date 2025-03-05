@@ -1,6 +1,12 @@
 # Wisdom Bites Dental Clinic - Changelog
 
 
+## [4.1.7] - 2025-03-06
+
+### Patch Update:
+- Fixed virtual tour marker issue and improved booking calendar
+
+
 ## [4.1.6] - 2025-03-06
 
 ### Patch Update:
