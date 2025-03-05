@@ -1,6 +1,12 @@
 # Wisdom Bites Dental Clinic - Changelog
 
 
+## [4.2.0] - 2025-03-06
+
+### Feature Update:
+- Updated website with centralized clinic data management system
+
+
 ## [4.1.12] - 2025-03-06
 
 ### Patch Update:
