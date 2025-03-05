@@ -63,14 +63,4 @@ jobs:
           echo "Website version ${{ steps.version.outputs.version }} deployed successfully to Cloudflare Pages"
           echo "Deployment completed at $(date)"
           
-      - name: Send deployment notification
-        if: success()
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_CHANNEL: website-deployments
-          SLACK_COLOR: '#36a64f'
-          SLACK_ICON: https://github.com/rtCamp.png?size=48
-          SLACK_MESSAGE: 'Wisdom Bites website v${{ steps.version.outputs.version }} deployed successfully :rocket:'
-          SLACK_TITLE: Deployment Success
-          SLACK_USERNAME: DeployBot 
+      
