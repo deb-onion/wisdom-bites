@@ -169,6 +169,16 @@ const GoogleBookingSystem = {
     },
     
     /**
+     * Fix negative maxlength values on all inputs
+     */
+    fixNegativeMaxlengths: function() {
+        const inputs = document.querySelectorAll('input, textarea');
+        inputs.forEach(input => {
+            this.fixInputMaxlength(input);
+        });
+    },
+    
+    /**
      * Cache DOM elements for better performance
      */
     cacheElements: function() {
@@ -445,6 +455,19 @@ const GoogleBookingSystem = {
         // Init calendar month view
         this.generateCalendarMonth(this.state.currentYear, this.state.currentMonth);
         
+        // Add event listeners to prev/next month buttons
+        if (this.elements.prevMonthButton) {
+            this.elements.prevMonthButton.addEventListener('click', () => {
+                this.changeMonth(-1);
+            });
+        }
+        
+        if (this.elements.nextMonthButton) {
+            this.elements.nextMonthButton.addEventListener('click', () => {
+                this.changeMonth(1);
+            });
+        }
+        
         // Enhance calendar days with touchend events for mobile
         const addTouchEvents = () => {
             const calendarDays = document.querySelectorAll('.calendar-day:not(.disabled):not(.empty)');
@@ -472,6 +495,122 @@ const GoogleBookingSystem = {
         });
         
         observer.observe(this.elements.calendarGrid, { childList: true, subtree: true });
+    },
+    
+    /**
+     * Change the displayed month
+     */
+    changeMonth: function(direction) {
+        // Update current month and year
+        let newMonth = this.state.currentMonth + direction;
+        let newYear = this.state.currentYear;
+        
+        // Handle year change
+        if (newMonth < 0) {
+            newMonth = 11;
+            newYear--;
+        } else if (newMonth > 11) {
+            newMonth = 0;
+            newYear++;
+        }
+        
+        // Update state
+        this.state.currentMonth = newMonth;
+        this.state.currentYear = newYear;
+        
+        // Generate new calendar month
+        this.generateCalendarMonth(newYear, newMonth);
+        
+        // Fetch availability for new month
+        this.fetchMonthAvailability(newYear, newMonth);
+    },
+    
+    /**
+     * Generate calendar month view
+     */
+    generateCalendarMonth: function(year, month) {
+        if (!this.elements.calendarGrid || !this.elements.calendarMonth) return;
+        
+        // Set month title
+        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        this.elements.calendarMonth.textContent = `${monthNames[month]} ${year}`;
+        
+        // Clear calendar grid
+        this.elements.calendarGrid.innerHTML = '';
+        
+        // Add day headers (Sunday-Saturday)
+        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        dayNames.forEach(day => {
+            const dayHeader = document.createElement('div');
+            dayHeader.className = 'calendar-day-header';
+            dayHeader.textContent = day;
+            this.elements.calendarGrid.appendChild(dayHeader);
+        });
+        
+        // Get first day of month and number of days in month
+        const firstDate = new Date(year, month, 1);
+        const lastDate = new Date(year, month + 1, 0);
+        const firstDay = firstDate.getDay(); // 0 = Sunday, 6 = Saturday
+        const daysInMonth = lastDate.getDate();
+        
+        // Add empty cells for days before the first day of the month
+        for (let i = 0; i < firstDay; i++) {
+            const emptyCell = document.createElement('div');
+            emptyCell.className = 'calendar-day empty';
+            this.elements.calendarGrid.appendChild(emptyCell);
+        }
+        
+        // Add cells for each day of the month
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(year, month, day);
+            date.setHours(0, 0, 0, 0);
+            
+            const dateFormatted = this.formatDate(date);
+            const dayCell = document.createElement('div');
+            dayCell.className = 'calendar-day';
+            dayCell.dataset.date = dateFormatted;
+            dayCell.textContent = day;
+            
+            // Check if date is today
+            if (date.getTime() === today.getTime()) {
+                dayCell.classList.add('today');
+            }
+            
+            // Check if date is selectable
+            if (date < this.state.minBookingDate) {
+                dayCell.classList.add('disabled');
+            } else if (date > this.state.maxBookingDate) {
+                dayCell.classList.add('disabled');
+            } else {
+                // Add date selection event
+                dayCell.addEventListener('click', () => {
+                    this.selectDate(dayCell, dateFormatted);
+                });
+            }
+            
+            // Check if date is currently selected
+            if (dateFormatted === this.state.selectedDate) {
+                dayCell.classList.add('selected');
+            }
+            
+            this.elements.calendarGrid.appendChild(dayCell);
+        }
+        
+        // Add empty cells for days after the last day of the month (to complete the grid)
+        const totalCells = firstDay + daysInMonth;
+        const emptyCellsNeeded = Math.ceil(totalCells / 7) * 7 - totalCells;
+        
+        for (let i = 0; i < emptyCellsNeeded; i++) {
+            const emptyCell = document.createElement('div');
+            emptyCell.className = 'calendar-day empty';
+            this.elements.calendarGrid.appendChild(emptyCell);
+        }
+        
+        // Fetch availability for this month
+        this.fetchMonthAvailability(year, month);
     },
     
     /**
@@ -616,7 +755,7 @@ const GoogleBookingSystem = {
             
             // Skip closed days
             const dayOfWeek = date.getDay();
-            if (!this.config.businessHours[dayOfWeek] || !this.config.businessHours[dayOfWeek].length === 0) {
+            if (!this.config.businessHours[dayOfWeek] || this.config.businessHours[dayOfWeek].length === 0) {
                 continue;
             }
             
@@ -1266,7 +1405,8 @@ const GoogleBookingSystem = {
                 behavior: 'smooth',
                 block: 'start'
             });
-        },
+        }
+    },
     
     /**
      * Handle URL parameters to pre-select service
@@ -1315,101 +1455,10 @@ const GoogleBookingSystem = {
                 }, 100);
             }
         }
-    },
-    
-    /**
-     * Generate day elements for calendar
-     */
-    generateCalendarDays: function(year, month) {
-        const daysContainer = this.elements.calendarDaysContainer;
-        if (!daysContainer) return;
-        
-        daysContainer.innerHTML = '';
-        
-        const today = new Date();
-        const currentMonth = new Date(year, month, 1);
-        const firstDayOfMonth = currentMonth.getDay(); // 0-6 (Sunday-Saturday)
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-        
-        // Generate empty cells for days before the 1st of month
-        for (let i = 0; i < firstDayOfMonth; i++) {
-            const emptyCell = document.createElement('div');
-            emptyCell.className = 'calendar-day empty';
-            daysContainer.appendChild(emptyCell);
-        }
-        
-        // Generate days of month
-        for (let day = 1; day <= daysInMonth; day++) {
-            const date = new Date(year, month, day);
-            const dateFormatted = this.formatDate(date);
-            
-            const dayElement = document.createElement('div');
-            dayElement.className = 'calendar-day';
-            dayElement.dataset.date = dateFormatted;
-            
-            // Check if date is selectable
-            let isSelectable = true;
-            
-            // Check minimum date
-            if (date < this.state.minBookingDate) {
-                isSelectable = false;
-                dayElement.classList.add('unavailable');
-                dayElement.classList.add('past-date');
-            }
-            
-            // Check maximum date
-            if (date > this.state.maxBookingDate) {
-                isSelectable = false;
-                dayElement.classList.add('unavailable');
-                dayElement.classList.add('future-date');
-            }
-            
-            // Check business hours for the day
-            const dayOfWeek = date.getDay();
-            if (!this.config.businessHours[dayOfWeek] || !this.config.businessHours[dayOfWeek].open) {
-                isSelectable = false;
-                dayElement.classList.add('unavailable');
-                dayElement.classList.add('closed-day');
-            }
-            
-            // Set today's date
-            if (date.toDateString() === today.toDateString()) {
-                dayElement.classList.add('today');
-            }
-            
-            // Add date number
-            const dateNumber = document.createElement('span');
-            dateNumber.className = 'date-number';
-            dateNumber.textContent = day;
-            dayElement.appendChild(dateNumber);
-            
-            // Add availability indicator
-            const availabilityIndicator = document.createElement('span');
-            availabilityIndicator.className = 'availability-indicator';
-            dayElement.appendChild(availabilityIndicator);
-            
-            // Make selectable dates clickable
-            if (isSelectable) {
-                dayElement.classList.add('selectable');
-                
-                // Add click event
-                dayElement.addEventListener('click', (e) => {
-                    console.log('Calendar day clicked:', dateFormatted);
-                    this.selectDate(dateFormatted);
-                });
-                
-                // Improve the touch experience for mobile
-                dayElement.addEventListener('touchend', (e) => {
-                    e.preventDefault();
-                    console.log('Calendar day touched:', dateFormatted);
-                    this.selectDate(dateFormatted);
-                });
-            }
-            
-            daysContainer.appendChild(dayElement);
-        }
-        
-        // Update availability indicators
-        this.updateCalendarAvailability();
     }
-}
+};
+
+// Initialize the booking system when the DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    GoogleBookingSystem.init();
+});
