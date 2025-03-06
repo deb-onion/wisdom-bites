@@ -19,6 +19,7 @@ const GoogleBookingSystem = {
         // API endpoints
         calendarApiEndpoint: 'https://script.google.com/macros/s/AKfycby284ZOZj-SIIovs4D7vb7LML__k1nTsH16xtZhHrI8EwTpn0DjpR-nSykC8YsZYIsS/exec',
         bookingApiEndpoint: 'https://script.google.com/macros/s/AKfycbyhEeCz1TtK5qJRvk1Z1e0mVfshYv1BBolBG6DNTyVFeowsbg8BM1YseOnr00cfjjDl/exec',
+        
         // Business hours
         businessHours: {
             0: [], // Sunday (closed)
@@ -524,7 +525,7 @@ const GoogleBookingSystem = {
     },
     
     /**
-     * Generate calendar month view
+     * Generate calendar month view with extra click handling safety
      */
     generateCalendarMonth: function(year, month) {
         if (!this.elements.calendarGrid || !this.elements.calendarMonth) return;
@@ -583,10 +584,19 @@ const GoogleBookingSystem = {
             } else if (date > this.state.maxBookingDate) {
                 dayCell.classList.add('disabled');
             } else {
-                // Add date selection event
-                dayCell.addEventListener('click', () => {
+                // IMPORTANT: Use a named function for the click event
+                // This helps prevent event listener issues
+                const handleDateClick = (e) => {
+                    e.stopPropagation(); // Prevent event bubbling
+                    console.log('Calendar day clicked (direct):', dateFormatted);
                     this.selectDate(dayCell, dateFormatted);
-                });
+                };
+                
+                // Add date selection event with multiple methods to ensure it works
+                dayCell.addEventListener('click', handleDateClick);
+                
+                // Also add as a direct property for maximum compatibility
+                dayCell.onclick = handleDateClick;
             }
             
             // Check if date is currently selected
@@ -642,6 +652,7 @@ const GoogleBookingSystem = {
     
     /**
      * Update calendar to show availability indicators
+     * WITH FIXED CALENDAR CLICK FUNCTIONALITY 
      */
     updateCalendarAvailability: function() {
         const dayElements = this.elements.calendarGrid.querySelectorAll('.calendar-day:not(.empty):not(.disabled)');
@@ -654,7 +665,7 @@ const GoogleBookingSystem = {
             
             // Check if we have availability data for this date
             const hasAvailability = this.state.availableTimeSlots[dateString] && 
-                                  this.state.availableTimeSlots[dateString].length > 0;
+                                this.state.availableTimeSlots[dateString].length > 0;
             
             // Remove any existing indicator
             const existingIndicator = dayElement.querySelector('.availability-indicator');
@@ -662,40 +673,48 @@ const GoogleBookingSystem = {
                 dayElement.removeChild(existingIndicator);
             }
             
-            // Always keep dates clickable to fix the calendar selection issue
-            if (!dayElement.dataset.clickHandled) {
-                // Add click event to every day that hasn't already been set up
-                dayElement.dataset.clickHandled = 'true';
-                
+            // CRITICAL FIX: Ensure click events are always added
+            // Remove existing click handlers to prevent duplicates
+            dayElement.replaceWith(dayElement.cloneNode(true));
+            
+            // Get the replaced element
+            const updatedDayElement = this.elements.calendarGrid.querySelector(`.calendar-day[data-date="${dateString}"]`);
+            
+            if (updatedDayElement) {
                 // Add desktop click event
-                dayElement.addEventListener('click', () => {
+                updatedDayElement.addEventListener('click', () => {
                     console.log('Calendar day clicked:', dateString);
-                    this.selectDate(dayElement, dateString);
+                    this.selectDate(updatedDayElement, dateString);
                 });
                 
                 // Improve touch experience for mobile devices
-                dayElement.addEventListener('touchend', (e) => {
+                updatedDayElement.addEventListener('touchend', (e) => {
                     e.preventDefault();
                     console.log('Calendar day touched:', dateString);
-                    this.selectDate(dayElement, dateString);
+                    this.selectDate(updatedDayElement, dateString);
                 });
-            }
-            
-            // Add availability indicator
-            if (hasAvailability) {
-                const indicator = document.createElement('span');
-                indicator.className = 'availability-indicator';
                 
-                const slots = this.state.availableTimeSlots[dateString].length;
-                if (slots > 10) {
-                    indicator.classList.add('high');
-                } else if (slots > 5) {
-                    indicator.classList.add('medium');
-                } else {
-                    indicator.classList.add('low');
+                // Check if date is currently selected
+                if (dateString === this.state.selectedDate) {
+                    updatedDayElement.classList.add('selected');
                 }
                 
-                dayElement.appendChild(indicator);
+                // Add availability indicator
+                if (hasAvailability) {
+                    const indicator = document.createElement('span');
+                    indicator.className = 'availability-indicator';
+                    
+                    const slots = this.state.availableTimeSlots[dateString].length;
+                    if (slots > 10) {
+                        indicator.classList.add('high');
+                    } else if (slots > 5) {
+                        indicator.classList.add('medium');
+                    } else {
+                        indicator.classList.add('low');
+                    }
+                    
+                    updatedDayElement.appendChild(indicator);
+                }
             }
         });
         
@@ -1125,130 +1144,221 @@ const GoogleBookingSystem = {
     },
     
     /**
- * Handle form submission with improved Google Sheets integration
- */
-handleFormSubmit: function(event) {
-    event.preventDefault();
-    
-    // Always fix maxlength issues right before submission
-    this.fixInputsBeforeSubmission();
-    
-    // Validate final step
-    if (!this.validateStep(this.state.currentStep)) {
-        return false;
-    }
-    
-    // Check if already submitting to prevent double submission
-    if (this.state.submitting) {
-        return false;
-    }
-    
-    // Set submitting state
-    this.state.submitting = true;
-    this.elements.loadingIndicator.classList.add('visible');
-    
-    // Collect form data
-    const formData = this.collectFormData();
-    
-    // Store the form data in localStorage as a backup
-    localStorage.setItem('wbdc_last_booking_data', JSON.stringify(formData));
-    
-    // Create a more reliable Google Sheets submission
-    const googleScriptUrl = this.config.bookingApiEndpoint;
-    
-    // Format data for the Google Script
-    let queryString = new URLSearchParams();
-    
-    // Add action parameter
-    queryString.append('action', 'submitBooking');
-    
-    // Add all form data
-    Object.entries(formData).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-            queryString.append(key, value);
-        }
-    });
-    
-    // Use fetch with JSONP-like approach for Google Scripts
-    const jsonpCallback = 'callback_' + Date.now();
-    const script = document.createElement('script');
-    
-    // Set up a global callback function
-    window[jsonpCallback] = (response) => {
-        console.log('Google Sheets response:', response);
+     * Handle form submission with improved Google Sheets integration
+     */
+    handleFormSubmit: function(event) {
+        event.preventDefault();
         
-        // Clean up the script tag
-        if (script.parentNode) {
-            script.parentNode.removeChild(script);
+        // Always fix maxlength issues right before submission
+        this.fixInputsBeforeSubmission();
+        
+        // Validate final step
+        if (!this.validateStep(this.state.currentStep)) {
+            return false;
         }
         
-        // Hide loading indicator
-        this.state.submitting = false;
-        this.elements.loadingIndicator.classList.remove('visible');
+        // Check if already submitting to prevent double submission
+        if (this.state.submitting) {
+            return false;
+        }
         
-        // Show success and redirect to the confirmation page
-        const redirectUrl = 'booking-success.html';
+        // Set submitting state
+        this.state.submitting = true;
+        this.elements.loadingIndicator.classList.add('visible');
         
-        // Create URL params for the success page
-        const successParams = new URLSearchParams();
+        // Collect form data
+        const formData = this.collectFormData();
+        
+        // Store the form data in localStorage as a backup
+        localStorage.setItem('wbdc_last_booking_data', JSON.stringify(formData));
+        
+        // Create a more reliable Google Sheets submission
+        const googleScriptUrl = this.config.bookingApiEndpoint;
+        
+        // Format data for the Google Script
+        let queryString = new URLSearchParams();
+        
+        // Add action parameter
+        queryString.append('action', 'submitBooking');
+        
+        // Add all form data
         Object.entries(formData).forEach(([key, value]) => {
-            if (typeof value === 'string' || typeof value === 'number') {
-                successParams.append(key, value);
+            if (value !== undefined && value !== null) {
+                queryString.append(key, value);
             }
         });
         
-        // Add status info
-        successParams.append('submission_status', response?.success ? 'success' : 'error');
-        if (response?.message) {
-            successParams.append('submission_message', response.message);
-        }
+        // Use fetch with JSONP-like approach for Google Scripts
+        const jsonpCallback = 'callback_' + Date.now();
+        const script = document.createElement('script');
         
-        // Track form submission
-        if (typeof gtag === 'function') {
-            gtag('event', 'form_submission', {
-                status: response?.success ? 'success' : 'error',
-                service: formData.specificServiceName || ''
+        // Set up a global callback function
+        window[jsonpCallback] = (response) => {
+            console.log('Google Sheets response:', response);
+            
+            // Clean up the script tag
+            if (script.parentNode) {
+                script.parentNode.removeChild(script);
+            }
+            
+            // Hide loading indicator
+            this.state.submitting = false;
+            this.elements.loadingIndicator.classList.remove('visible');
+            
+            // Show success and redirect to the confirmation page
+            const redirectUrl = 'booking-success.html';
+            
+            // Create URL params for the success page
+            const successParams = new URLSearchParams();
+            Object.entries(formData).forEach(([key, value]) => {
+                if (typeof value === 'string' || typeof value === 'number') {
+                    successParams.append(key, value);
+                }
             });
+            
+            // Add status info
+            successParams.append('submission_status', response?.success ? 'success' : 'error');
+            if (response?.message) {
+                successParams.append('submission_message', response.message);
+            }
+            
+            // Track form submission
+            if (typeof gtag === 'function') {
+                gtag('event', 'form_submission', {
+                    status: response?.success ? 'success' : 'error',
+                    service: formData.specificServiceName || ''
+                });
+            }
+            
+            // Redirect to success page
+            window.location.href = redirectUrl + '?' + successParams.toString();
+            
+            // Clean up the global callback
+            delete window[jsonpCallback];
+        };
+        
+        // Add error handling with a timeout
+        const timeoutId = setTimeout(() => {
+            console.warn('Google Sheets submission timed out');
+            
+            // Call the callback with an error status
+            if (typeof window[jsonpCallback] === 'function') {
+                window[jsonpCallback]({
+                    success: false,
+                    message: 'Submission timeout'
+                });
+            }
+        }, 8000);
+        
+        // Set up the script URL
+        script.src = `${googleScriptUrl}?${queryString.toString()}&callback=${jsonpCallback}`;
+        script.async = true;
+        script.onerror = () => {
+            console.error('Error loading Google Sheets script');
+            clearTimeout(timeoutId);
+            
+            // Call the callback with an error status
+            if (typeof window[jsonpCallback] === 'function') {
+                window[jsonpCallback]({
+                    success: false,
+                    message: 'Script load error'
+                });
+            }
+        };
+        
+        // Append the script to the document to initiate the request
+        document.body.appendChild(script);
+        
+        return false;
+    },
+    
+    /**
+     * Fix all inputs immediately before form submission
+     */
+    fixInputsBeforeSubmission: function() {
+        console.log('Fixing all inputs before form submission');
+        
+        // Remove maxlength attribute from all inputs
+        const allInputs = document.querySelectorAll('input, textarea');
+        allInputs.forEach(input => {
+            // Check for negative maxlength attribute
+            const maxLengthAttr = input.getAttribute('maxlength');
+            if (maxLengthAttr !== null && parseInt(maxLengthAttr) < 0) {
+                console.log(`Removing negative maxlength attribute from ${input.id || input.name} before submission`);
+                input.removeAttribute('maxlength');
+            }
+            
+            // Fix negative maxLength property
+            if (input.maxLength < 0) {
+                console.log(`Fixing negative maxLength property on ${input.id || input.name} before submission`);
+                // Set to a more generous value to allow submission
+                input.maxLength = 1000;
+            }
+        });
+        
+        // Specifically target the fields we know are problematic
+        const firstNameInput = document.getElementById('first-name');
+        const lastNameInput = document.getElementById('last-name');
+        
+        if (firstNameInput) {
+            firstNameInput.removeAttribute('maxlength');
+            if (firstNameInput.maxLength < 0) {
+                firstNameInput.maxLength = 1000;
+            }
+            console.log('First name field fixed before submission');
         }
         
-        // Redirect to success page
-        window.location.href = redirectUrl + '?' + successParams.toString();
-        
-        // Clean up the global callback
-        delete window[jsonpCallback];
-    };
-    
-    // Add error handling with a timeout
-    const timeoutId = setTimeout(() => {
-        console.warn('Google Sheets submission timed out');
-        
-        // Call the callback with an error status
-        if (typeof window[jsonpCallback] === 'function') {
-            window[jsonpCallback]({
-                success: false,
-                message: 'Submission timeout'
-            });
+        if (lastNameInput) {
+            lastNameInput.removeAttribute('maxlength');
+            if (lastNameInput.maxLength < 0) {
+                lastNameInput.maxLength = 1000;
+            }
+            console.log('Last name field fixed before submission');
         }
-    }, 8000);
+    },
     
-    // Set up the script URL
-    script.src = `${googleScriptUrl}?${queryString.toString()}&callback=${jsonpCallback}`;
-    script.async = true;
-    script.onerror = () => {
-        console.error('Error loading Google Sheets script');
-        clearTimeout(timeoutId);
+    /**
+     * Collect all form data
+     */
+    collectFormData: function() {
+        const formData = new FormData(this.elements.bookingForm);
+        const formObject = {};
         
-        // Call the callback with an error status
-        if (typeof window[jsonpCallback] === 'function') {
-            window[jsonpCallback]({
-                success: false,
-                message: 'Script load error'
-            });
+        // Convert FormData to object
+        formData.forEach((value, key) => {
+            formObject[key] = value;
+        });
+        
+        // Add additional data
+        formObject.sessionId = this.state.sessionId;
+        formObject.selectedDate = this.state.selectedDate;
+        formObject.selectedTime = this.state.selectedTime;
+        formObject.submissionTime = new Date().toISOString();
+        
+        // Add service names (not just IDs)
+        if (this.elements.serviceCategory && this.elements.specificService) {
+            const categorySelect = this.elements.serviceCategory;
+            const serviceSelect = this.elements.specificService;
+            
+            if (categorySelect.selectedIndex > 0) {
+                formObject.serviceCategoryName = categorySelect.options[categorySelect.selectedIndex].text;
+            }
+            
+            if (serviceSelect.selectedIndex > 0) {
+                formObject.specificServiceName = serviceSelect.options[serviceSelect.selectedIndex].text;
+            }
         }
-    };
-    
-    // Append the script to the document to initiate the request
-    document.body.appendChild(script);
-    
-    return false;
-}}
+        
+        // Add dentist name (not just ID)
+        if (this.elements.preferredDentist && this.elements.preferredDentist.selectedIndex > 0) {
+            formObject.preferredDentistName = this.elements.preferredDentist.options[this.elements.preferredDentist.selectedIndex].text;
+        }
+        
+        return formObject;
+    }
+};
+
+// Initialize the booking system when the DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    GoogleBookingSystem.init();
+});
