@@ -1026,6 +1026,13 @@ const WisdomBites = {
      * Validate a single input
      */
     validateInput: function(input) {
+        // Debug the input being validated
+        console.log('Validating input:', input.id, {
+            maxlength: input.getAttribute('maxlength'),
+            value: input.value,
+            validity: input.validity
+        });
+        
         // Skip disabled or hidden inputs
         if (input.disabled || input.type === 'hidden') {
             return true;
