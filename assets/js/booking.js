@@ -837,48 +837,43 @@ const GoogleBookingSystem = {
         const currentStepElement = this.elements.formSteps[stepNumber - 1];
         if (!currentStepElement) return true;
         
+        // Debug which step is being validated
+        console.log(`Validating step ${stepNumber}`);
+        
         let isValid = true;
         
         // Get all required inputs in current step
         const requiredInputs = currentStepElement.querySelectorAll('input[required], select[required], textarea[required]');
+        
+        // Debug required inputs
+        console.log(`Found ${requiredInputs.length} required inputs`);
+        
+        // Add check for any maxlength attributes
+        requiredInputs.forEach(input => {
+            const maxLength = input.getAttribute('maxlength');
+            if (maxLength !== null) {
+                console.log(`Input ${input.id || input.name} has maxlength=${maxLength}`);
+                if (parseInt(maxLength) < 0) {
+                    console.error(`Found negative maxlength on ${input.id || input.name} - removing it`);
+                    input.removeAttribute('maxlength');
+                }
+            }
+            
+            // Check for pattern validation
+            const pattern = input.getAttribute('pattern');
+            if (pattern) {
+                console.log(`Input ${input.id || input.name} has pattern=${pattern}`);
+            }
+        });
         
         // Validate each required input
         requiredInputs.forEach(input => {
             // Skip validation for hidden inputs
             if (input.type === 'hidden') return;
             
-            const value = input.value.trim();
-            const formGroup = input.closest('.form-group');
-            
-            if (!formGroup) return;
-            
-            // Clear previous validation
-            formGroup.classList.remove('is-invalid', 'is-valid');
-            
-            // Get or create feedback element
-            let feedback = formGroup.querySelector('.invalid-feedback');
-            if (!feedback) {
-                feedback = document.createElement('div');
-                feedback.className = 'invalid-feedback';
-                formGroup.appendChild(feedback);
-            }
-            
-            // Validate based on input type and requirements
-            if (!value) {
+            // Use the validateInput function for each input
+            if (!this.validateInput(input)) {
                 isValid = false;
-                formGroup.classList.add('is-invalid');
-                feedback.textContent = 'This field is required';
-            } else if (input.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-                isValid = false;
-                formGroup.classList.add('is-invalid');
-                feedback.textContent = 'Please enter a valid email address';
-            } else if (input.type === 'tel' && !/^[\d\+\-\(\) ]{10,15}$/.test(value)) {
-                isValid = false;
-                formGroup.classList.add('is-invalid');
-                feedback.textContent = 'Please enter a valid phone number';
-            } else {
-                formGroup.classList.add('is-valid');
-                feedback.textContent = '';
             }
         });
         
@@ -897,6 +892,57 @@ const GoogleBookingSystem = {
         }
         
         return isValid;
+    },
+    
+    /**
+     * Validate a single input
+     */
+    validateInput: function(input) {
+        // Debug message to trace validation
+        console.log(`Validating ${input.id || input.name}`, { 
+            type: input.type, 
+            value: input.value,
+            maxlength: input.getAttribute('maxlength'),
+            validity: input.validity
+        });
+        
+        // Skip validation for hidden inputs
+        if (input.type === 'hidden') return true;
+        
+        const value = input.value.trim();
+        const formGroup = input.closest('.form-group');
+        
+        if (!formGroup) return true;
+        
+        // Clear previous validation
+        formGroup.classList.remove('is-invalid', 'is-valid');
+        
+        // Get or create feedback element
+        let feedback = formGroup.querySelector('.invalid-feedback');
+        if (!feedback) {
+            feedback = document.createElement('div');
+            feedback.className = 'invalid-feedback';
+            formGroup.appendChild(feedback);
+        }
+        
+        // Validate based on input type and requirements
+        if (!value && input.required) {
+            formGroup.classList.add('is-invalid');
+            feedback.textContent = 'This field is required';
+            return false;
+        } else if (input.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+            formGroup.classList.add('is-invalid');
+            feedback.textContent = 'Please enter a valid email address';
+            return false;
+        } else if (input.type === 'tel' && !/^[\d\+\-\(\) ]{10,15}$/.test(value)) {
+            formGroup.classList.add('is-invalid');
+            feedback.textContent = 'Please enter a valid phone number';
+            return false;
+        } else {
+            formGroup.classList.add('is-valid');
+            feedback.textContent = '';
+            return true;
+        }
     },
     
     /**
