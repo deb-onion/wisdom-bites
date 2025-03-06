@@ -59,6 +59,9 @@ const GoogleBookingSystem = {
         // Generate session ID for tracking
         this.state.sessionId = 'WB-' + Date.now() + '-' + Math.floor(Math.random() * 1000000);
         
+        // Apply a global fix for the negative maxlength issue
+        this.applyGlobalMaxlengthFix();
+        
         // Fix any negative maxlength values on all inputs
         this.fixNegativeMaxlengths();
         
@@ -81,57 +84,84 @@ const GoogleBookingSystem = {
     },
     
     /**
-     * Fix any negative maxlength values on inputs
+     * Apply a global fix for the negative maxlength issue by overriding the property
      */
-    fixNegativeMaxlengths: function() {
-        if (!this.elements.bookingForm) return;
+    applyGlobalMaxlengthFix: function() {
+        // Create a MutationObserver to watch for new input elements
+        if (window.MutationObserver) {
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.addedNodes && mutation.addedNodes.length > 0) {
+                        for (let i = 0; i < mutation.addedNodes.length; i++) {
+                            const node = mutation.addedNodes[i];
+                            if (node.nodeType === 1 && (node.tagName === 'INPUT' || node.tagName === 'TEXTAREA')) {
+                                this.fixInputMaxlength(node);
+                            }
+                            if (node.nodeType === 1 && node.querySelectorAll) {
+                                const inputs = node.querySelectorAll('input, textarea');
+                                inputs.forEach(input => this.fixInputMaxlength(input));
+                            }
+                        }
+                    }
+                });
+            });
+            
+            // Start observing the document
+            observer.observe(document.body, { childList: true, subtree: true });
+        }
         
-        // Find all inputs with maxlength attribute
-        const inputs = this.elements.bookingForm.querySelectorAll('input[maxlength]');
-        console.log(`Checking ${inputs.length} inputs for negative maxlength values`);
+        // Immediately fix all existing inputs
+        const allInputs = document.querySelectorAll('input, textarea');
+        allInputs.forEach(input => this.fixInputMaxlength(input));
         
-        inputs.forEach(input => {
-            const maxLength = input.getAttribute('maxlength');
-            if (maxLength !== null) {
-                const maxLengthValue = parseInt(maxLength);
-                
-                // Log and fix negative maxlength values
-                if (maxLengthValue < 0) {
-                    console.error(`Found negative maxlength=${maxLengthValue} on ${input.id || input.name} - removing it`);
-                    input.removeAttribute('maxlength');
-                }
-            }
-        });
-        
-        // Also check all inputs in the form for runtime-set maxlength property
-        const allInputs = this.elements.bookingForm.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], textarea');
-        allInputs.forEach(input => {
-            if (input.maxLength && input.maxLength < 0) {
-                console.error(`Found negative maxLength property=${input.maxLength} on ${input.id || input.name} - setting to a reasonable default`);
-                // Use 0 to reset to browser default or set a reasonable value like 255
-                input.maxLength = 255;
-            }
-        });
-        
-        // Direct fix for first-name and last-name fields that we know have issues
-        const firstNameInput = document.getElementById('first-name');
-        const lastNameInput = document.getElementById('last-name');
-        
-        if (firstNameInput) {
-            firstNameInput.removeAttribute('maxlength');
-            if (firstNameInput.maxLength < 0) {
+        // Force fix for specific problematic fields we know about
+        setTimeout(() => {
+            const firstNameInput = document.getElementById('first-name');
+            const lastNameInput = document.getElementById('last-name');
+            
+            if (firstNameInput) {
                 firstNameInput.maxLength = 255;
+                firstNameInput.removeAttribute('maxlength');
+                console.log('Direct fix on first-name input');
             }
-            console.log('Fixed first-name input:', firstNameInput.maxLength);
+            
+            if (lastNameInput) {
+                lastNameInput.maxLength = 255;
+                lastNameInput.removeAttribute('maxlength');
+                console.log('Direct fix on last-name input');
+            }
+        }, 500);
+    },
+    
+    /**
+     * Fix maxlength property on a single input
+     */
+    fixInputMaxlength: function(input) {
+        // Only proceed if it's an HTMLInputElement or HTMLTextAreaElement
+        if (!(input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement)) {
+            return;
         }
         
-        if (lastNameInput) {
-            lastNameInput.removeAttribute('maxlength');
-            if (lastNameInput.maxLength < 0) {
-                lastNameInput.maxLength = 255;
-            }
-            console.log('Fixed last-name input:', lastNameInput.maxLength);
+        // Remove negative maxlength attribute
+        const maxLengthAttr = input.getAttribute('maxlength');
+        if (maxLengthAttr !== null && parseInt(maxLengthAttr) < 0) {
+            console.log(`Removing negative maxlength attribute from ${input.id || input.name}`);
+            input.removeAttribute('maxlength');
         }
+        
+        // Reset negative maxLength property
+        if (input.maxLength < 0) {
+            console.log(`Fixing negative maxLength property on ${input.id || input.name}`);
+            input.maxLength = 255;
+        }
+        
+        // Add an input event listener to constantly check for negative maxlength
+        input.addEventListener('input', function() {
+            if (this.maxLength < 0) {
+                console.log(`Runtime fix for negative maxLength on ${this.id || this.name}`);
+                this.maxLength = 255;
+            }
+        });
     },
     
     /**
@@ -1085,8 +1115,10 @@ const GoogleBookingSystem = {
      * Handle form submission
      */
     handleFormSubmit: function(event) {
-        // Prevent default form submission
         event.preventDefault();
+        
+        // Always fix maxlength issues right before submission
+        this.fixInputsBeforeSubmission();
         
         // Validate final step
         if (!this.validateStep(this.state.currentStep)) {
@@ -1192,6 +1224,51 @@ const GoogleBookingSystem = {
         });
         
         return false;
+    },
+    
+    /**
+     * Fix all inputs immediately before form submission
+     */
+    fixInputsBeforeSubmission: function() {
+        console.log('Fixing all inputs before form submission');
+        
+        // Remove maxlength attribute from all inputs
+        const allInputs = document.querySelectorAll('input, textarea');
+        allInputs.forEach(input => {
+            // Check for negative maxlength attribute
+            const maxLengthAttr = input.getAttribute('maxlength');
+            if (maxLengthAttr !== null && parseInt(maxLengthAttr) < 0) {
+                console.log(`Removing negative maxlength attribute from ${input.id || input.name} before submission`);
+                input.removeAttribute('maxlength');
+            }
+            
+            // Fix negative maxLength property
+            if (input.maxLength < 0) {
+                console.log(`Fixing negative maxLength property on ${input.id || input.name} before submission`);
+                // Set to a more generous value to allow submission
+                input.maxLength = 1000;
+            }
+        });
+        
+        // Specifically target the fields we know are problematic
+        const firstNameInput = document.getElementById('first-name');
+        const lastNameInput = document.getElementById('last-name');
+        
+        if (firstNameInput) {
+            firstNameInput.removeAttribute('maxlength');
+            if (firstNameInput.maxLength < 0) {
+                firstNameInput.maxLength = 1000;
+            }
+            console.log('First name field fixed before submission');
+        }
+        
+        if (lastNameInput) {
+            lastNameInput.removeAttribute('maxlength');
+            if (lastNameInput.maxLength < 0) {
+                lastNameInput.maxLength = 1000;
+            }
+            console.log('Last name field fixed before submission');
+        }
     },
     
     /**
@@ -1329,4 +1406,5 @@ const GoogleBookingSystem = {
                 }, 100);
             }
         }
-    }}
+    }
+}
