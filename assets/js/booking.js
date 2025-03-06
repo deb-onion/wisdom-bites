@@ -59,6 +59,9 @@ const GoogleBookingSystem = {
         // Generate session ID for tracking
         this.state.sessionId = 'WB-' + Date.now() + '-' + Math.floor(Math.random() * 1000000);
         
+        // Fix any negative maxlength values on all inputs
+        this.fixNegativeMaxlengths();
+        
         // Initialize components
         this.initFormSteps();
         this.initServiceSelection();
@@ -75,6 +78,60 @@ const GoogleBookingSystem = {
         
         // Add analytics tracking
         this.trackPageVisit();
+    },
+    
+    /**
+     * Fix any negative maxlength values on inputs
+     */
+    fixNegativeMaxlengths: function() {
+        if (!this.elements.bookingForm) return;
+        
+        // Find all inputs with maxlength attribute
+        const inputs = this.elements.bookingForm.querySelectorAll('input[maxlength]');
+        console.log(`Checking ${inputs.length} inputs for negative maxlength values`);
+        
+        inputs.forEach(input => {
+            const maxLength = input.getAttribute('maxlength');
+            if (maxLength !== null) {
+                const maxLengthValue = parseInt(maxLength);
+                
+                // Log and fix negative maxlength values
+                if (maxLengthValue < 0) {
+                    console.error(`Found negative maxlength=${maxLengthValue} on ${input.id || input.name} - removing it`);
+                    input.removeAttribute('maxlength');
+                }
+            }
+        });
+        
+        // Also check all inputs in the form for runtime-set maxlength property
+        const allInputs = this.elements.bookingForm.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], textarea');
+        allInputs.forEach(input => {
+            if (input.maxLength && input.maxLength < 0) {
+                console.error(`Found negative maxLength property=${input.maxLength} on ${input.id || input.name} - setting to a reasonable default`);
+                // Use 0 to reset to browser default or set a reasonable value like 255
+                input.maxLength = 255;
+            }
+        });
+        
+        // Direct fix for first-name and last-name fields that we know have issues
+        const firstNameInput = document.getElementById('first-name');
+        const lastNameInput = document.getElementById('last-name');
+        
+        if (firstNameInput) {
+            firstNameInput.removeAttribute('maxlength');
+            if (firstNameInput.maxLength < 0) {
+                firstNameInput.maxLength = 255;
+            }
+            console.log('Fixed first-name input:', firstNameInput.maxLength);
+        }
+        
+        if (lastNameInput) {
+            lastNameInput.removeAttribute('maxlength');
+            if (lastNameInput.maxLength < 0) {
+                lastNameInput.maxLength = 255;
+            }
+            console.log('Fixed last-name input:', lastNameInput.maxLength);
+        }
     },
     
     /**
@@ -905,6 +962,19 @@ const GoogleBookingSystem = {
             maxlength: input.getAttribute('maxlength'),
             validity: input.validity
         });
+        
+        // Check and fix any negative maxlength attributes or properties
+        const maxLength = input.getAttribute('maxlength');
+        if (maxLength !== null && parseInt(maxLength) < 0) {
+            console.error(`Found negative maxlength on ${input.id || input.name} during validation - removing it`);
+            input.removeAttribute('maxlength');
+        }
+        
+        // Also check the maxLength property (DOM property vs attribute)
+        if (input.maxLength && input.maxLength < 0) {
+            console.error(`Found negative maxLength property=${input.maxLength} on ${input.id || input.name} - setting to a reasonable default`);
+            input.maxLength = 255;
+        }
         
         // Skip validation for hidden inputs
         if (input.type === 'hidden') return true;

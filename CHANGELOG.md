@@ -1,6 +1,12 @@
 # Wisdom Bites Dental Clinic - Changelog
 
 
+## [4.3.3] - 2025-03-06
+
+### Patch Update:
+- Updated booking system and calendar configuration
+
+
 ## [4.3.2] - 2025-03-06
 
 ### Patch Update:
