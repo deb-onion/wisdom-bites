@@ -18,8 +18,7 @@ const GoogleBookingSystem = {
         
         // API endpoints
         calendarApiEndpoint: 'https://script.google.com/macros/s/AKfycby284ZOZj-SIIovs4D7vb7LML__k1nTsH16xtZhHrI8EwTpn0DjpR-nSykC8YsZYIsS/exec',
-        bookingApiEndpoint: 'https://script.google.com/macros/s/AKfycby284ZOZj-SIIovs4D7vb7LML__k1nTsH16xtZhHrI8EwTpn0DjpR-nSykC8YsZYIsS/exec',
-        
+        bookingApiEndpoint: 'https://script.google.com/macros/s/AKfycbyhEeCz1TtK5qJRvk1Z1e0mVfshYv1BBolBG6DNTyVFeowsbg8BM1YseOnr00cfjjDl/exec',
         // Business hours
         businessHours: {
             0: [], // Sunday (closed)
@@ -1126,352 +1125,130 @@ const GoogleBookingSystem = {
     },
     
     /**
-     * Handle form submission - UPDATED to work around HTTP 405 issues
-     * while still submitting data to Google Sheets
-     */
-    handleFormSubmit: function(event) {
-        event.preventDefault();
-        
-        // Always fix maxlength issues right before submission
-        this.fixInputsBeforeSubmission();
-        
-        // Validate final step
-        if (!this.validateStep(this.state.currentStep)) {
-            return false;
-        }
-        
-        // Check if already submitting to prevent double submission
-        if (this.state.submitting) {
-            return false;
-        }
-        
-        // Set submitting state
-        this.state.submitting = true;
-        this.elements.loadingIndicator.classList.add('visible');
-        
-        // Collect form data
-        const formData = this.collectFormData();
-        
-        // Submit to Google Sheets via JSONP approach to avoid CORS/405 issues
-        this.submitToGoogleSheets(formData)
-            .then(response => {
-               // Add this to the handleFormSubmit function instead of showBookingConfirmation
-// Redirect to a success page with query parameters
-let redirectUrl = 'booking-success.html';
-        
-// Create a simple encoded version of the data for the URL
-const urlSearchParams = new URLSearchParams();
-Object.entries(formData).forEach(([key, value]) => {
-    if (typeof value === 'string' || typeof value === 'number') {
-        urlSearchParams.append(key, value);
-    }
-});
-        
-// Redirect to success page with data
-window.location.href = redirectUrl + '?' + urlSearchParams.toString();
-                
-                // Track form submission
-                if (typeof gtag === 'function') {
-                    gtag('event', 'form_submission', {
-                        status: 'success',
-                        service: formData.specificServiceName || ''
-                    });
-                }
-            })
-            .catch(error => {
-                console.error('Form submission error:', error);
-                
-                // Show error but still display confirmation
-                this.showNotification('There was an issue saving your booking, but we\'ve recorded your appointment. Our team will contact you to confirm.', 'warning');
-                
-                // Show confirmation anyway as a fallback
-                setTimeout(() => {
-                    this.showBookingConfirmation(formData);
-                    
-                    // Track form submission with error
-                    if (typeof gtag === 'function') {
-                        gtag('event', 'form_submission', {
-                            status: 'error_but_confirmed',
-                            error_message: error.message
-                        });
-                    }
-                }, 1500);
-            });
-        
+ * Handle form submission with improved Google Sheets integration
+ */
+handleFormSubmit: function(event) {
+    event.preventDefault();
+    
+    // Always fix maxlength issues right before submission
+    this.fixInputsBeforeSubmission();
+    
+    // Validate final step
+    if (!this.validateStep(this.state.currentStep)) {
         return false;
-    },
+    }
     
-    /**
-     * Submit form data to Google Sheets using JSONP approach
-     * to work around CORS/405 errors
-     */
-    submitToGoogleSheets: function(formData) {
-        return new Promise((resolve, reject) => {
-            // Create a hidden iframe for form submission
-            const iframe = document.createElement('iframe');
-            iframe.name = 'hidden_iframe';
-            iframe.style.display = 'none';
-            document.body.appendChild(iframe);
-            
-            // Create a form element
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = this.config.bookingApiEndpoint;
-            form.target = 'hidden_iframe';
-            form.style.display = 'none';
-            
-            // Add data as hidden fields
-            Object.entries(formData).forEach(([key, value]) => {
-                if (value !== undefined && value !== null) {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = key;
-                    input.value = value;
-                    form.appendChild(input);
-                }
-            });
-            
-            // Add a special field to indicate this is an AJAX submission
-            const ajaxInput = document.createElement('input');
-            ajaxInput.type = 'hidden';
-            ajaxInput.name = 'ajax_submission';
-            ajaxInput.value = 'true';
-            form.appendChild(ajaxInput);
-            
-            // Add form to document and submit
-            document.body.appendChild(form);
-            
-            // Set a timeout to ensure we don't wait forever
-            const timeoutId = setTimeout(() => {
-                // Clean up
-                document.body.removeChild(form);
-                document.body.removeChild(iframe);
-                
-                // We'll resolve anyway after timeout to ensure user gets confirmation
-                resolve({success: true, message: 'Submission timeout but proceeding'});
-            }, 5000);
-            
-            // Handle iframe load - this is our "callback"
-            iframe.onload = () => {
-                clearTimeout(timeoutId);
-                
-                try {
-                    // Attempt to check if submission was successful
-                    // Note: might not be able to access iframe content due to same-origin policy
-                    let success = true;
-                    
-                    // Clean up
-                    document.body.removeChild(form);
-                    document.body.removeChild(iframe);
-                    
-                    // Resolve with success
-                    resolve({success: true, message: 'Form submitted successfully'});
-                } catch (e) {
-                    // If we can't access iframe content, assume success
-                    console.warn('Cannot access iframe content, assuming submission success');
-                    
-                    // Clean up
-                    document.body.removeChild(form);
-                    document.body.removeChild(iframe);
-                    
-                    // Resolve with success as a fallback
-                    resolve({success: true, message: 'Form submitted with unknown status'});
-                }
-            };
-            
-            // Submit the form
-            form.submit();
-        });
-    },
+    // Check if already submitting to prevent double submission
+    if (this.state.submitting) {
+        return false;
+    }
     
-    /**
-     * Fix all inputs immediately before form submission
-     */
-    fixInputsBeforeSubmission: function() {
-        console.log('Fixing all inputs before form submission');
+    // Set submitting state
+    this.state.submitting = true;
+    this.elements.loadingIndicator.classList.add('visible');
+    
+    // Collect form data
+    const formData = this.collectFormData();
+    
+    // Store the form data in localStorage as a backup
+    localStorage.setItem('wbdc_last_booking_data', JSON.stringify(formData));
+    
+    // Create a more reliable Google Sheets submission
+    const googleScriptUrl = this.config.bookingApiEndpoint;
+    
+    // Format data for the Google Script
+    let queryString = new URLSearchParams();
+    
+    // Add action parameter
+    queryString.append('action', 'submitBooking');
+    
+    // Add all form data
+    Object.entries(formData).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+            queryString.append(key, value);
+        }
+    });
+    
+    // Use fetch with JSONP-like approach for Google Scripts
+    const jsonpCallback = 'callback_' + Date.now();
+    const script = document.createElement('script');
+    
+    // Set up a global callback function
+    window[jsonpCallback] = (response) => {
+        console.log('Google Sheets response:', response);
         
-        // Remove maxlength attribute from all inputs
-        const allInputs = document.querySelectorAll('input, textarea');
-        allInputs.forEach(input => {
-            // Check for negative maxlength attribute
-            const maxLengthAttr = input.getAttribute('maxlength');
-            if (maxLengthAttr !== null && parseInt(maxLengthAttr) < 0) {
-                console.log(`Removing negative maxlength attribute from ${input.id || input.name} before submission`);
-                input.removeAttribute('maxlength');
-            }
-            
-            // Fix negative maxLength property
-            if (input.maxLength < 0) {
-                console.log(`Fixing negative maxLength property on ${input.id || input.name} before submission`);
-                // Set to a more generous value to allow submission
-                input.maxLength = 1000;
-            }
-        });
-        
-        // Specifically target the fields we know are problematic
-        const firstNameInput = document.getElementById('first-name');
-        const lastNameInput = document.getElementById('last-name');
-        
-        if (firstNameInput) {
-            firstNameInput.removeAttribute('maxlength');
-            if (firstNameInput.maxLength < 0) {
-                firstNameInput.maxLength = 1000;
-            }
-            console.log('First name field fixed before submission');
+        // Clean up the script tag
+        if (script.parentNode) {
+            script.parentNode.removeChild(script);
         }
         
-        if (lastNameInput) {
-            lastNameInput.removeAttribute('maxlength');
-            if (lastNameInput.maxLength < 0) {
-                lastNameInput.maxLength = 1000;
-            }
-            console.log('Last name field fixed before submission');
-        }
-    },
-    
-    /**
-     * Collect all form data
-     */
-    collectFormData: function() {
-        const formData = new FormData(this.elements.bookingForm);
-        const formObject = {};
-        
-        // Convert FormData to object
-        formData.forEach((value, key) => {
-            formObject[key] = value;
-        });
-        
-        // Add additional data
-        formObject.sessionId = this.state.sessionId;
-        formObject.selectedDate = this.state.selectedDate;
-        formObject.selectedTime = this.state.selectedTime;
-        formObject.submissionTime = new Date().toISOString();
-        
-        // Add service names (not just IDs)
-        if (this.elements.serviceCategory && this.elements.specificService) {
-            const categorySelect = this.elements.serviceCategory;
-            const serviceSelect = this.elements.specificService;
-            
-            if (categorySelect.selectedIndex > 0) {
-                formObject.serviceCategoryName = categorySelect.options[categorySelect.selectedIndex].text;
-            }
-            
-            if (serviceSelect.selectedIndex > 0) {
-                formObject.specificServiceName = serviceSelect.options[serviceSelect.selectedIndex].text;
-            }
-        }
-        
-        // Add dentist name (not just ID)
-        if (this.elements.preferredDentist && this.elements.preferredDentist.selectedIndex > 0) {
-            formObject.preferredDentistName = this.elements.preferredDentist.options[this.elements.preferredDentist.selectedIndex].text;
-        }
-        
-        return formObject;
-    },
-    
-    /**
-     * Show booking confirmation
-     */
-    showBookingConfirmation: function(formData, calendarEventId) {
         // Hide loading indicator
         this.state.submitting = false;
         this.elements.loadingIndicator.classList.remove('visible');
         
-        // Store appointment details in localStorage for future reference
-        localStorage.setItem('wbdc_has_booking', 'true');
-        localStorage.setItem('wbdc_appointment_details', JSON.stringify({
-            name: this.elements.summaryName.textContent,
-            service: this.elements.summaryService.textContent,
-            dentist: this.elements.summaryDentist.textContent,
-            datetime: this.elements.summaryDatetime.textContent,
-            calendarEventId: calendarEventId || ''
-        }));
+        // Show success and redirect to the confirmation page
+        const redirectUrl = 'booking-success.html';
         
-        // Replace form with confirmation message
-        if (this.elements.bookingForm) {
-            const confirmationMessage = document.createElement('div');
-            confirmationMessage.className = 'booking-confirmation';
-            confirmationMessage.innerHTML = `
-                <div class="confirmation-icon">
-                    <i class="icon icon-check-circle"></i>
-                </div>
-                <h2>Appointment Confirmed!</h2>
-                <p>Thank you for booking your appointment with Wisdom Bites Dental Clinic.</p>
-                <div class="confirmation-details">
-                    <p><strong>Name:</strong> ${this.elements.summaryName.textContent}</p>
-                    <p><strong>Service:</strong> ${this.elements.summaryService.textContent}</p>
-                    <p><strong>Dentist:</strong> ${this.elements.summaryDentist.textContent}</p>
-                    <p><strong>Date & Time:</strong> ${this.elements.summaryDatetime.textContent}</p>
-                </div>
-                <p>We've sent a confirmation email to your inbox with these details. Your appointment has been added to our calendar. If you need to make any changes, please contact us.</p>
-                <div class="confirmation-actions">
-                    <a href="directions.html" class="btn btn-primary">Get Directions</a>
-                    <a href="index.html" class="btn btn-outline">Return to Home</a>
-                    <a href="contact.html" class="btn btn-outline">Contact Us</a>
-                </div>
-            `;
-            
-            this.elements.bookingForm.parentNode.replaceChild(confirmationMessage, this.elements.bookingForm);
-            
-            // Scroll to top of confirmation
-            confirmationMessage.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
+        // Create URL params for the success page
+        const successParams = new URLSearchParams();
+        Object.entries(formData).forEach(([key, value]) => {
+            if (typeof value === 'string' || typeof value === 'number') {
+                successParams.append(key, value);
+            }
+        });
+        
+        // Add status info
+        successParams.append('submission_status', response?.success ? 'success' : 'error');
+        if (response?.message) {
+            successParams.append('submission_message', response.message);
+        }
+        
+        // Track form submission
+        if (typeof gtag === 'function') {
+            gtag('event', 'form_submission', {
+                status: response?.success ? 'success' : 'error',
+                service: formData.specificServiceName || ''
             });
         }
-    },
-    
-    /**
-     * Handle URL parameters to pre-select service
-     */
-    handleUrlParameters: function() {
-        // Get URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const serviceParam = urlParams.get('service');
         
-        if (serviceParam && this.elements.serviceCategory) {
-            // Map service parameter to service category
-            let category = '';
-            
-            // General services
-            if (['general', 'checkup', 'fillings', 'root-canal', 'extraction', 'crowns', 'dentures'].includes(serviceParam)) {
-                category = 'general';
-            }
-            // Cosmetic services
-            else if (['cosmetic', 'whitening', 'veneers', 'bonding', 'smile-makeover'].includes(serviceParam)) {
-                category = 'cosmetic';
-            }
-            // Emergency services
-            else if (['emergency', 'toothache', 'broken-tooth', 'lost-filling', 'dental-abscess', 'jaw-pain'].includes(serviceParam)) {
-                category = 'emergency';
-            }
-            
-            // If category is found, select it
-            if (category && this.elements.serviceCategory.querySelector(`option[value="${category}"]`)) {
-                this.elements.serviceCategory.value = category;
-                
-                // Trigger change event to update specific service dropdown
-                const event = new Event('change', { bubbles: true });
-                this.elements.serviceCategory.dispatchEvent(event);
-                
-                // If specific service parameter exists, select it after dropdown is populated
-                setTimeout(() => {
-                    if (this.elements.specificService && serviceParam !== category) {
-                        // Find matching service option
-                        const serviceOption = Array.from(this.elements.specificService.options)
-                            .find(option => option.value === serviceParam);
-                        
-                        if (serviceOption) {
-                            this.elements.specificService.value = serviceParam;
-                        }
-                    }
-                }, 100);
-            }
+        // Redirect to success page
+        window.location.href = redirectUrl + '?' + successParams.toString();
+        
+        // Clean up the global callback
+        delete window[jsonpCallback];
+    };
+    
+    // Add error handling with a timeout
+    const timeoutId = setTimeout(() => {
+        console.warn('Google Sheets submission timed out');
+        
+        // Call the callback with an error status
+        if (typeof window[jsonpCallback] === 'function') {
+            window[jsonpCallback]({
+                success: false,
+                message: 'Submission timeout'
+            });
         }
-    }
-};
-
-// Initialize the booking system when the DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
-    GoogleBookingSystem.init();
-});
+    }, 8000);
+    
+    // Set up the script URL
+    script.src = `${googleScriptUrl}?${queryString.toString()}&callback=${jsonpCallback}`;
+    script.async = true;
+    script.onerror = () => {
+        console.error('Error loading Google Sheets script');
+        clearTimeout(timeoutId);
+        
+        // Call the callback with an error status
+        if (typeof window[jsonpCallback] === 'function') {
+            window[jsonpCallback]({
+                success: false,
+                message: 'Script load error'
+            });
+        }
+    };
+    
+    // Append the script to the document to initiate the request
+    document.body.appendChild(script);
+    
+    return false;
+}}
