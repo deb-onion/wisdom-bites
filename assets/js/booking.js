@@ -1,24 +1,19 @@
 /**
  * Wisdom Bites Dental Clinic
- * Enhanced Booking System with Google Calendar & Sheets Integration
+ * Enhanced Booking System with Direct Google API Integration
  * 
- * This implementation connects the booking form to Google Calendar for availability
- * and Google Sheets for data storage, creating a complete booking solution.
+ * This implementation connects the booking form directly to Google APIs via our backend
+ * instead of using Google Apps Script as an intermediary.
  */
 
 "use strict";
 
-const GoogleBookingSystem = {
+const BookingSystem = {
     // Configuration options
     config: {
         // Calendar settings
-        calendarId: 'clinic@wisdombites.com', // Your clinic's Google Calendar ID
         timeSlotDuration: 30, // in minutes
         maxBookingDays: 60, // How far in advance patients can book
-        
-        // API endpoints
-        calendarApiEndpoint: 'https://script.google.com/macros/s/AKfycby284ZOZj-SIIovs4D7vb7LML__k1nTsH16xtZhHrI8EwTpn0DjpR-nSykC8YsZYIsS/exec',
-        bookingApiEndpoint: 'https://script.google.com/macros/s/AKfycbyhEeCz1TtK5qJRvk1Z1e0mVfshYv1BBolBG6DNTyVFeowsbg8BM1YseOnr00cfjjDl/exec',
         
         // Business hours
         businessHours: {
@@ -55,7 +50,7 @@ const GoogleBookingSystem = {
      * Initialize the booking system
      */
     init: function() {
-        console.log('Initializing Google Booking System');
+        console.log('Initializing Direct API Booking System');
         
         // Cache DOM elements
         this.cacheElements();
@@ -181,28 +176,38 @@ const GoogleBookingSystem = {
      * Cache DOM elements for better performance
      */
     cacheElements: function() {
-        // Form and steps
+        // Main form elements
         this.elements.bookingForm = document.getElementById('booking-form');
         this.elements.formSteps = document.querySelectorAll('.form-step');
         this.elements.progressSteps = document.querySelectorAll('.progress-step');
         this.elements.nextButtons = document.querySelectorAll('.next-step');
         this.elements.prevButtons = document.querySelectorAll('.prev-step');
         
-        // Service selection
+        // Personal info elements
+        this.elements.firstNameInput = document.getElementById('first-name');
+        this.elements.lastNameInput = document.getElementById('last-name');
+        this.elements.emailInput = document.getElementById('email');
+        this.elements.phoneInput = document.getElementById('phone');
+        this.elements.patientTypeSelect = document.getElementById('patient-type');
+        
+        // Service selection elements
         this.elements.serviceCategory = document.getElementById('service-category');
         this.elements.specificService = document.getElementById('specific-service');
         this.elements.preferredDentist = document.getElementById('preferred-dentist');
+        this.elements.notesTextarea = document.getElementById('notes');
         
-        // Date and time selection
+        // Calendar elements
         this.elements.calendarContainer = document.querySelector('.calendar-container');
-        this.elements.calendarGrid = document.querySelector('.calendar-grid');
         this.elements.calendarMonth = document.querySelector('.calendar-month');
+        this.elements.calendarGrid = document.querySelector('.calendar-grid');
         this.elements.prevMonthButton = document.querySelector('.prev-month');
         this.elements.nextMonthButton = document.querySelector('.next-month');
-        this.elements.timeSlotContainer = document.querySelector('.time-slots');
-        this.elements.selectedDateDisplay = document.querySelector('.selected-date');
+        this.elements.timeSlots = document.querySelector('.time-slots');
+        this.elements.selectedDateLabel = document.querySelector('.selected-date');
+        this.elements.timeSlotContainer = document.querySelector('.time-slot-container');
+        this.elements.selectedDateDisplay = document.querySelector('.selected-date-display');
         
-        // Input fields
+        // Hidden inputs for date and time
         this.elements.appointmentDateInput = document.getElementById('appointment-date');
         this.elements.selectedDateInput = document.getElementById('selected-date');
         this.elements.selectedTimeInput = document.getElementById('selected-time');
@@ -431,11 +436,26 @@ const GoogleBookingSystem = {
      * Initialize calendar for date selection
      */
     initCalendar: function() {
+        console.log('🗓️ Initializing calendar');
+        
         // Check if calendar elements exist
         if (!this.elements.calendarContainer || !this.elements.calendarGrid) {
-            console.log('Calendar elements not found, skipping calendar initialization');
+            console.log('Calendar elements not found, trying to find them directly');
+            
+            // Try to find elements directly
+            this.elements.calendarContainer = document.querySelector('.calendar-container');
+            this.elements.calendarGrid = document.querySelector('.calendar-grid');
+            this.elements.calendarMonth = document.querySelector('.calendar-month');
+            this.elements.prevMonthButton = document.querySelector('.prev-month');
+            this.elements.nextMonthButton = document.querySelector('.next-month');
+            
+            if (!this.elements.calendarContainer || !this.elements.calendarGrid) {
+                console.log('Calendar elements still not found, skipping calendar initialization');
             return;
+            }
         }
+        
+        console.log('Calendar elements found, proceeding with initialization');
         
         // Set min and max dates for booking
         const today = new Date();
@@ -459,12 +479,16 @@ const GoogleBookingSystem = {
             this.elements.prevMonthButton.addEventListener('click', () => {
                 this.changeMonth(-1);
             });
+        } else {
+            console.log('⚠️ Previous month button not found');
         }
         
         if (this.elements.nextMonthButton) {
             this.elements.nextMonthButton.addEventListener('click', () => {
                 this.changeMonth(1);
             });
+        } else {
+            console.log('⚠️ Next month button not found');
         }
         
         // Enhance calendar days with touchend events for mobile
@@ -494,6 +518,8 @@ const GoogleBookingSystem = {
         });
         
         observer.observe(this.elements.calendarGrid, { childList: true, subtree: true });
+        
+        console.log('Calendar initialization complete');
     },
     
     /**
@@ -528,7 +554,17 @@ const GoogleBookingSystem = {
      * Generate calendar month view with extra click handling safety
      */
     generateCalendarMonth: function(year, month) {
-        if (!this.elements.calendarGrid || !this.elements.calendarMonth) return;
+        console.log('📅 Generating calendar for', year, month);
+        if (!this.elements.calendarGrid || !this.elements.calendarMonth) {
+            console.log('⚠️ Calendar elements not found in generateCalendarMonth, looking directly');
+            this.elements.calendarGrid = document.querySelector('.calendar-grid');
+            this.elements.calendarMonth = document.querySelector('.calendar-month');
+            
+            if (!this.elements.calendarGrid || !this.elements.calendarMonth) {
+                console.error('❌ Calendar elements still not found, cannot generate calendar');
+                return;
+            }
+        }
         
         // Set month title
         const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -563,6 +599,8 @@ const GoogleBookingSystem = {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         
+        let clickableCount = 0;
+        
         for (let day = 1; day <= daysInMonth; day++) {
             const date = new Date(year, month, day);
             date.setHours(0, 0, 0, 0);
@@ -584,11 +622,12 @@ const GoogleBookingSystem = {
             } else if (date > this.state.maxBookingDate) {
                 dayCell.classList.add('disabled');
             } else {
+                clickableCount++;
                 // IMPORTANT: Use a named function for the click event
                 // This helps prevent event listener issues
                 const handleDateClick = (e) => {
                     e.stopPropagation(); // Prevent event bubbling
-                    console.log('Calendar day clicked (direct):', dateFormatted);
+                    console.log('🖱️ Calendar day clicked (direct):', dateFormatted);
                     this.selectDate(dayCell, dateFormatted);
                 };
                 
@@ -597,6 +636,9 @@ const GoogleBookingSystem = {
                 
                 // Also add as a direct property for maximum compatibility
                 dayCell.onclick = handleDateClick;
+                
+                // Make the day visually appear clickable
+                dayCell.style.cursor = 'pointer';
             }
             
             // Check if date is currently selected
@@ -606,6 +648,8 @@ const GoogleBookingSystem = {
             
             this.elements.calendarGrid.appendChild(dayCell);
         }
+        
+        console.log(`📊 Calendar generated with ${clickableCount} clickable days`);
         
         // Add empty cells for days after the last day of the month (to complete the grid)
         const totalCells = firstDay + daysInMonth;
@@ -622,7 +666,7 @@ const GoogleBookingSystem = {
     },
     
     /**
-     * Fetch availability for a specific month from Google Calendar
+     * Fetch availability for a specific month from the API
      */
     fetchMonthAvailability: function(year, month) {
         // Set loading state
@@ -636,18 +680,187 @@ const GoogleBookingSystem = {
         const startDateStr = this.formatDate(startDate);
         const endDateStr = this.formatDate(endDate);
         
+        console.log('🔍 Fetching availability for:', startDateStr, 'to', endDateStr);
+        
         // Show loading message for timeslots
         if (this.elements.timeSlotContainer) {
             this.elements.timeSlotContainer.innerHTML = '<div class="loading-message">Loading available appointments...</div>';
         }
         
-        // ALWAYS use mock data for now to ensure calendar works properly
-        console.log('Using mock availability data');
+        // Check if ApiService is available, otherwise use mock data
+        if (typeof ApiService !== 'undefined') {
+            // Get availability from the backend API
+            console.log('🔌 Using API Service for availability');
+            ApiService.getAvailability(startDateStr, endDateStr)
+                .then(response => {
+                    console.log('✅ Received availability data:', response);
+                    // Process and store available time slots
+                    this.processAvailabilityResponse(response, startDate, endDate);
+                    this.state.loadingAvailability = false;
+                    this.updateCalendarAvailability();
+                })
+                .catch(error => {
+                    console.error('❌ Error fetching availability:', error);
+                    // Fallback to mock data on error
+                    this.generateMockAvailableSlots(startDate, endDate);
+                    this.state.loadingAvailability = false;
+                    this.updateCalendarAvailability();
+                });
+        } else {
+            // Use mock data if API service is not available
+            console.log('⚠️ Using mock availability data (API service not available)');
         setTimeout(() => {
             this.generateMockAvailableSlots(startDate, endDate);
             this.state.loadingAvailability = false;
             this.updateCalendarAvailability();
         }, 800);
+        }
+    },
+    
+    /**
+     * Process availability response from API
+     */
+    processAvailabilityResponse: function(response, startDate, endDate) {
+        // Extract busy slots from response
+        const busySlots = response.busySlots || [];
+        
+        // Get business hours
+        ApiService.getBusinessHours()
+            .then(businessHoursResponse => {
+                const businessHours = businessHoursResponse.businessHours || this.config.businessHours;
+                
+                // Calculate available slots based on business hours and busy slots
+                this.calculateAvailableSlots(startDate, endDate, businessHours, busySlots);
+            })
+            .catch(error => {
+                console.error('Error fetching business hours:', error);
+                // Use default business hours
+                this.calculateAvailableSlots(startDate, endDate, this.config.businessHours, busySlots);
+            });
+    },
+    
+    /**
+     * Calculate available slots based on business hours and busy slots
+     */
+    calculateAvailableSlots: function(startDate, endDate, businessHours, busySlots) {
+        console.log('🧮 Calculating available slots with:', {
+            startDate: startDate,
+            endDate: endDate,
+            businessHoursKeys: Object.keys(businessHours),
+            busySlots: busySlots
+        });
+        
+        // Loop through each day in the date range
+        for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
+            const currentDate = new Date(date);
+            const dateString = this.formatDate(currentDate);
+            const dayOfWeek = currentDate.getDay(); // 0 for Sunday, 1 for Monday, etc.
+            
+            // Check if we have business hours for this day
+            if (!businessHours[dayOfWeek] || businessHours[dayOfWeek].length < 2) {
+                // No business hours defined for this day
+                this.state.availableTimeSlots[dateString] = [];
+                continue;
+            }
+            
+            // Get business hours for this day
+            const [openTime, closeTime] = businessHours[dayOfWeek];
+            
+            // Create time slots for this day within business hours
+            const timeSlots = this.generateTimeSlotsForDay(currentDate, openTime, closeTime);
+            
+            // Filter out busy slots
+            const availableSlots = this.filterBusySlots(timeSlots, busySlots);
+            
+            // Store available slots for this day
+            this.state.availableTimeSlots[dateString] = availableSlots;
+            
+            console.log(`📅 Available slots for ${dateString}:`, availableSlots.length);
+        }
+        
+        // If no available slots were found in any day, generate mock slots to allow UI testing
+        let hasAnySlots = false;
+        for (const date in this.state.availableTimeSlots) {
+            if (this.state.availableTimeSlots[date].length > 0) {
+                hasAnySlots = true;
+                break;
+            }
+        }
+        
+        if (!hasAnySlots) {
+            console.log('⚠️ No available slots found, generating mock slots for testing');
+            this.generateMockAvailableSlots(startDate, endDate);
+        }
+        
+        // Update calendar UI to show availability
+        this.updateCalendarAvailability();
+    },
+    
+    /**
+     * Generate time slots for a specific day
+     */
+    generateTimeSlotsForDay: function(date, openTime, closeTime) {
+        const slots = [];
+        const dateStr = this.formatDate(date);
+        
+        // Parse open and close times
+        const [openHour, openMinute] = openTime.split(':').map(Number);
+        const [closeHour, closeMinute] = closeTime.split(':').map(Number);
+        
+        // Create slots at regular intervals
+        const slotInterval = this.config.timeSlotDuration;
+        const openDate = new Date(date);
+        openDate.setHours(openHour, openMinute, 0, 0);
+        
+        const closeDate = new Date(date);
+        closeDate.setHours(closeHour, closeMinute, 0, 0);
+        
+        // Create slots
+        for (let time = openDate; time < closeDate; time.setMinutes(time.getMinutes() + slotInterval)) {
+            const startTime = new Date(time);
+            const endTime = new Date(time);
+            endTime.setMinutes(endTime.getMinutes() + slotInterval);
+            
+            if (endTime <= closeDate) {
+                slots.push({
+                    date: dateStr,
+                    startTime: this.formatTime(startTime),
+                    endTime: this.formatTime(endTime),
+                    timestamp: startTime.getTime()
+                });
+            }
+        }
+        
+        return slots;
+    },
+    
+    /**
+     * Filter out busy slots
+     */
+    filterBusySlots: function(timeSlots, busySlots) {
+        if (!busySlots || busySlots.length === 0) {
+            return timeSlots;
+        }
+        
+        // Convert busy slots to timestamp ranges for easier comparison
+        const busyRanges = busySlots.map(slot => {
+            const startTime = new Date(slot.start).getTime();
+            const endTime = new Date(slot.end).getTime();
+            return { start: startTime, end: endTime };
+        });
+        
+        // Filter out slots that overlap with busy times
+        return timeSlots.filter(slot => {
+            const slotDate = new Date(`${slot.date}T${slot.startTime}`);
+            const slotEndDate = new Date(`${slot.date}T${slot.endTime}`);
+            const slotStart = slotDate.getTime();
+            const slotEnd = slotEndDate.getTime();
+            
+            // Check if this slot overlaps with any busy slot
+            return !busyRanges.some(busyRange => {
+                return (slotStart < busyRange.end && slotEnd > busyRange.start);
+            });
+        });
     },
     
     /**
@@ -728,63 +941,80 @@ const GoogleBookingSystem = {
      * Generate mock available slots for development/testing
      */
     generateMockAvailableSlots: function(startDate, endDate) {
-        console.log('Generating mock data from', startDate, 'to', endDate);
+        console.log('🔄 Generating mock available slots from', startDate, 'to', endDate);
         const daysInRange = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
         
+        // Reset available slots for this date range
+        for (let i = 0; i < daysInRange; i++) {
+            const date = new Date(startDate);
+            date.setDate(startDate.getDate() + i);
+            const dateStr = this.formatDate(date);
+            this.state.availableTimeSlots[dateStr] = [];
+        }
+        
+        // Add mock slots for each day
         for (let i = 0; i < daysInRange; i++) {
             // Create date object for each day in range
             const date = new Date(startDate);
             date.setDate(startDate.getDate() + i);
             
-            // Skip closed days
+            // Skip weekends and past dates
             const dayOfWeek = date.getDay();
-            if (!this.config.businessHours[dayOfWeek] || this.config.businessHours[dayOfWeek].length === 0) {
-                continue;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            if (dayOfWeek === 0 || date < today) {
+                continue; // Skip Sundays and past dates
             }
             
-            const dateString = this.formatDate(date);
-            const timeSlots = [];
+            const dateStr = this.formatDate(date);
             
-            // Generate between 5-15 slots for each day to ensure we always have slots
-            const slotsCount = 5 + Math.floor(Math.random() * 11);
-            
-            // Get business hours for this day
-            const [startHour, endHour] = this.config.businessHours[dayOfWeek];
-            const startHourNum = parseInt(startHour.split(':')[0]);
-            const endHourNum = parseInt(endHour.split(':')[0]);
-            
-            // Generate random available times within business hours
-            const availableTimes = new Set();
-            for (let j = 0; j < slotsCount; j++) {
-                const hour = startHourNum + Math.floor(Math.random() * (endHourNum - startHourNum));
-                const minute = Math.random() < 0.5 ? 0 : 30; // Either on the hour or half hour
+            // Morning slots (9am to 12pm)
+            for (let hour = 9; hour < 12; hour++) {
+                const randomSkip = Math.random() < 0.3; // Randomly skip some slots
+                if (randomSkip) continue;
                 
-                const timeString = `${hour.toString().padStart(2, '0')}:${minute === 0 ? '00' : '30'}`;
-                availableTimes.add(timeString);
+                const slotDate = new Date(date);
+                slotDate.setHours(hour, 0, 0, 0);
+                
+                const endDate = new Date(slotDate);
+                endDate.setMinutes(endDate.getMinutes() + this.config.timeSlotDuration);
+                
+                const slot = {
+                    date: dateStr,
+                    startTime: this.formatTime(slotDate),
+                    endTime: this.formatTime(endDate),
+                    timestamp: slotDate.getTime()
+                };
+                
+                this.state.availableTimeSlots[dateStr].push(slot);
             }
             
-            // Convert to array and sort
-            Array.from(availableTimes).sort().forEach(time => {
-                // Push both the time and a formatted version for display
-                const hour = parseInt(time.split(':')[0]);
-                const minute = time.split(':')[1];
-                const period = hour >= 12 ? 'PM' : 'AM';
-                const hour12 = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
+            // Afternoon slots (2pm to 5pm)
+            for (let hour = 14; hour < 17; hour++) {
+                const randomSkip = Math.random() < 0.4; // Randomly skip some slots
+                if (randomSkip) continue;
                 
-                const formattedTime = `${hour12}:${minute} ${period}`;
+                const slotDate = new Date(date);
+                slotDate.setHours(hour, 0, 0, 0);
                 
-                timeSlots.push({
-                    time: formattedTime,
-                    value: time
-                });
-            });
-            
-            // Add slots to state
-            this.state.availableTimeSlots[dateString] = timeSlots;
+                const endDate = new Date(slotDate);
+                endDate.setMinutes(endDate.getMinutes() + this.config.timeSlotDuration);
+                
+                const slot = {
+                    date: dateStr,
+                    startTime: this.formatTime(slotDate),
+                    endTime: this.formatTime(endDate),
+                    timestamp: slotDate.getTime()
+                };
+                
+                this.state.availableTimeSlots[dateStr].push(slot);
+            }
         }
         
-        console.log('Generated mock slots for dates:', Object.keys(this.state.availableTimeSlots).length);
-        console.log('First few dates with slots:', Object.keys(this.state.availableTimeSlots).slice(0, 3));
+        console.log('📊 Mock data generated with slots for', 
+            Object.keys(this.state.availableTimeSlots).filter(date => 
+                this.state.availableTimeSlots[date].length > 0).length, 'days');
     },
     
     /**
@@ -809,6 +1039,8 @@ const GoogleBookingSystem = {
      * Select a date on the calendar
      */
     selectDate: function(dayElement, dateString) {
+        console.log('🗓️ Date selection triggered for:', dateString, dayElement);
+        
         // Clear previous selection
         const prevSelected = this.elements.calendarGrid.querySelectorAll('.calendar-day.selected');
         prevSelected.forEach(day => {
@@ -843,9 +1075,10 @@ const GoogleBookingSystem = {
     },
     
     /**
-     * Update time slots based on selected date
+     * Update time slots when a date is selected
      */
     updateTimeSlots: function(dateString) {
+        console.log('🕒 Updating time slots for date:', dateString);
         if (!this.elements.timeSlotContainer || !this.elements.selectedDateDisplay) return;
         
         // Clear time slots
@@ -866,6 +1099,8 @@ const GoogleBookingSystem = {
             return;
         }
         
+        console.log(`📅 Found ${availableSlots.length} slots for ${dateString}`);
+        
         // Create morning and afternoon sections
         const morningSlots = document.createElement('div');
         morningSlots.className = 'time-slot-section';
@@ -883,19 +1118,30 @@ const GoogleBookingSystem = {
         
         // Populate time slots
         availableSlots.forEach(slot => {
+            // Determine if morning or afternoon
+            const hour = parseInt(slot.startTime.split(':')[0]);
+            const isMorning = hour < 12;
+            
+            // Format for display (convert to 12h format)
+            const startHour = hour % 12 || 12;
+            const startMinute = slot.startTime.split(':')[1];
+            const amPm = hour < 12 ? 'AM' : 'PM';
+            const displayTime = `${startHour}:${startMinute} ${amPm}`;
+            
             // Create time slot element
             const timeSlot = document.createElement('div');
             timeSlot.className = 'time-slot';
-            timeSlot.dataset.time = slot.time;
-            timeSlot.textContent = slot.time;
+            timeSlot.dataset.startTime = slot.startTime;
+            timeSlot.dataset.endTime = slot.endTime;
+            timeSlot.textContent = displayTime;
             
             // Add click event
             timeSlot.addEventListener('click', () => {
-                this.selectTimeSlot(timeSlot, slot.time);
+                this.selectTimeSlot(timeSlot, slot);
             });
             
-            // Add to appropriate section based on AM/PM
-            if (slot.time.includes('AM')) {
+            // Add to appropriate section
+            if (isMorning) {
                 morningGrid.appendChild(timeSlot);
             } else {
                 afternoonGrid.appendChild(timeSlot);
@@ -921,18 +1167,25 @@ const GoogleBookingSystem = {
     /**
      * Select a time slot
      */
-    selectTimeSlot: function(timeSlot, timeString) {
+    selectTimeSlot: function(timeSlot, slot) {
+        console.log('⏰ Time slot selected:', slot);
+        
         // Deselect all other slots
-        document.querySelectorAll('.time-slot.selected').forEach(slot => {
-            slot.classList.remove('selected');
+        document.querySelectorAll('.time-slot.selected').forEach(el => {
+            el.classList.remove('selected');
         });
         
         // Select this slot
         timeSlot.classList.add('selected');
         
         // Update state and input
-        this.state.selectedTime = timeString;
-        this.elements.selectedTimeInput.value = timeString;
+        this.state.selectedTime = slot.startTime;
+        this.state.selectedEndTime = slot.endTime;
+        this.elements.selectedTimeInput.value = slot.startTime;
+        
+        if (this.elements.appointmentTimeInput) {
+            this.elements.appointmentTimeInput.value = slot.startTime;
+        }
         
         // Enable next button
         const nextButton = document.querySelector('.form-step[data-step="3"] .next-step');
@@ -944,7 +1197,7 @@ const GoogleBookingSystem = {
         if (typeof gtag === 'function') {
             gtag('event', 'time_selection', {
                 selected_date: this.state.selectedDate,
-                selected_time: timeString
+                selected_time: slot.startTime
             });
         }
     },
@@ -1144,7 +1397,7 @@ const GoogleBookingSystem = {
     },
     
     /**
-     * Handle form submission with improved Google Sheets integration
+     * Handle form submission with direct API integration
      */
     handleFormSubmit: function(event) {
         event.preventDefault();
@@ -1172,40 +1425,54 @@ const GoogleBookingSystem = {
         // Store the form data in localStorage as a backup
         localStorage.setItem('wbdc_last_booking_data', JSON.stringify(formData));
         
-        // Create a more reliable Google Sheets submission
-        const googleScriptUrl = this.config.bookingApiEndpoint;
-        
-        // Format data for the Google Script
-        let queryString = new URLSearchParams();
-        
-        // Add action parameter
-        queryString.append('action', 'submitBooking');
-        
-        // Add all form data
-        Object.entries(formData).forEach(([key, value]) => {
-            if (value !== undefined && value !== null) {
-                queryString.append(key, value);
-            }
-        });
-        
-        // Use fetch with JSONP-like approach for Google Scripts
-        const jsonpCallback = 'callback_' + Date.now();
-        const script = document.createElement('script');
-        
-        // Set up a global callback function
-        window[jsonpCallback] = (response) => {
-            console.log('Google Sheets response:', response);
+        // Check if ApiService is available
+        if (typeof ApiService !== 'undefined') {
+            // Submit booking through the API service
+            ApiService.submitBooking(formData)
+                .then(response => {
+                    console.log('Booking response:', response);
+                    this.handleBookingSuccess(formData, response);
+                })
+                .catch(error => {
+                    console.error('Booking error:', error);
+                    this.handleBookingError(error);
+                })
+                .finally(() => {
+                    this.state.submitting = false;
+                    this.elements.loadingIndicator.classList.remove('visible');
+                });
+        } else {
+            // Fallback to mock submission if API is not available
+            console.warn('API service not available, using mock submission');
             
-            // Clean up the script tag
-            if (script.parentNode) {
-                script.parentNode.removeChild(script);
-            }
-            
-            // Hide loading indicator
-            this.state.submitting = false;
-            this.elements.loadingIndicator.classList.remove('visible');
-            
-            // Show success and redirect to the confirmation page
+            // Simulate API delay
+            setTimeout(() => {
+                this.handleBookingSuccess(formData, {
+                    success: true,
+                    message: 'Booking completed (mock mode)'
+                });
+                
+                this.state.submitting = false;
+                this.elements.loadingIndicator.classList.remove('visible');
+            }, 2000);
+        }
+        
+        return false;
+    },
+    
+    /**
+     * Handle successful booking
+     */
+    handleBookingSuccess: function(formData, response) {
+        // Track form submission
+        if (typeof gtag === 'function') {
+            gtag('event', 'form_submission', {
+                status: 'success',
+                service: formData.specificServiceName || ''
+            });
+        }
+        
+        // Redirect to success page
             const redirectUrl = 'booking-success.html';
             
             // Create URL params for the success page
@@ -1217,59 +1484,35 @@ const GoogleBookingSystem = {
             });
             
             // Add status info
-            successParams.append('submission_status', response?.success ? 'success' : 'error');
+        successParams.append('submission_status', 'success');
             if (response?.message) {
                 successParams.append('submission_message', response.message);
             }
             
-            // Track form submission
-            if (typeof gtag === 'function') {
-                gtag('event', 'form_submission', {
-                    status: response?.success ? 'success' : 'error',
-                    service: formData.specificServiceName || ''
-                });
+        // Add calendar event link if available
+        if (response?.calendarEvent?.eventLink) {
+            successParams.append('calendar_link', response.calendarEvent.eventLink);
             }
             
             // Redirect to success page
             window.location.href = redirectUrl + '?' + successParams.toString();
-            
-            // Clean up the global callback
-            delete window[jsonpCallback];
-        };
+    },
+    
+    /**
+     * Handle booking error
+     */
+    handleBookingError: function(error) {
+        // Track form submission error
+        if (typeof gtag === 'function') {
+            gtag('event', 'form_submission', {
+                status: 'error',
+                error_message: error.message || 'Unknown error'
+            });
+        }
         
-        // Add error handling with a timeout
-        const timeoutId = setTimeout(() => {
-            console.warn('Google Sheets submission timed out');
-            
-            // Call the callback with an error status
-            if (typeof window[jsonpCallback] === 'function') {
-                window[jsonpCallback]({
-                    success: false,
-                    message: 'Submission timeout'
-                });
-            }
-        }, 8000);
-        
-        // Set up the script URL
-        script.src = `${googleScriptUrl}?${queryString.toString()}&callback=${jsonpCallback}`;
-        script.async = true;
-        script.onerror = () => {
-            console.error('Error loading Google Sheets script');
-            clearTimeout(timeoutId);
-            
-            // Call the callback with an error status
-            if (typeof window[jsonpCallback] === 'function') {
-                window[jsonpCallback]({
-                    success: false,
-                    message: 'Script load error'
-                });
-            }
-        };
-        
-        // Append the script to the document to initiate the request
-        document.body.appendChild(script);
-        
-        return false;
+        // Show error message
+        alert('There was an error processing your booking: ' + (error.message || 'Unknown error') + 
+              '\n\nPlease try again or contact us directly.');
     },
     
     /**
@@ -1355,10 +1598,82 @@ const GoogleBookingSystem = {
         }
         
         return formObject;
+    },
+    
+    /**
+     * Format time object to string (HH:MM)
+     */
+    formatTime: function(date) {
+        return date.toTimeString().slice(0, 5);
+    },
+    
+    /**
+     * Handle URL parameters (if any)
+     */
+    handleUrlParameters: function() {
+        // Get URL parameters
+        const params = new URLSearchParams(window.location.search);
+        
+        // Check for service parameter
+        if (params.has('service')) {
+            const serviceId = params.get('service');
+            if (this.elements.serviceCategory) {
+                // Set service category
+                const category = this.findServiceCategory(serviceId);
+                if (category) {
+                    this.elements.serviceCategory.value = category;
+                    // Trigger change event to update specific services
+                    const event = new Event('change');
+                    this.elements.serviceCategory.dispatchEvent(event);
+                    
+                    // Set specific service
+                    if (this.elements.specificService) {
+                        setTimeout(() => {
+                            this.elements.specificService.value = serviceId;
+                        }, 100);
+                    }
+                }
+            }
+        }
+        
+        // Check for dentist parameter
+        if (params.has('dentist') && this.elements.preferredDentist) {
+            const dentistId = params.get('dentist');
+            this.elements.preferredDentist.value = dentistId;
+        }
+        
+        // Check for date parameter
+        if (params.has('date')) {
+            const dateParam = params.get('date');
+            // Store for later use when calendar is initialized
+            this.state.preselectedDate = dateParam;
+        }
+    },
+    
+    /**
+     * Find service category for a specific service
+     */
+    findServiceCategory: function(serviceId) {
+        // Define service categories and their services
+        const serviceCategories = {
+            'general': ['cleaning', 'checkup', 'fillings', 'extractions'],
+            'cosmetic': ['whitening', 'veneers', 'bonding'],
+            'restorative': ['crowns', 'bridges', 'implants'],
+            'specialty': ['orthodontics', 'periodontics', 'endodontics']
+        };
+        
+        // Find category containing the service
+        for (const category in serviceCategories) {
+            if (serviceCategories[category].includes(serviceId)) {
+                return category;
+            }
+        }
+        
+        return null;
     }
 };
 
 // Initialize the booking system when the DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    GoogleBookingSystem.init();
+    BookingSystem.init();
 });

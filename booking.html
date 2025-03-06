@@ -78,6 +78,30 @@
             max-width: 1200px;
             margin: 0 auto;
         }
+        
+        /* Calendar fix for clickable days */
+        .calendar-day:not(.disabled):not(.empty) {
+            cursor: pointer !important;
+            position: relative;
+            z-index: 1;
+            transition: all 0.2s ease;
+        }
+        
+        .calendar-day:not(.disabled):not(.empty):hover {
+            background-color: var(--primary-ultra-light) !important;
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            color: var(--primary-dark) !important;
+            font-weight: bold;
+        }
+        
+        .calendar-day.selected {
+            background-color: var(--primary) !important;
+            color: white !important;
+            font-weight: bold;
+            transform: scale(1.1);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
     </style>
     
     <!-- Main CSS -->
@@ -836,10 +860,11 @@
     </a>
 
     <!-- JavaScript -->
-    <script src="assets/js/vendors/swiper-bundle.min.js" defer></script>
     <script src="assets/js/main.js" defer></script>
     <script src="assets/js/animations.js" defer></script>
-    <script src="assets/js/booking.js" defer></script>
+    <script src="assets/js/utils/clinic-data.js"></script>
+    <script src="assets/js/api-service.js"></script>
+    <script src="assets/js/booking.js"></script>
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     
     <!-- Initialize current year for copyright -->
@@ -854,6 +879,61 @@
             }, 500);
         });
     </script>
-    <script src="assets/js/utils/clinic-data.js"></script>
+    
+    <!-- Direct calendar interactivity fix -->
+    <script>
+        // Add this script to ensure calendar days are clickable even if the main system fails
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                console.log('Checking if calendar days are interactive...');
+                const calendarDays = document.querySelectorAll('.calendar-day:not(.disabled):not(.empty)');
+                
+                if (calendarDays.length > 0) {
+                    console.log('Found ' + calendarDays.length + ' calendar days, ensuring they are clickable');
+                    
+                    calendarDays.forEach(day => {
+                        // Only add event if it doesn't already have one
+                        if (!day.getAttribute('data-has-click')) {
+                            day.setAttribute('data-has-click', 'true');
+                            
+                            // Add click handler
+                            day.addEventListener('click', function() {
+                                const dateString = day.getAttribute('data-date');
+                                console.log('Calendar day clicked:', dateString);
+                                
+                                // Remove previous selection
+                                document.querySelectorAll('.calendar-day.selected').forEach(el => {
+                                    el.classList.remove('selected');
+                                });
+                                
+                                // Select this day
+                                day.classList.add('selected');
+                                
+                                // Update hidden input if it exists
+                                const dateInput = document.getElementById('selected-date');
+                                if (dateInput) {
+                                    dateInput.value = dateString;
+                                }
+                                
+                                // Trigger BookingSystem function if available
+                                if (window.BookingSystem && BookingSystem.selectDate) {
+                                    BookingSystem.selectDate(day, dateString);
+                                } else {
+                                    console.log('BookingSystem not available, using basic selection only');
+                                }
+                            });
+                            
+                            // Ensure it looks clickable
+                            day.style.cursor = 'pointer';
+                        }
+                    });
+                } else {
+                    console.log('No calendar days found yet, will try again...');
+                    // Try again in 1 second
+                    setTimeout(arguments.callee, 1000);
+                }
+            }, 500);
+        });
+    </script>
     </body>
 </html>

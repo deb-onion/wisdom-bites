@@ -44,3 +44,4 @@ v4.3.9 (2025-03-06): Updated booking system and calendar configuration
 v4.3.10 (2025-03-06): Updated booking system and calendar configuration
 v4.3.11 (2025-03-06): Updated booking system and calendar configuration
 v4.3.12 (2025-03-06): Updated booking system and calendar configuration
+v4.3.13 (2025-03-07): Fixed calendar day selection issues, added CORS configuration and debug tracker documentation

@@ -1,6 +1,12 @@
 # Wisdom Bites Dental Clinic - Changelog
 
 
+## [4.3.13] - 2025-03-07
+
+### Patch Update:
+- Fixed calendar day selection issues, added CORS configuration and debug tracker documentation
+
+
 ## [4.3.12] - 2025-03-06
 
 ### Patch Update:
