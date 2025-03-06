@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Appointment confirmed at Wisdom Bites Dental Clinic. Thank you for booking with us.">
+    <meta name="keywords" content="dental appointment, booking confirmation, dental clinic">
+    <title>Booking Confirmed | Wisdom Bites Dental Clinic</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/animations.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+    <link rel="stylesheet" href="assets/css/booking-enhanced.css">
+    
+    <!-- Clinic Data -->
+    <script id="clinic-data" type="application/json">
+    {
+    "name": "Wisdom Bites Dental Clinic",
+    "address": "1/4A, North Road, Poddar Nagar, Jadavpur, Kolkata, West Bengal 700032, India",
+    "phone": "+91 123 456 7890",
+    "placeId": "ChIJEZw2uCNxAjoRrPHJvp1VC2g",
+    "position": {
+        "lat": 22.496391851463255,
+        "lng": 88.36915472944189
+    },
+    "hours": [
+        "Monday: 9:00 AM – 8:00 PM",
+        "Tuesday: 9:00 AM – 8:00 PM",
+        "Wednesday: 9:00 AM – 8:00 PM",
+        "Thursday: 9:00 AM – 8:00 PM",
+        "Friday: 9:00 AM – 8:00 PM",
+        "Saturday: 9:00 AM – 6:00 PM",
+        "Sunday: Closed"
+    ],
+    "services": [
+        "General Dentistry",
+        "Cosmetic Dentistry",
+        "Emergency Dental Care",
+        "Dental Implants",
+        "Root Canal Treatment",
+        "Teeth Whitening"
+    ]
+}
+    </script>
+</head>
+<body class="success-page">
+    <!-- Loading Screen -->
+    <div class="loading-screen">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="site-header">
+        <div class="container">
+            <div class="header-wrapper">
+                <div class="logo">
+                    <a href="index.html" aria-label="Wisdom Bites Dental Clinic">
+                        <img src="assets/images/logo.svg" alt="Wisdom Bites Dental Clinic Logo" width="180" height="45">
+                    </a>
+                </div>
+                
+                <nav class="main-nav">
+                    <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false">
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                    </button>
+                    
+                    <div class="nav-container">
+                        <ul class="nav-list">
+                            <li class="nav-item"><a href="index.html">Home</a></li>
+                            <li class="nav-item"><a href="about.html">About Us</a></li>
+                            <li class="nav-item has-dropdown">
+                                <a href="#" class="dropdown-toggle">Services</a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="services/general-dentistry.html">General Dentistry</a></li>
+                                    <li><a href="services/cosmetic-dentistry.html">Cosmetic Dentistry</a></li>
+                                    <li><a href="services/emergency-care.html">Emergency Care</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item"><a href="booking.html">Book Appointment</a></li>
+                            <li class="nav-item"><a href="contact.html">Contact</a></li>
+                        </ul>
+                        
+                        <div class="nav-cta">
+                            <a href="tel:+911234567890" data-clinic-phone class="phone-link">
+                                <i class="icon icon-phone"></i>
+                                <span>(555) 123-4567</span>
+                            </a>
+                            <a href="booking.html" class="btn btn-primary">Book Now</a>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section with simpler design -->
+        <section class="page-hero success-hero">
+            <div class="hero-background">
+                <picture>
+                    <source srcset="assets/images/booking-hero.webp" type="image/webp">
+                    <source srcset="assets/images/booking-hero.jpg" type="image/jpeg">
+                    <img src="assets/images/booking-hero.jpg" alt="Booking confirmation" loading="eager">
+                </picture>
+                <div class="hero-overlay"></div>
+            </div>
+            
+            <div class="container">
+                <div class="page-hero-content">
+                    <h1 class="page-title" data-animation="fade-up">Appointment Confirmed!</h1>
+                    <p class="page-subtitle" data-animation="fade-up" data-delay="0.2">Thank you for choosing Wisdom Bites Dental Clinic</p>
+                </div>
+            </div>
+            
+            <div class="hero-waves">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+                    <path fill="#ffffff" fill-opacity="1" d="M0,64L48,80C96,96,192,128,288,133.3C384,139,480,117,576,122.7C672,128,768,160,864,186.7C960,213,1056,235,1152,229.3C1248,224,1344,192,1392,176L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+                </svg>
+            </div>
+        </section>
+
+        <!-- Confirmation Section -->
+        <section class="confirmation-section">
+            <div class="container">
+                <div class="booking-confirmation" data-animation="fade-up">
+                    <div class="confirmation-icon">
+                        <i class="icon icon-check-circle"></i>
+                    </div>
+                    <h2>Your Appointment Is Confirmed</h2>
+                    <p>Thank you for booking your appointment with Wisdom Bites Dental Clinic.</p>
+                    <div class="confirmation-details" id="appointment-details">
+                        <!-- This will be filled by JavaScript -->
+                    </div>
+                    <p>We've sent a confirmation email to your inbox with these details. Your appointment has been added to our calendar. If you need to make any changes, please contact us.</p>
+                    <div class="confirmation-actions">
+                        <a href="directions.html" class="btn btn-primary">Get Directions</a>
+                        <a href="index.html" class="btn btn-outline">Return to Home</a>
+                        <a href="contact.html" class="btn btn-outline">Contact Us</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- What to Bring Section -->
+        <section class="what-to-bring-section">
+            <div class="container">
+                <div class="section-header" data-animation="fade-up">
+                    <span class="section-tagline">Prepare for Your Visit</span>
+                    <h2 class="section-title">What to Bring</h2>
+                    <p class="section-subtitle">To make your appointment go smoothly</p>
+                </div>
+                
+                <div class="bring-items" data-animation="fade-up" data-delay="0.2">
+                    <div class="bring-item">
+                        <div class="bring-icon">
+                            <i class="icon icon-id-card"></i>
+                        </div>
+                        <div class="bring-content">
+                            <h3>Identification</h3>
+                            <p>Please bring a photo ID (driver's license or other government-issued ID).</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bring-item">
+                        <div class="bring-icon">
+                            <i class="icon icon-insurance"></i>
+                        </div>
+                        <div class="bring-content">
+                            <h3>Insurance Information</h3>
+                            <p>If you have dental insurance, please bring your insurance card and any relevant information.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bring-item">
+                        <div class="bring-icon">
+                            <i class="icon icon-medical"></i>
+                        </div>
+                        <div class="bring-content">
+                            <h3>Medical History</h3>
+                            <p>A list of current medications and any medical conditions your dentist should know about.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bring-item">
+                        <div class="bring-icon">
+                            <i class="icon icon-clock"></i>
+                        </div>
+                        <div class="bring-content">
+                            <h3>Arrive Early</h3>
+                            <p>Please arrive 15 minutes before your scheduled appointment to complete any necessary paperwork.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Appointment Reminder Section -->
+        <section class="reminder-section">
+            <div class="container">
+                <div class="reminder-container" data-animation="fade-up">
+                    <div class="reminder-icon">
+                        <i class="icon icon-bell"></i>
+                    </div>
+                    <div class="reminder-content">
+                        <h3>We'll Send You a Reminder</h3>
+                        <p>You'll receive an email confirmation shortly, and a reminder 24 hours before your appointment. If you need to reschedule, please contact us at least 24 hours in advance.</p>
+                        <a href="tel:+911234567890" data-clinic-phone class="btn btn-primary">Call Us</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-top">
+            <div class="container">
+                <div class="footer-widgets">
+                    <div class="footer-widget">
+                        <div class="footer-logo">
+                            <img src="assets/images/logo-white.svg" alt="Wisdom Bites Dental Clinic" width="180" height="45">
+                        </div>
+                        <p class="footer-description">Providing exceptional dental care in a comfortable, modern environment. Our mission is to help you achieve and maintain optimal oral health.</p>
+                        <div class="social-links">
+                            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                                <i class="icon icon-facebook"></i>
+                            </a>
+                            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                                <i class="icon icon-instagram"></i>
+                            </a>
+                            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+                                <i class="icon icon-twitter"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-widget">
+                        <h3 class="footer-heading">Contact Us</h3>
+                        <address>
+                            <div class="contact-item">
+                                <i class="icon icon-map"></i>
+                                <span><span data-clinic-address>1/4A, North Road, Poddar Nagar, Jadavpur, Kolkata, West Bengal 700032, India</span>
+                            </div>
+                            <div class="contact-item">
+                                <i class="icon icon-phone"></i>
+                                <a href="tel:+911234567890" data-clinic-phone>+1 (555) 123-4567</a>
+                            </div>
+                            <div class="contact-item">
+                                <i class="icon icon-email"></i>
+                                <a href="mailto:info@wisdombites.com">info@wisdombites.com</a>
+                            </div>
+                        </address>
+                    </div>
+                    
+                    <div class="footer-widget">
+                        <h3 class="footer-heading">Office Hours</h3>
+                        <ul class="hours-list">
+                            <li><span>Monday - Friday:</span> 9:00 AM - 6:00 PM</li>
+                            <li><span>Saturday:</span> 10:00 AM - 3:00 PM</li>
+                            <li><span>Sunday:</span> Closed</li>
+                        </ul>
+                        <div class="emergency-info">
+                            <p><strong>Dental Emergency?</strong></p>
+                            <a href="services/emergency-care.html" class="btn btn-sm btn-primary">Emergency Information</a>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-widget">
+                        <h3 class="footer-heading">Quick Links</h3>
+                        <ul class="footer-links">
+                            <li><a href="index.html">Home</a></li>
+                            <li><a href="about.html">About Us</a></li>
+                            <li><a href="services/general-dentistry.html">Services</a></li>
+                            <li><a href="booking.html">Book Appointment</a></li>
+                            <li><a href="contact.html">Contact</a></li>
+                            <li><a href="blog.html">Blog</a></li>
+                            <li><a href="insurance.html">Insurance Information</a></li>
+                            <li><a href="faq.html">FAQs</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="container">
+                <div class="footer-bottom-content">
+                    <div class="copyright">
+                        <p>&copy; <span id="current-year">2025</span> Wisdom Bites Dental Clinic. All Rights Reserved.</p>
+                    </div>
+                    <div class="footer-legal">
+                        <a href="privacy-policy.html">Privacy Policy</a>
+                        <a href="terms-of-service.html">Terms of Service</a>
+                        <a href="accessibility.html">Accessibility</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <a href="#" class="back-to-top" aria-label="Back to top">
+        <i class="icon icon-arrow-up"></i>
+    </a>
+
+    <!-- JavaScript -->
+    <script src="assets/js/main.js" defer></script>
+    <script src="assets/js/animations.js" defer></script>
+    <script src="assets/js/utils/clinic-data.js"></script>
+    
+    <!-- Appointment Details Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get appointment details from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const firstName = urlParams.get('first-name') || '';
+            const lastName = urlParams.get('last-name') || '';
+            const fullName = `${firstName} ${lastName}`.trim();
+            
+            // Get service and dentist information
+            const serviceCategory = urlParams.get('service-category') || '';
+            const specificService = urlParams.get('specific-service') || '';
+            const preferredDentist = urlParams.get('preferred-dentist') || 'No preference';
+            
+            // Get selected date and time
+            const selectedDate = urlParams.get('selected-date') || '';
+            const selectedTime = urlParams.get('selected-time') || '';
+            
+            // Format the date
+            let formattedDate = '';
+            if (selectedDate) {
+                const dateParts = selectedDate.split('-');
+                if (dateParts.length === 3) {
+                    const date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+                    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                    formattedDate = date.toLocaleDateString('en-US', options);
+                }
+            }
+            
+            // Create HTML for appointment details
+            const appointmentDetailsElement = document.getElementById('appointment-details');
+            if (appointmentDetailsElement) {
+                let detailsHTML = '';
+                
+                if (fullName) {
+                    detailsHTML += `<p><strong>Name:</strong> ${fullName}</p>`;
+                }
+                
+                if (specificService) {
+                    // Map service ID to readable name
+                    const serviceNames = {
+                        'checkup': 'Dental Check-up & Cleaning',
+                        'fillings': 'Dental Fillings',
+                        'root-canal': 'Root Canal Therapy',
+                        'extraction': 'Tooth Extraction',
+                        'crowns': 'Dental Crowns & Bridges',
+                        'dentures': 'Dentures & Partial Dentures',
+                        'whitening': 'Teeth Whitening',
+                        'veneers': 'Porcelain Veneers',
+                        'bonding': 'Dental Bonding',
+                        'smile-makeover': 'Complete Smile Makeover',
+                        'toothache': 'Severe Toothache',
+                        'broken-tooth': 'Broken or Chipped Tooth',
+                        'lost-filling': 'Lost Filling or Crown',
+                        'dental-abscess': 'Dental Abscess',
+                        'jaw-pain': 'Jaw Pain or Injury'
+                    };
+                    
+                    const serviceName = serviceNames[specificService] || specificService;
+                    detailsHTML += `<p><strong>Service:</strong> ${serviceName}</p>`;
+                }
+                
+                if (preferredDentist) {
+                    // Map dentist ID to readable name
+                    const dentistNames = {
+                        'dr-chen': 'Dr. Emily Chen',
+                        'dr-wilson': 'Dr. James Wilson',
+                        'dr-rodriguez': 'Dr. Sophia Rodriguez',
+                        '': 'No preference'
+                    };
+                    
+                    const dentistName = dentistNames[preferredDentist] || preferredDentist;
+                    detailsHTML += `<p><strong>Dentist:</strong> ${dentistName}</p>`;
+                }
+                
+                if (formattedDate && selectedTime) {
+                    detailsHTML += `<p><strong>Date & Time:</strong> ${formattedDate} at ${selectedTime}</p>`;
+                }
+                
+                // If no details were found, show generic message
+                if (!detailsHTML) {
+                    detailsHTML = `
+                        <p><strong>Your appointment has been confirmed.</strong></p>
+                        <p>Please check your email for appointment details.</p>
+                    `;
+                }
+                
+                appointmentDetailsElement.innerHTML = detailsHTML;
+                
+                // Store appointment details in localStorage for future reference
+                localStorage.setItem('wbdc_has_booking', 'true');
+                localStorage.setItem('wbdc_appointment_details', JSON.stringify({
+                    name: fullName,
+                    service: specificService,
+                    dentist: preferredDentist,
+                    datetime: `${formattedDate} at ${selectedTime}`
+                }));
+            }
+            
+            // Mark body as loaded when content is ready
+            document.body.classList.add('loaded');
+            setTimeout(function() {
+                document.querySelector('.loading-screen').style.display = 'none';
+            }, 500);
+            
+            // Set current year in footer
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+        });
+    </script>
+</body>
+</html>
