@@ -1155,8 +1155,20 @@ const GoogleBookingSystem = {
         // Submit to Google Sheets via JSONP approach to avoid CORS/405 issues
         this.submitToGoogleSheets(formData)
             .then(response => {
-                // Show success and redirect
-                this.showBookingConfirmation(formData);
+               // Add this to the handleFormSubmit function instead of showBookingConfirmation
+// Redirect to a success page with query parameters
+let redirectUrl = 'booking-success.html';
+        
+// Create a simple encoded version of the data for the URL
+const urlSearchParams = new URLSearchParams();
+Object.entries(formData).forEach(([key, value]) => {
+    if (typeof value === 'string' || typeof value === 'number') {
+        urlSearchParams.append(key, value);
+    }
+});
+        
+// Redirect to success page with data
+window.location.href = redirectUrl + '?' + urlSearchParams.toString();
                 
                 // Track form submission
                 if (typeof gtag === 'function') {

@@ -41,3 +41,4 @@ v4.3.6 (2025-03-06): Fixed booking form issues with negative maxlength values an
 v4.3.7 (2025-03-06): Updated booking system and calendar configuration
 v4.3.8 (2025-03-06): Updated booking system and calendar configuration
 v4.3.9 (2025-03-06): Updated booking system and calendar configuration
+v4.3.10 (2025-03-06): Updated booking system and calendar configuration
