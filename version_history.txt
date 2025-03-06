@@ -31,3 +31,4 @@ v4.1.10 (2025-03-06): configuration updated
 v4.1.11 (2025-03-06): Fixed syntax error in directions.js and updated GitHub workflow
 v4.1.12 (2025-03-06): Fixed syntax error in directions.js and updated GitHub workflow
 v4.2.0 (2025-03-06): Updated website with centralized clinic data management system
+v4.3.0 (2025-03-06): Updated booking system and calendar configuration

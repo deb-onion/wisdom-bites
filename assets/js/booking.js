@@ -1,35 +1,35 @@
 /**
  * Wisdom Bites Dental Clinic
- * Enhanced Booking Page JavaScript
- * Version: 4.0.0
+ * Enhanced Booking System with Google Calendar & Sheets Integration
  * 
- * This file contains improved functionality for the booking page including:
- * - Enhanced calendar interface with real available slots
- * - Google Sheets integration for form submission
- * - User tracking metrics
+ * This implementation connects the booking form to Google Calendar for availability
+ * and Google Sheets for data storage, creating a complete booking solution.
  */
 
 "use strict";
 
-// Enhanced Booking System
-const EnhancedBookingSystem = {
+const GoogleBookingSystem = {
     // Configuration options
     config: {
-        dateFormat: 'YYYY-MM-DD',
+        // Calendar settings
+        calendarId: 'clinic@wisdombites.com', // Your clinic's Google Calendar ID
         timeSlotDuration: 30, // in minutes
-        maxBookingDays: 60,   // number of days in advance that can be booked
-        maxAppointmentsPerDay: 16,
-        startingHour: {
-            weekday: 9,  // 9 AM on weekdays
-            saturday: 10 // 10 AM on Saturdays
-        },
-        endingHour: {
-            weekday: 18, // 6 PM on weekdays
-            saturday: 15 // 3 PM on Saturdays
-        },
-        closedDays: [0], // Sunday (0) is closed
-        googleScriptUrl: 'https://script.google.com/macros/s/AKfycbwEewRhwAIwqxYmaU0GJvhVN2pasBj1umCVhKxzZwa80XAzLcPBBetbyH2L-y_OsctQ/exec', // Will be replaced with actual script ID
-        analyticsEndpoint:'https://script.google.com/macros/s/AKfycbwEewRhwAIwqxYmaU0GJvhVN2pasBj1umCVhKxzZwa80XAzLcPBBetbyH2L-y_OsctQ/exec', // Will be replaced with actual script ID for analytics
+        maxBookingDays: 60, // How far in advance patients can book
+        
+        // API endpoints
+        calendarApiEndpoint: 'https://script.google.com/macros/s/AKfycby284ZOZj-SIIovs4D7vb7LML__k1nTsH16xtZhHrI8EwTpn0DjpR-nSykC8YsZYIsS/exec',
+        bookingApiEndpoint: 'https://script.google.com/macros/s/AKfycby284ZOZj-SIIovs4D7vb7LML__k1nTsH16xtZhHrI8EwTpn0DjpR-nSykC8YsZYIsS/exec',
+        
+        // Business hours
+        businessHours: {
+            0: [], // Sunday (closed)
+            1: ['09:00', '18:00'], // Monday
+            2: ['09:00', '18:00'], // Tuesday
+            3: ['09:00', '18:00'], // Wednesday
+            4: ['09:00', '18:00'], // Thursday
+            5: ['09:00', '18:00'], // Friday
+            6: ['10:00', '15:00']  // Saturday
+        }
     },
     
     // DOM elements cache
@@ -40,90 +40,41 @@ const EnhancedBookingSystem = {
         currentStep: 1,
         selectedDate: null,
         selectedTime: null,
-        serviceCategory: '',
-        specificService: '',
-        preferredDentist: '',
-        availableTimeSlots: {}, // Will be populated from Google Sheets
+        availableTimeSlots: {},
         sessionId: '',
         formData: {},
         submitting: false,
+        loadingAvailability: false
     },
     
     /**
-     * Initialize booking system
+     * Initialize the booking system
      */
     init: function() {
+        console.log('Initializing Google Booking System');
+        
         // Cache DOM elements
         this.cacheElements();
         
         // Generate session ID for tracking
-        this.generateSessionId();
-        
-        // Track page visit
-        this.trackPageVisit();
+        this.state.sessionId = 'WB-' + Date.now() + '-' + Math.floor(Math.random() * 1000000);
         
         // Initialize components
         this.initFormSteps();
         this.initServiceSelection();
         this.initCalendar();
         this.initFormValidation();
-        this.fetchAvailableTimeSlots();
         
         // Handle URL parameters
         this.handleUrlParameters();
         
-        // Bind events
-        this.bindEvents();
-        
-        console.log('Enhanced Booking system initialized');
-    },
-    
-    /**
-     * Generate unique session ID for tracking
-     */
-    generateSessionId: function() {
-        this.state.sessionId = 'WB-' + Date.now() + '-' + Math.floor(Math.random() * 1000000);
-        localStorage.setItem('wb_session_id', this.state.sessionId);
-    },
-    
-    /**
-     * Track page visit to Google Sheets
-     */
-    trackPageVisit: function() {
-        const trackingData = {
-            event: 'page_visit',
-            sessionId: this.state.sessionId,
-            page: 'booking',
-            timestamp: new Date().toISOString(),
-            referrer: document.referrer || 'direct',
-            userAgent: navigator.userAgent,
-            screenSize: `${window.innerWidth}x${window.innerHeight}`
-        };
-        
-        // Send tracking data
-        this.sendAnalyticsData(trackingData);
-    },
-    
-    /**
-     * Send analytics data to Google Sheets
-     */
-    sendAnalyticsData: function(data) {
-        // Don't send analytics in development mode
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            console.log('Analytics data (dev mode):', data);
-            return;
+        // Bind form submission event
+        if (this.elements.bookingForm) {
+            this.elements.bookingForm.addEventListener('submit', this.handleFormSubmit.bind(this));
         }
         
-        fetch(this.config.analyticsEndpoint, {
-            method: 'POST',
-            mode: 'no-cors', // Required for Google Apps Script
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
-        }).catch(error => {
-            console.error('Analytics error:', error);
-        });
+        // Add analytics tracking
+        this.trackPageVisit();
     },
     
     /**
@@ -162,7 +113,7 @@ const EnhancedBookingSystem = {
         this.elements.summaryDentist = document.getElementById('summary-dentist');
         this.elements.summaryDatetime = document.getElementById('summary-datetime');
         
-        // Loading indicator (create if doesn't exist)
+        // Create loading indicator if it doesn't exist
         if (!document.getElementById('loading-indicator')) {
             const loadingIndicator = document.createElement('div');
             loadingIndicator.id = 'loading-indicator';
@@ -179,75 +130,27 @@ const EnhancedBookingSystem = {
     },
     
     /**
-     * Bind events
+     * Track page visit for analytics
      */
-    bindEvents: function() {
-        // Form submission
-        if (this.elements.bookingForm) {
-            this.elements.bookingForm.addEventListener('submit', this.handleFormSubmit.bind(this));
+    trackPageVisit: function() {
+        // Implement analytics tracking
+        if (typeof gtag === 'function') {
+            gtag('event', 'page_view', {
+                page_title: 'Booking Page',
+                page_location: window.location.href,
+                page_path: window.location.pathname,
+                send_to: 'G-XXXXXXXXXX' // Replace with your Google Analytics ID
+            });
         }
-        
-        // Track form field changes
-        const formFields = document.querySelectorAll('input, select, textarea');
-        formFields.forEach(field => {
-            field.addEventListener('change', this.trackFieldChange.bind(this));
-        });
     },
     
     /**
-     * Track field changes for analytics
-     */
-    trackFieldChange: function(event) {
-        const field = event.target;
-        const fieldName = field.name || field.id;
-        const fieldType = field.type;
-        let fieldValue = field.value;
-        
-        // Don't track sensitive information like email or phone
-        if (fieldName.includes('email') || fieldName.includes('phone')) {
-            fieldValue = '[REDACTED]';
-        }
-        
-        // Track field change
-        const trackingData = {
-            event: 'field_change',
-            sessionId: this.state.sessionId,
-            fieldName: fieldName,
-            fieldType: fieldType,
-            fieldValue: fieldValue,
-            timestamp: new Date().toISOString()
-        };
-        
-        this.sendAnalyticsData(trackingData);
-    },
-    
-    /**
-     * Format date to YYYY-MM-DD string
-     */
-    formatDate: function(date) {
-        const year = date.getFullYear();
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const day = date.getDate().toString().padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    },
-    
-    /**
-     * Parse date string to Date object
-     */
-    parseDate: function(dateString) {
-        const [year, month, day] = dateString.split('-').map(Number);
-        return new Date(year, month - 1, day);
-    },
-    
-    /**
-     * Initialize multi-step form
+     * Initialize form steps
      */
     initFormSteps: function() {
         // Add click event to next buttons
         this.elements.nextButtons.forEach(button => {
             button.addEventListener('click', () => {
-                // Track step progression
-                this.trackStepProgression('next', this.state.currentStep);
                 this.goToNextStep();
             });
         });
@@ -255,30 +158,12 @@ const EnhancedBookingSystem = {
         // Add click event to previous buttons
         this.elements.prevButtons.forEach(button => {
             button.addEventListener('click', () => {
-                // Track step progression
-                this.trackStepProgression('back', this.state.currentStep);
                 this.goToPrevStep();
             });
         });
         
         // Set initial state
         this.updateStepDisplay();
-    },
-    
-    /**
-     * Track form step progression for analytics
-     */
-    trackStepProgression: function(direction, fromStep) {
-        const trackingData = {
-            event: 'form_navigation',
-            sessionId: this.state.sessionId,
-            direction: direction,
-            fromStep: fromStep,
-            toStep: direction === 'next' ? fromStep + 1 : fromStep - 1,
-            timestamp: new Date().toISOString()
-        };
-        
-        this.sendAnalyticsData(trackingData);
     },
     
     /**
@@ -306,6 +191,9 @@ const EnhancedBookingSystem = {
                 block: 'start'
             });
             
+            // Track step progression
+            this.trackStepProgression('next', this.state.currentStep - 1);
+            
             return true;
         }
         
@@ -326,6 +214,9 @@ const EnhancedBookingSystem = {
                 block: 'start'
             });
             
+            // Track step progression
+            this.trackStepProgression('back', this.state.currentStep + 1);
+            
             return true;
         }
         
@@ -333,7 +224,7 @@ const EnhancedBookingSystem = {
     },
     
     /**
-     * Update step display based on current step
+     * Update display based on current step
      */
     updateStepDisplay: function() {
         // Update form steps visibility
@@ -353,6 +244,590 @@ const EnhancedBookingSystem = {
                 step.classList.remove('active');
             }
         });
+    },
+    
+    /**
+     * Track step progression for analytics
+     */
+    trackStepProgression: function(direction, fromStep) {
+        if (typeof gtag === 'function') {
+            gtag('event', 'form_navigation', {
+                direction: direction,
+                from_step: fromStep,
+                to_step: direction === 'next' ? fromStep + 1 : fromStep - 1
+            });
+        }
+    },
+    
+    /**
+     * Initialize service selection functionality
+     */
+    initServiceSelection: function() {
+        if (!this.elements.serviceCategory || !this.elements.specificService) return;
+        
+        // Handle service category change
+        this.elements.serviceCategory.addEventListener('change', () => {
+            const category = this.elements.serviceCategory.value;
+            
+            // Update specific service dropdown based on selected category
+            this.updateServiceOptions(category);
+        });
+    },
+    
+    /**
+     * Update service options based on selected category
+     */
+    updateServiceOptions: function(category) {
+        if (!this.elements.specificService) return;
+        
+        // Clear current options
+        this.elements.specificService.innerHTML = '<option value="">Select a service</option>';
+        
+        // Enable/disable dropdown based on category selection
+        if (!category) {
+            this.elements.specificService.disabled = true;
+            return;
+        }
+        
+        this.elements.specificService.disabled = false;
+        
+        // Define services by category
+        const services = {
+            general: [
+                { value: 'checkup', label: 'Dental Check-up & Cleaning' },
+                { value: 'fillings', label: 'Dental Fillings' },
+                { value: 'root-canal', label: 'Root Canal Therapy' },
+                { value: 'extraction', label: 'Tooth Extraction' },
+                { value: 'crowns', label: 'Dental Crowns & Bridges' },
+                { value: 'dentures', label: 'Dentures & Partial Dentures' }
+            ],
+            cosmetic: [
+                { value: 'whitening', label: 'Teeth Whitening' },
+                { value: 'veneers', label: 'Porcelain Veneers' },
+                { value: 'bonding', label: 'Dental Bonding' },
+                { value: 'smile-makeover', label: 'Complete Smile Makeover' }
+            ],
+            emergency: [
+                { value: 'toothache', label: 'Severe Toothache' },
+                { value: 'broken-tooth', label: 'Broken or Chipped Tooth' },
+                { value: 'lost-filling', label: 'Lost Filling or Crown' },
+                { value: 'dental-abscess', label: 'Dental Abscess' },
+                { value: 'jaw-pain', label: 'Jaw Pain or Injury' }
+            ]
+        };
+        
+        // Add options for selected category
+        if (services[category]) {
+            services[category].forEach(service => {
+                const option = document.createElement('option');
+                option.value = service.value;
+                option.textContent = service.label;
+                this.elements.specificService.appendChild(option);
+            });
+        }
+    },
+    
+    /**
+     * Initialize calendar for date selection
+     */
+    initCalendar: function() {
+        if (!this.elements.calendarGrid || !this.elements.calendarMonth) return;
+        
+        const today = new Date();
+        let currentMonth = today.getMonth();
+        let currentYear = today.getFullYear();
+        
+        // Generate calendar
+        const generateCalendar = () => {
+            // Clear grid
+            this.elements.calendarGrid.innerHTML = '';
+            
+            // Update month header
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            this.elements.calendarMonth.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+            
+            // Create day headers
+            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            
+            dayNames.forEach(day => {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day-header';
+                dayElement.textContent = day;
+                this.elements.calendarGrid.appendChild(dayElement);
+            });
+            
+            // Get first day of month
+            const firstDay = new Date(currentYear, currentMonth, 1);
+            const startingDay = firstDay.getDay();
+            
+            // Get last day of month
+            const lastDay = new Date(currentYear, currentMonth + 1, 0);
+            const totalDays = lastDay.getDate();
+            
+            // Add empty cells for days before first day of month
+            for (let i = 0; i < startingDay; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'calendar-day empty';
+                this.elements.calendarGrid.appendChild(emptyCell);
+            }
+            
+            // Set min date (today) and max date (today + maxBookingDays)
+            const minDate = new Date();
+            minDate.setHours(0, 0, 0, 0);
+            
+            const maxDate = new Date();
+            maxDate.setDate(maxDate.getDate() + this.config.maxBookingDays);
+            
+            // Add days of the month
+            for (let day = 1; day <= totalDays; day++) {
+                const date = new Date(currentYear, currentMonth, day);
+                const dateString = this.formatDate(date);
+                
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.textContent = day;
+                dayElement.dataset.date = dateString;
+                
+                // Check if date is selectable
+                const isBeforeMin = date < minDate;
+                const isAfterMax = date > maxDate;
+                
+                // Check if it's a closed day
+                const dayOfWeek = date.getDay();
+                const isClosedDay = !this.config.businessHours[dayOfWeek] || this.config.businessHours[dayOfWeek].length === 0;
+                
+                if (isBeforeMin || isAfterMax || isClosedDay) {
+                    dayElement.classList.add('disabled');
+                } else {
+                    // Add clickable behavior for available dates
+                    dayElement.addEventListener('click', () => {
+                        this.selectDate(dayElement, dateString);
+                    });
+                    
+                    // Check if date has available slots
+                    const hasAvailability = this.state.availableTimeSlots[dateString] && 
+                                          this.state.availableTimeSlots[dateString].length > 0;
+                    
+                    // Add availability indicator
+                    if (hasAvailability) {
+                        const indicator = document.createElement('span');
+                        indicator.className = 'availability-indicator';
+                        
+                        const slots = this.state.availableTimeSlots[dateString].length;
+                        if (slots > 10) {
+                            indicator.classList.add('high');
+                        } else if (slots > 5) {
+                            indicator.classList.add('medium');
+                        } else {
+                            indicator.classList.add('low');
+                        }
+                        
+                        dayElement.appendChild(indicator);
+                    } else {
+                        // If we don't have availability data for this date yet, mark it as loading
+                        if (!this.state.loadingAvailability) {
+                            // Fetch availability data for this month
+                            this.fetchMonthAvailability(currentYear, currentMonth);
+                        }
+                    }
+                }
+                
+                // Highlight today
+                if (date.toDateString() === new Date().toDateString()) {
+                    dayElement.classList.add('today');
+                }
+                
+                // Highlight selected date
+                if (dateString === this.state.selectedDate) {
+                    dayElement.classList.add('selected');
+                }
+                
+                this.elements.calendarGrid.appendChild(dayElement);
+            }
+            
+            // Add empty cells for days after the last day to complete the grid
+            const totalCells = this.elements.calendarGrid.children.length;
+            const cellsInLastRow = totalCells % 7;
+            
+            if (cellsInLastRow > 0) {
+                const emptyCellsNeeded = 7 - cellsInLastRow;
+                for (let i = 0; i < emptyCellsNeeded; i++) {
+                    const emptyCell = document.createElement('div');
+                    emptyCell.className = 'calendar-day empty';
+                    this.elements.calendarGrid.appendChild(emptyCell);
+                }
+            }
+        };
+        
+        // Go to previous month
+        const goToPrevMonth = () => {
+            currentMonth--;
+            
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            
+            generateCalendar();
+            this.fetchMonthAvailability(currentYear, currentMonth);
+        };
+        
+        // Go to next month
+        const goToNextMonth = () => {
+            currentMonth++;
+            
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            
+            generateCalendar();
+            this.fetchMonthAvailability(currentYear, currentMonth);
+        };
+        
+        // Bind events
+        this.elements.prevMonthButton.addEventListener('click', goToPrevMonth);
+        this.elements.nextMonthButton.addEventListener('click', goToNextMonth);
+        
+        // Initialize calendar
+        generateCalendar();
+        
+        // Fetch initial availability
+        this.fetchMonthAvailability(currentYear, currentMonth);
+    },
+    
+    /**
+     * Fetch availability for a specific month from Google Calendar
+     */
+    fetchMonthAvailability: function(year, month) {
+        // Set loading state
+        this.state.loadingAvailability = true;
+        
+        // Create dates for start and end of month
+        const startDate = new Date(year, month, 1);
+        const endDate = new Date(year, month + 1, 0);
+        
+        // Format dates for API
+        const startDateStr = this.formatDate(startDate);
+        const endDateStr = this.formatDate(endDate);
+        
+        // Show loading message for timeslots
+        if (this.elements.timeSlotContainer) {
+            this.elements.timeSlotContainer.innerHTML = '<div class="loading-message">Loading available appointments...</div>';
+        }
+        
+        // For development or testing, use mock data
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            console.log('Using mock availability data for development');
+            setTimeout(() => {
+                this.generateMockAvailableSlots(startDate, endDate);
+                this.state.loadingAvailability = false;
+                this.updateCalendarAvailability();
+            }, 800);
+            return;
+        }
+        
+        // Make API call to Google Apps Script endpoint
+        fetch(`${this.config.calendarApiEndpoint}?action=getAvailability&start=${startDateStr}&end=${endDateStr}&service=${this.elements.specificService?.value || ''}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch availability data');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data && data.slots) {
+                    // Merge new availability data with existing data
+                    this.state.availableTimeSlots = {...this.state.availableTimeSlots, ...data.slots};
+                    
+                    // Update calendar display
+                    this.updateCalendarAvailability();
+                } else {
+                    console.warn('Invalid availability data format received');
+                    this.generateMockAvailableSlots(startDate, endDate);
+                }
+                
+                this.state.loadingAvailability = false;
+            })
+            .catch(error => {
+                console.error('Error fetching availability:', error);
+                
+                // Fallback to mock data
+                this.generateMockAvailableSlots(startDate, endDate);
+                this.state.loadingAvailability = false;
+                this.updateCalendarAvailability();
+            });
+    },
+    
+    /**
+     * Update calendar to show availability indicators
+     */
+    updateCalendarAvailability: function() {
+        const dayElements = this.elements.calendarGrid.querySelectorAll('.calendar-day:not(.empty):not(.disabled)');
+        
+        dayElements.forEach(dayElement => {
+            const dateString = dayElement.dataset.date;
+            
+            if (!dateString) return;
+            
+            // Check if we have availability data for this date
+            const hasAvailability = this.state.availableTimeSlots[dateString] && 
+                                  this.state.availableTimeSlots[dateString].length > 0;
+            
+            // Remove any existing indicator
+            const existingIndicator = dayElement.querySelector('.availability-indicator');
+            if (existingIndicator) {
+                dayElement.removeChild(existingIndicator);
+            }
+            
+            // Add availability indicator
+            if (hasAvailability) {
+                const indicator = document.createElement('span');
+                indicator.className = 'availability-indicator';
+                
+                const slots = this.state.availableTimeSlots[dateString].length;
+                if (slots > 10) {
+                    indicator.classList.add('high');
+                } else if (slots > 5) {
+                    indicator.classList.add('medium');
+                } else {
+                    indicator.classList.add('low');
+                }
+                
+                dayElement.appendChild(indicator);
+            } else {
+                // If no availability, add disabled class
+                dayElement.classList.add('unavailable');
+                
+                // Remove click event by cloning and replacing
+                const newDayElement = dayElement.cloneNode(true);
+                dayElement.parentNode.replaceChild(newDayElement, dayElement);
+            }
+        });
+        
+        // If we already had a date selected, update the time slots
+        if (this.state.selectedDate) {
+            this.updateTimeSlots(this.state.selectedDate);
+        }
+    },
+    
+    /**
+     * Generate mock available slots for development/testing
+     */
+    generateMockAvailableSlots: function(startDate, endDate) {
+        const daysInRange = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+        
+        for (let i = 0; i < daysInRange; i++) {
+            const date = new Date(startDate);
+            date.setDate(startDate.getDate() + i);
+            
+            // Skip closed days
+            const dayOfWeek = date.getDay();
+            if (!this.config.businessHours[dayOfWeek] || this.config.businessHours[dayOfWeek].length === 0) {
+                continue;
+            }
+            
+            const dateString = this.formatDate(date);
+            const timeSlots = [];
+            
+            // Generate between 0-15 slots for each day
+            const slotsCount = Math.floor(Math.random() * 16);
+            
+            // Get business hours for this day
+            const [startHour, endHour] = this.config.businessHours[dayOfWeek];
+            const startHourNum = parseInt(startHour.split(':')[0]);
+            const endHourNum = parseInt(endHour.split(':')[0]);
+            
+            // Generate random available times within business hours
+            const availableTimes = new Set();
+            for (let j = 0; j < slotsCount; j++) {
+                const hour = startHourNum + Math.floor(Math.random() * (endHourNum - startHourNum));
+                const minute = Math.random() < 0.5 ? 0 : 30; // Either on the hour or half hour
+                
+                const timeString = `${hour.toString().padStart(2, '0')}:${minute === 0 ? '00' : '30'}`;
+                availableTimes.add(timeString);
+            }
+            
+            // Convert to array and sort
+            const sortedTimes = Array.from(availableTimes).sort();
+            
+            // Format times for display
+            sortedTimes.forEach(time => {
+                const [hourStr, minuteStr] = time.split(':');
+                const hour = parseInt(hourStr);
+                const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
+                const period = hour >= 12 ? 'PM' : 'AM';
+                
+                timeSlots.push({
+                    time: `${displayHour}:${minuteStr} ${period}`,
+                    available: true
+                });
+            });
+            
+            this.state.availableTimeSlots[dateString] = timeSlots;
+        }
+    },
+    
+    /**
+     * Format date to YYYY-MM-DD string
+     */
+    formatDate: function(date) {
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    },
+    
+    /**
+     * Parse date string to Date object
+     */
+    parseDate: function(dateString) {
+        const [year, month, day] = dateString.split('-').map(Number);
+        return new Date(year, month - 1, day);
+    },
+    
+    /**
+     * Select a date on the calendar
+     */
+    selectDate: function(dayElement, dateString) {
+        // Clear previous selection
+        const prevSelected = this.elements.calendarGrid.querySelectorAll('.calendar-day.selected');
+        prevSelected.forEach(day => {
+            day.classList.remove('selected');
+        });
+        
+        // Select this day
+        dayElement.classList.add('selected');
+        
+        // Update state and inputs
+        this.state.selectedDate = dateString;
+        this.elements.selectedDateInput.value = dateString;
+        
+        if (this.elements.appointmentDateInput) {
+            this.elements.appointmentDateInput.value = dateString;
+        }
+        
+        // Update time slots
+        this.updateTimeSlots(dateString);
+        
+        // Clear selected time
+        this.state.selectedTime = '';
+        this.elements.selectedTimeInput.value = '';
+        
+        // Track date selection
+        if (typeof gtag === 'function') {
+            gtag('event', 'date_selection', {
+                selected_date: dateString,
+                available_slots: this.state.availableTimeSlots[dateString]?.length || 0
+            });
+        }
+    },
+    
+    /**
+     * Update time slots based on selected date
+     */
+    updateTimeSlots: function(dateString) {
+        if (!this.elements.timeSlotContainer || !this.elements.selectedDateDisplay) return;
+        
+        // Clear time slots
+        this.elements.timeSlotContainer.innerHTML = '';
+        
+        // Parse selected date
+        const selectedDate = this.parseDate(dateString);
+        
+        // Format date for display
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        this.elements.selectedDateDisplay.textContent = selectedDate.toLocaleDateString('en-US', options);
+        
+        // Get available time slots for this date
+        const availableSlots = this.state.availableTimeSlots[dateString] || [];
+        
+        if (availableSlots.length === 0) {
+            this.elements.timeSlotContainer.innerHTML = '<p class="no-slots-message">No available appointments on this day. Please select another date.</p>';
+            return;
+        }
+        
+        // Create morning and afternoon sections
+        const morningSlots = document.createElement('div');
+        morningSlots.className = 'time-slot-section';
+        morningSlots.innerHTML = '<h4 class="time-section-title">Morning</h4><div class="time-slots-grid morning-slots"></div>';
+        
+        const afternoonSlots = document.createElement('div');
+        afternoonSlots.className = 'time-slot-section';
+        afternoonSlots.innerHTML = '<h4 class="time-section-title">Afternoon</h4><div class="time-slots-grid afternoon-slots"></div>';
+        
+        this.elements.timeSlotContainer.appendChild(morningSlots);
+        this.elements.timeSlotContainer.appendChild(afternoonSlots);
+        
+        const morningGrid = morningSlots.querySelector('.morning-slots');
+        const afternoonGrid = afternoonSlots.querySelector('.afternoon-slots');
+        
+        // Populate time slots
+        availableSlots.forEach(slot => {
+            // Create time slot element
+            const timeSlot = document.createElement('div');
+            timeSlot.className = 'time-slot';
+            timeSlot.dataset.time = slot.time;
+            timeSlot.textContent = slot.time;
+            
+            // Add click event
+            timeSlot.addEventListener('click', () => {
+                this.selectTimeSlot(timeSlot, slot.time);
+            });
+            
+            // Add to appropriate section based on AM/PM
+            if (slot.time.includes('AM')) {
+                morningGrid.appendChild(timeSlot);
+            } else {
+                afternoonGrid.appendChild(timeSlot);
+            }
+        });
+        
+        // Hide section if no slots
+        if (morningGrid.children.length === 0) {
+            morningSlots.style.display = 'none';
+        }
+        
+        if (afternoonGrid.children.length === 0) {
+            afternoonSlots.style.display = 'none';
+        }
+        
+        // Enable continue button if user already selected a time
+        const nextStepButton = document.querySelector('.form-step[data-step="3"] .next-step');
+        if (nextStepButton) {
+            nextStepButton.disabled = !this.state.selectedTime;
+        }
+    },
+    
+    /**
+     * Select a time slot
+     */
+    selectTimeSlot: function(timeSlot, timeString) {
+        // Deselect all other slots
+        document.querySelectorAll('.time-slot.selected').forEach(slot => {
+            slot.classList.remove('selected');
+        });
+        
+        // Select this slot
+        timeSlot.classList.add('selected');
+        
+        // Update state and input
+        this.state.selectedTime = timeString;
+        this.elements.selectedTimeInput.value = timeString;
+        
+        // Enable next button
+        const nextButton = document.querySelector('.form-step[data-step="3"] .next-step');
+        if (nextButton) {
+            nextButton.disabled = false;
+        }
+        
+        // Track time selection
+        if (typeof gtag === 'function') {
+            gtag('event', 'time_selection', {
+                selected_date: this.state.selectedDate,
+                selected_time: timeString
+            });
+        }
     },
     
     /**
@@ -412,6 +887,7 @@ const EnhancedBookingSystem = {
             if (!this.state.selectedDate || !this.state.selectedTime) {
                 isValid = false;
                 
+                // Show notification
                 if (!this.state.selectedDate) {
                     this.showNotification('Please select a date from the calendar', 'error');
                 } else if (!this.state.selectedTime) {
@@ -420,40 +896,7 @@ const EnhancedBookingSystem = {
             }
         }
         
-        // If validation fails, focus on first invalid input
-        if (!isValid) {
-            const firstInvalid = currentStepElement.querySelector('.is-invalid input, .is-invalid select, .is-invalid textarea');
-            if (firstInvalid) {
-                firstInvalid.focus();
-            }
-            
-            // Track validation failure
-            this.trackValidationFailure(stepNumber);
-        }
-        
         return isValid;
-    },
-    
-    /**
-     * Track validation failure for analytics
-     */
-    trackValidationFailure: function(stepNumber) {
-        // Get all invalid fields
-        const invalidFields = Array.from(this.elements.formSteps[stepNumber - 1].querySelectorAll('.is-invalid'))
-            .map(formGroup => {
-                const input = formGroup.querySelector('input, select, textarea');
-                return input ? input.name || input.id : 'unknown';
-            });
-        
-        const trackingData = {
-            event: 'validation_failure',
-            sessionId: this.state.sessionId,
-            stepNumber: stepNumber,
-            invalidFields: invalidFields,
-            timestamp: new Date().toISOString()
-        };
-        
-        this.sendAnalyticsData(trackingData);
     },
     
     /**
@@ -461,10 +904,9 @@ const EnhancedBookingSystem = {
      */
     showNotification: function(message, type = 'info') {
         // Create notification element if it doesn't exist
-        let notification = document.getElementById('booking-notification');
+        let notification = document.querySelector('.booking-notification');
         if (!notification) {
             notification = document.createElement('div');
-            notification.id = 'booking-notification';
             notification.className = 'booking-notification';
             document.body.appendChild(notification);
         }
@@ -483,607 +925,6 @@ const EnhancedBookingSystem = {
     },
     
     /**
-     * Initialize service selection functionality
-     */
-    initServiceSelection: function() {
-        if (!this.elements.serviceCategory || !this.elements.specificService) return;
-        
-        // Handle service category change
-        this.elements.serviceCategory.addEventListener('change', () => {
-            const category = this.elements.serviceCategory.value;
-            this.state.serviceCategory = category;
-            
-            // Update specific service dropdown based on selected category
-            this.updateServiceOptions(category);
-        });
-        
-        // Handle specific service change
-        this.elements.specificService.addEventListener('change', () => {
-            this.state.specificService = this.elements.specificService.value;
-        });
-        
-        // Handle preferred dentist change
-        if (this.elements.preferredDentist) {
-            this.elements.preferredDentist.addEventListener('change', () => {
-                this.state.preferredDentist = this.elements.preferredDentist.value;
-            });
-        }
-    },
-    
-    /**
-     * Update service options based on selected category
-     */
-    updateServiceOptions: function(category) {
-        if (!this.elements.specificService) return;
-        
-        // Clear current options
-        this.elements.specificService.innerHTML = '<option value="">Select a service</option>';
-        
-        // Enable/disable dropdown based on category selection
-        if (!category) {
-            this.elements.specificService.disabled = true;
-            return;
-        }
-        
-        this.elements.specificService.disabled = false;
-        
-        // Define services by category
-        const services = {
-            general: [
-                { value: 'checkup', label: 'Dental Check-up & Cleaning' },
-                { value: 'fillings', label: 'Dental Fillings' },
-                { value: 'root-canal', label: 'Root Canal Therapy' },
-                { value: 'extraction', label: 'Tooth Extraction' },
-                { value: 'crowns', label: 'Dental Crowns & Bridges' },
-                { value: 'dentures', label: 'Dentures & Partial Dentures' }
-            ],
-            cosmetic: [
-                { value: 'whitening', label: 'Teeth Whitening' },
-                { value: 'veneers', label: 'Porcelain Veneers' },
-                { value: 'bonding', label: 'Dental Bonding' },
-                { value: 'smile-makeover', label: 'Complete Smile Makeover' }
-            ],
-            emergency: [
-                { value: 'toothache', label: 'Severe Toothache' },
-                { value: 'broken-tooth', label: 'Broken or Chipped Tooth' },
-                { value: 'lost-filling', label: 'Lost Filling or Crown' },
-                { value: 'dental-abscess', label: 'Dental Abscess' },
-                { value: 'jaw-pain', label: 'Jaw Pain or Injury' }
-            ]
-        };
-        
-        // Add options for selected category
-        if (services[category]) {
-            services[category].forEach(service => {
-                const option = document.createElement('option');
-                option.value = service.value;
-                option.textContent = service.label;
-                this.elements.specificService.appendChild(option);
-            });
-        }
-    },
-    
-    /**
-     * Fetch available time slots from Google Sheets
-     */
-    fetchAvailableTimeSlots: function() {
-        // Set loading state
-        const loadingMessage = document.createElement('div');
-        loadingMessage.className = 'loading-message';
-        loadingMessage.textContent = 'Loading available appointments...';
-        
-        if (this.elements.timeSlotContainer) {
-            this.elements.timeSlotContainer.innerHTML = '';
-            this.elements.timeSlotContainer.appendChild(loadingMessage);
-        }
-        
-        // For development or if URL is not set, use mock data
-        if (!this.config.googleScriptUrl || 
-            window.location.hostname === 'localhost' || 
-            window.location.hostname === '127.0.0.1') {
-            setTimeout(() => {
-                // Generate and use mock data
-                this.generateMockAvailableSlots();
-                // Make sure calendar is initialized
-if (this.elements.calendarGrid && this.elements.calendarGrid.querySelectorAll('.calendar-day').length === 0) {
-    this.initCalendar();
-}
-                
-                // Show mock data in calendar
-                if (this.elements.calendarGrid) {
-                    // Force calendar regeneration if needed
-                    if (this.elements.calendarGrid.querySelectorAll('.calendar-day').length === 0) {
-                        this.initCalendar();
-                    }
-                    
-                    // Find first available date
-                    const firstAvailableDay = this.elements.calendarGrid.querySelector('.calendar-day:not(.empty):not(.disabled)');
-                    if (firstAvailableDay) {
-                        // Simulate clicking on first available date
-                        firstAvailableDay.click();
-                    }
-                }
-            }, 500);
-            return;
-        }
-        
-        // Make real API call if URL is set
-        console.log('Fetching available slots from:', this.config.googleScriptUrl);
-        
-        const apiUrl = this.config.googleScriptUrl + '?action=getAvailableSlots';
-        fetch(apiUrl)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok: ' + response.status);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Received data from Google Sheets:', data);
-                
-                if (data && data.slots) {
-                this.state.availableTimeSlots = data.slots;
-                } else {
-                    // If data format is incorrect, use mock data
-                    console.warn('Data format from API was unexpected, using mock data instead');
-                    this.generateMockAvailableSlots();
-                }
-                
-                // Update calendar and select a date
-                if (this.elements.calendarGrid) {
-                    // Force calendar regeneration if needed
-                    if (this.elements.calendarGrid.querySelectorAll('.calendar-day').length === 0) {
-                        this.initCalendar();
-                    }
-                    
-                    // Find first available date
-                    const firstAvailableDay = this.elements.calendarGrid.querySelector('.calendar-day:not(.empty):not(.disabled)');
-                    if (firstAvailableDay) {
-                        firstAvailableDay.click();
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching available slots:', error);
-                
-                // Fall back to mock data
-                this.generateMockAvailableSlots();
-                
-                // Update calendar and select a date
-                if (this.elements.calendarGrid) {
-                    // Force calendar regeneration if needed
-                    if (this.elements.calendarGrid.querySelectorAll('.calendar-day').length === 0) {
-                        this.initCalendar();
-                    }
-                    
-                    // Find first available date
-                    const firstAvailableDay = this.elements.calendarGrid.querySelector('.calendar-day:not(.empty):not(.disabled)');
-                    if (firstAvailableDay) {
-                        firstAvailableDay.click();
-                    }
-                }
-            });
-    },
-    
-    /**
-     * Generate mock available slots for development/fallback
-     */
-    generateMockAvailableSlots: function() {
-        const today = new Date();
-        this.state.availableTimeSlots = {};
-        
-        // Create available slots for the next 60 days
-        for (let i = 0; i < this.config.maxBookingDays; i++) {
-            const date = new Date();
-            date.setDate(today.getDate() + i);
-            
-            // Skip Sundays (closed days)
-            if (date.getDay() === 0 || this.config.closedDays.includes(date.getDay())) {
-                continue;
-            }
-            
-            const dateString = this.formatDate(date);
-            
-            // Generate 5-12 random time slots per day
-            const slotsCount = Math.floor(Math.random() * 8) + 5;
-            const timeSlots = [];
-            
-            // Business hours: 9 AM - 5 PM
-            for (let j = 0; j < slotsCount; j++) {
-                const hour = Math.floor(Math.random() * 8) + 9; // 9 AM to 4 PM
-                const minute = Math.random() < 0.5 ? 0 : 30; // Either on the hour or half hour
-                const period = hour >= 12 ? 'PM' : 'AM';
-                const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
-                const timeString = `${displayHour}:${minute === 0 ? '00' : '30'} ${period}`;
-                
-                timeSlots.push({
-                    time: timeString,
-                    available: true
-                });
-            }
-            
-            // Sort time slots chronologically
-            timeSlots.sort((a, b) => {
-                const aHour = parseInt(a.time.split(':')[0]);
-                const aMinute = parseInt(a.time.split(':')[1]);
-                const aPeriod = a.time.split(' ')[1];
-                
-                const bHour = parseInt(b.time.split(':')[0]);
-                const bMinute = parseInt(b.time.split(':')[1]);
-                const bPeriod = b.time.split(' ')[1];
-                
-                // Convert to 24-hour for comparison
-                const aValue = ((aPeriod === 'PM' && aHour !== 12) ? aHour + 12 : aHour) * 60 + aMinute;
-                const bValue = ((bPeriod === 'PM' && bHour !== 12) ? bHour + 12 : bHour) * 60 + bMinute;
-                
-                return aValue - bValue;
-            });
-            
-            this.state.availableTimeSlots[dateString] = timeSlots;
-        }
-        
-        console.log('Mock available time slots generated:', Object.keys(this.state.availableTimeSlots).length, 'days');
-    },
-    
-    /**
-     * Generate calendar for date selection
-     */
-    initCalendar: function() {
-        if (!this.elements.calendarGrid || !this.elements.calendarMonth) return;
-        
-        const today = new Date();
-        let currentMonth = today.getMonth();
-        let currentYear = today.getFullYear();
-        
-        // Set min date (today) and max date (today + maxBookingDays)
-        const minDate = new Date();
-        minDate.setHours(0, 0, 0, 0);
-        
-        const maxDate = new Date();
-        maxDate.setDate(maxDate.getDate() + this.config.maxBookingDays);
-        
-        // Generate calendar
-        const generateCalendar = () => {
-            // Clear grid
-            this.elements.calendarGrid.innerHTML = '';
-            
-            // Update month header
-            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-            this.elements.calendarMonth.textContent = `${monthNames[currentMonth]} ${currentYear}`;
-            
-            // Create day headers
-            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-            
-            dayNames.forEach(day => {
-                const dayElement = document.createElement('div');
-                dayElement.className = 'calendar-day-header';
-                dayElement.textContent = day;
-                this.elements.calendarGrid.appendChild(dayElement);
-            });
-            
-            // Get first day of month
-            const firstDay = new Date(currentYear, currentMonth, 1);
-            const startingDay = firstDay.getDay();
-            
-            // Get last day of month
-            const lastDay = new Date(currentYear, currentMonth + 1, 0);
-            const totalDays = lastDay.getDate();
-            
-            // Add empty cells for days before first day of month
-            for (let i = 0; i < startingDay; i++) {
-                const emptyCell = document.createElement('div');
-                emptyCell.className = 'calendar-day empty';
-                this.elements.calendarGrid.appendChild(emptyCell);
-            }
-            
-            // Add days of the month
-            for (let day = 1; day <= totalDays; day++) {
-                const date = new Date(currentYear, currentMonth, day);
-                const dateString = this.formatDate(date);
-                
-                const dayElement = document.createElement('div');
-                dayElement.className = 'calendar-day';
-                dayElement.textContent = day;
-                dayElement.dataset.date = dateString;
-                
-                // Check if date has available slots
-                const hasAvailableSlots = this.state.availableTimeSlots[dateString] && 
-                                        (this.state.availableTimeSlots[dateString].length > 0);
-                
-                // Check if date is selectable
-                const isBeforeMin = date < minDate;
-                const isAfterMax = date > maxDate;
-                const isClosedDay = this.config.closedDays.includes(date.getDay());
-                
-                if (isBeforeMin || isAfterMax || isClosedDay) {
-                    dayElement.classList.add('disabled');
-                } else {
-                    // Add availability indicator
-                    if (hasAvailableSlots) {
-                        // Add availability dot with color based on number of available slots
-                        const availabilityIndicator = document.createElement('span');
-                        availabilityIndicator.className = 'availability-indicator';
-                        
-                        // Determine availability level
-                        const availableCount = this.state.availableTimeSlots[dateString].length;
-                        if (availableCount > 10) {
-                            availabilityIndicator.classList.add('high');
-                        } else if (availableCount > 5) {
-                            availabilityIndicator.classList.add('medium');
-                        } else {
-                            availabilityIndicator.classList.add('low');
-                        }
-                        
-                        dayElement.appendChild(availabilityIndicator);
-                    } else {
-                        dayElement.classList.add('unavailable');
-                    }
-                    
-                    // Only allow selection if has available slots
-                    if (hasAvailableSlots) {
-                        // Make sure to use the correct 'this' context
-                        let self = this;
-                        dayElement.addEventListener('click', function() {
-                            console.log('Day clicked:', dateString);
-                            self.selectDate(this, dateString);
-                        });
-                    } else {
-                        dayElement.classList.add('disabled');
-                    }
-                }
-                
-                // Highlight today
-                if (date.toDateString() === today.toDateString()) {
-                    dayElement.classList.add('today');
-                }
-                
-                // Highlight selected date
-                if (dateString === this.state.selectedDate) {
-                    dayElement.classList.add('selected');
-                }
-                
-                this.elements.calendarGrid.appendChild(dayElement);
-            }
-            
-            // Add empty cells for days after the last day to complete the grid
-            const totalCells = this.elements.calendarGrid.children.length;
-            const cellsInLastRow = totalCells % 7;
-            
-            if (cellsInLastRow > 0) {
-                const emptyCellsNeeded = 7 - cellsInLastRow;
-                for (let i = 0; i < emptyCellsNeeded; i++) {
-                    const emptyCell = document.createElement('div');
-                    emptyCell.className = 'calendar-day empty';
-                    this.elements.calendarGrid.appendChild(emptyCell);
-                }
-            }
-        };
-        
-        // Go to previous month
-        const goToPrevMonth = () => {
-            currentMonth--;
-            
-            if (currentMonth < 0) {
-                currentMonth = 11;
-                currentYear--;
-            }
-            
-            generateCalendar();
-        };
-        
-        // Go to next month
-        const goToNextMonth = () => {
-            currentMonth++;
-            
-            if (currentMonth > 11) {
-                currentMonth = 0;
-                currentYear++;
-            }
-            
-            generateCalendar();
-        };
-        
-        // Bind events
-        this.elements.prevMonthButton.addEventListener('click', goToPrevMonth);
-        this.elements.nextMonthButton.addEventListener('click', goToNextMonth);
-        
-        // Initialize calendar
-        generateCalendar();
-        
-        // Log calendar generation complete
-        console.log('Calendar generated');
-    },
-    
-    /**
-     * Track date selection for analytics
-     */
-    trackDateSelection: function(dateString) {
-        const trackingData = {
-            event: 'date_selection',
-            sessionId: this.state.sessionId,
-            selectedDate: dateString,
-            dayOfWeek: new Date(dateString).getDay(),
-            availableSlots: this.state.availableTimeSlots[dateString]?.length || 0,
-            timestamp: new Date().toISOString()
-        };
-        
-        this.sendAnalyticsData(trackingData);
-    },
-    
-    /**
-     * Update time slots based on selected date
-     */
-    updateTimeSlots: function(dateString) {
-        if (!this.elements.timeSlotContainer || !this.elements.selectedDateDisplay) return;
-        
-        // Clear time slots
-        this.elements.timeSlotContainer.innerHTML = '';
-        
-        // Parse selected date
-        const selectedDate = this.parseDate(dateString);
-        
-        // Format date for display
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        this.elements.selectedDateDisplay.textContent = selectedDate.toLocaleDateString('en-US', options);
-        
-        // Check if the selected date is valid
-        if (isNaN(selectedDate.getTime())) {
-            this.elements.timeSlotContainer.innerHTML = '<p class="no-slots-message">Please select a valid date.</p>';
-            return;
-        }
-        
-        // Check if date is in the past
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        
-        if (selectedDate < today) {
-            this.elements.timeSlotContainer.innerHTML = '<p class="no-slots-message">Please select a date in the future.</p>';
-            return;
-        }
-        
-        // Check if it's a closed day (e.g., Sunday)
-        const dayOfWeek = selectedDate.getDay();
-        if (this.config.closedDays.includes(dayOfWeek)) {
-            this.elements.timeSlotContainer.innerHTML = '<p class="no-slots-message">We are closed on this day. Please select another day.</p>';
-            return;
-        }
-        
-        // Get available time slots for this date
-        const availableSlots = this.state.availableTimeSlots[dateString] || [];
-        
-        if (availableSlots.length === 0) {
-            this.elements.timeSlotContainer.innerHTML = '<p class="no-slots-message">No available appointments on this day. Please select another date.</p>';
-            return;
-        }
-        
-        // Create morning and afternoon sections
-        const morningSlots = document.createElement('div');
-        morningSlots.className = 'time-slot-section';
-        morningSlots.innerHTML = '<h4 class="time-section-title">Morning</h4><div class="time-slots-grid morning-slots"></div>';
-        
-        const afternoonSlots = document.createElement('div');
-        afternoonSlots.className = 'time-slot-section';
-        afternoonSlots.innerHTML = '<h4 class="time-section-title">Afternoon</h4><div class="time-slots-grid afternoon-slots"></div>';
-        
-        this.elements.timeSlotContainer.appendChild(morningSlots);
-        this.elements.timeSlotContainer.appendChild(afternoonSlots);
-        
-        const morningGrid = morningSlots.querySelector('.morning-slots');
-        const afternoonGrid = afternoonSlots.querySelector('.afternoon-slots');
-        
-        // Handle both formats of time slots (objects with time property or simple strings)
-        availableSlots.forEach(slot => {
-            // Handle different formats of time slots (from API or mock data)
-            let timeString = '';
-            let isAvailable = true;
-            
-            // If the slot is an object with a time property (new format from our mock data)
-            if (typeof slot === 'object' && slot.time) {
-                timeString = slot.time;
-                isAvailable = slot.available !== false; // Default to true if not specified
-            } 
-            // If the slot is a string (original format from Google Sheets API)
-            else if (typeof slot === 'string') {
-                timeString = slot;
-                
-                // Convert 24-hour format to 12-hour format if needed
-                if (timeString.match(/^\d{2}:\d{2}$/)) {
-                    const [hour, minute] = timeString.split(':').map(Number);
-                    const period = hour >= 12 ? 'PM' : 'AM';
-                    const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
-                    timeString = `${displayHour}:${minute === 0 ? '00' : minute} ${period}`;
-                }
-            }
-            
-            // Skip invalid time strings
-            if (!timeString) return;
-            
-            // Create time slot element
-            const timeSlot = document.createElement('div');
-            timeSlot.className = 'time-slot';
-            if (!isAvailable) timeSlot.classList.add('unavailable');
-            
-            timeSlot.dataset.time = timeString;
-            timeSlot.textContent = timeString;
-            
-            // Only add click listener if available
-            if (isAvailable) {
-            timeSlot.addEventListener('click', () => {
-                this.selectTimeSlot(timeSlot, timeString);
-            });
-            
-            // Highlight selected time slot
-            if (timeString === this.state.selectedTime) {
-                timeSlot.classList.add('selected');
-                }
-            }
-            
-            // Add to appropriate section based on AM/PM
-            if (timeString.includes('AM')) {
-                morningGrid.appendChild(timeSlot);
-            } else {
-                afternoonGrid.appendChild(timeSlot);
-            }
-        });
-        
-        // Hide section if no slots
-        if (morningGrid.children.length === 0) {
-            morningSlots.style.display = 'none';
-        }
-        
-        if (afternoonGrid.children.length === 0) {
-            afternoonSlots.style.display = 'none';
-        }
-        
-        // Enable continue button if user already selected a time
-        const nextStepButton = document.querySelector('.form-step[data-step="3"] .next-step');
-        if (nextStepButton) {
-            nextStepButton.disabled = !this.state.selectedTime;
-        }
-    },
-    
-    /**
-     * Select a time slot
-     */
-    selectTimeSlot: function(timeSlot, timeString) {
-        // Deselect all other slots
-        document.querySelectorAll('.time-slot.selected').forEach(slot => {
-            slot.classList.remove('selected');
-        });
-        
-        // Select this slot
-        timeSlot.classList.add('selected');
-        
-        // Update state and input
-        this.state.selectedTime = timeString;
-        this.elements.selectedTimeInput.value = timeString;
-        
-        // Enable next button
-        const nextButton = document.querySelector('.form-step[data-step="3"] .next-step');
-        if (nextButton) {
-            nextButton.disabled = false;
-        }
-        
-        // Track time selection
-        this.trackTimeSelection(timeString);
-    },
-    
-    /**
-     * Track time selection for analytics
-     */
-    trackTimeSelection: function(timeString) {
-        const trackingData = {
-            event: 'time_selection',
-            sessionId: this.state.sessionId,
-            selectedDate: this.state.selectedDate,
-            selectedTime: timeString,
-            timestamp: new Date().toISOString()
-        };
-        
-        this.sendAnalyticsData(trackingData);
-    },
-    
-    /**
      * Update confirmation summary
      */
     updateConfirmationSummary: function() {
@@ -1099,16 +940,13 @@ if (this.elements.calendarGrid && this.elements.calendarGrid.querySelectorAll('.
         
         // Get service details
         let serviceName = 'Not selected';
-        if (this.elements.serviceCategory && this.elements.specificService && 
-            this.elements.serviceCategory.value && this.elements.specificService.value) {
-            const categoryText = this.elements.serviceCategory.options[this.elements.serviceCategory.selectedIndex].text;
-            const serviceText = this.elements.specificService.options[this.elements.specificService.selectedIndex].text;
-            serviceName = `${serviceText} (${categoryText})`;
+        if (this.elements.specificService && this.elements.specificService.selectedIndex > 0) {
+            serviceName = this.elements.specificService.options[this.elements.specificService.selectedIndex].text;
         }
         
         // Get dentist name
         let dentistName = 'No preference';
-        if (this.elements.preferredDentist && this.elements.preferredDentist.value) {
+        if (this.elements.preferredDentist && this.elements.preferredDentist.selectedIndex > 0) {
             dentistName = this.elements.preferredDentist.options[this.elements.preferredDentist.selectedIndex].text;
         }
         
@@ -1117,16 +955,7 @@ if (this.elements.calendarGrid && this.elements.calendarGrid.querySelectorAll('.
         if (this.state.selectedDate && this.state.selectedTime) {
             const date = this.parseDate(this.state.selectedDate);
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            
-            // Format time for display (12-hour format)
-            const timeString = this.state.selectedTime;
-            const hour = parseInt(timeString.split(':')[0], 10);
-            const hourNum = hour % 12 || 12;
-            const minute = timeString.split(':')[1];
-            const ampm = hour < 12 ? 'AM' : 'PM';
-            const formattedTime = `${hourNum}:${minute} ${ampm}`;
-            
-            dateTimeText = `${date.toLocaleDateString('en-US', options)} at ${formattedTime}`;
+            dateTimeText = `${date.toLocaleDateString('en-US', options)} at ${this.state.selectedTime}`;
         }
         
         // Update summary elements
@@ -1137,79 +966,116 @@ if (this.elements.calendarGrid && this.elements.calendarGrid.querySelectorAll('.
     },
     
     /**
-     * Initialize form validation
+     * Handle form submission
      */
-    initFormValidation: function() {
-        if (!this.elements.bookingForm) return;
+    handleFormSubmit: function(event) {
+        // Prevent default form submission
+        event.preventDefault();
         
-        // Get all inputs, selects, and textareas
-        const formInputs = this.elements.bookingForm.querySelectorAll('input:not([type="hidden"]), select, textarea');
+        // Validate final step
+        if (!this.validateStep(this.state.currentStep)) {
+            return false;
+        }
         
-        // Add blur and input event listeners for validation
-        formInputs.forEach(input => {
-            // Validate on blur
-            input.addEventListener('blur', () => {
-                this.validateInput(input);
-                input.dataset.blurred = 'true';
-            });
+        // Check if already submitting to prevent double submission
+        if (this.state.submitting) {
+            return false;
+        }
+        
+        // Set submitting state
+        this.state.submitting = true;
+        this.elements.loadingIndicator.classList.add('visible');
+        
+        // Collect form data
+        const formData = this.collectFormData();
+        
+        // For development/testing, simulate submission
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            console.log('Form data (dev mode):', formData);
             
-            // Validate on input if already blurred
-            input.addEventListener('input', () => {
-                if (input.dataset.blurred === 'true') {
-                    this.validateInput(input);
+            setTimeout(() => {
+                this.state.submitting = false;
+                this.elements.loadingIndicator.classList.remove('visible');
+                
+                // Show booking confirmation
+                this.showBookingConfirmation(formData);
+                
+                // Track form submission
+                if (typeof gtag === 'function') {
+                    gtag('event', 'form_submission', {
+                        status: 'success',
+                        service: formData.specificServiceName || ''
+                    });
                 }
-            });
+            }, 1500);
+            
+            return false;
+        }
+        
+        // Submit to Google Sheets via Apps Script
+        fetch(this.config.bookingApiEndpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                action: 'submitBooking',
+                bookingData: formData
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            this.state.submitting = false;
+            this.elements.loadingIndicator.classList.remove('visible');
+            
+            if (data.success) {
+                // Show booking confirmation
+                this.showBookingConfirmation(formData, data.calendarEventId);
+                
+                // Track form submission
+                if (typeof gtag === 'function') {
+                    gtag('event', 'form_submission', {
+                        status: 'success',
+                        service: formData.specificServiceName || ''
+                    });
+                }
+            } else {
+                // Show error message
+                this.showNotification(data.message || 'There was an error processing your booking. Please try again.', 'error');
+                
+                // Track form submission error
+                if (typeof gtag === 'function') {
+                    gtag('event', 'form_submission', {
+                        status: 'error',
+                        error_message: data.message || 'Unknown error'
+                    });
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Form submission error:', error);
+            
+            this.state.submitting = false;
+            this.elements.loadingIndicator.classList.remove('visible');
+            
+            // Show error message
+            this.showNotification('There was an error submitting your booking. Please try again or contact us directly.', 'error');
+            
+            // Track form submission error
+            if (typeof gtag === 'function') {
+                gtag('event', 'form_submission', {
+                    status: 'error',
+                    error_message: error.message
+                });
+            }
         });
-    },
-    
-    /**
-     * Validate a single input
-     */
-    validateInput: function(input) {
-        // Skip validation for hidden inputs
-        if (input.type === 'hidden' || input.disabled) return true;
         
-        const value = input.value.trim();
-        const formGroup = input.closest('.form-group');
-        
-        if (!formGroup) return true;
-        
-        // Clear previous validation
-        formGroup.classList.remove('is-invalid', 'is-valid');
-        
-        // Get or create feedback element
-        let feedback = formGroup.querySelector('.invalid-feedback');
-        if (!feedback) {
-            feedback = document.createElement('div');
-            feedback.className = 'invalid-feedback';
-            formGroup.appendChild(feedback);
-        }
-        
-        // Required validation
-        if (input.required && !value) {
-            formGroup.classList.add('is-invalid');
-            feedback.textContent = 'This field is required';
-            return false;
-        }
-        
-        // Email validation
-        if (input.type === 'email' && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-            formGroup.classList.add('is-invalid');
-            feedback.textContent = 'Please enter a valid email address';
-            return false;
-        }
-        
-        // Phone validation
-        if (input.type === 'tel' && value && !/^[\d\+\-\(\) ]{10,15}$/.test(value)) {
-            formGroup.classList.add('is-invalid');
-            feedback.textContent = 'Please enter a valid phone number';
-            return false;
-        }
-        
-        // Input is valid
-        formGroup.classList.add('is-valid');
-        feedback.textContent = '';
-        return true;
+        return false;
     },
     
     /**
@@ -1253,116 +1119,17 @@ if (this.elements.calendarGrid && this.elements.calendarGrid.querySelectorAll('.
     },
     
     /**
-     * Handle form submission
+     * Show booking confirmation
      */
-    handleFormSubmit: function(event) {
-        // Prevent default form submission
-        event.preventDefault();
-        
-        // Validate form
-        if (!this.validateStep(this.state.currentStep)) {
-            return false;
-        }
-        
-        // Check if already submitting to prevent double submission
-        if (this.state.submitting) {
-            return false;
-        }
-        
-        // Set submitting state
-        this.state.submitting = true;
-        
-        // Show loading indicator
-        this.elements.loadingIndicator.classList.add('visible');
-        
-        // Collect form data
-        const formData = this.collectFormData();
-        this.state.formData = formData;
-        
-        // Track form submission attempt
-        this.trackFormSubmission('attempt');
-        
-        // In development mode, just simulate success
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            console.log('Form data (dev mode):', formData);
-            
-            setTimeout(() => {
-                this.state.submitting = false;
-                this.elements.loadingIndicator.classList.remove('visible');
-                this.trackFormSubmission('success');
-                this.showBookingConfirmation();
-            }, 1500);
-            
-            return false;
-        }
-        
-        // Submit the form data to Google Apps Script
-        fetch(this.config.googleScriptUrl, {
-            method: 'POST',
-            mode: 'no-cors', // Required for Google Apps Script
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                action: 'submitBooking',
-                bookingData: formData
-            })
-        })
-        .then(response => {
-            // Handle success
-            this.state.submitting = false;
-            this.elements.loadingIndicator.classList.remove('visible');
-            this.trackFormSubmission('success');
-            this.showBookingConfirmation();
-        })
-        .catch(error => {
-            // Handle error
-            console.error('Form submission error:', error);
-            this.state.submitting = false;
-            this.elements.loadingIndicator.classList.remove('visible');
-            this.trackFormSubmission('error', error.message);
-            this.showNotification('There was an error submitting your booking. Please try again or contact us directly.', 'error');
-        });
-        
-        return false;
-    },
-    
-    /**
-     * Track form submission for analytics
-     */
-    trackFormSubmission: function(status, errorMessage = null) {
-        const trackingData = {
-            event: 'form_submission',
-            sessionId: this.state.sessionId,
-            status: status,
-            formData: {
-                service: this.state.formData.serviceCategoryName || '',
-                specificService: this.state.formData.specificServiceName || '',
-                dentist: this.state.formData.preferredDentistName || 'No preference',
-                date: this.state.formData.selectedDate || '',
-                time: this.state.formData.selectedTime || ''
-            },
-            timestamp: new Date().toISOString()
-        };
-        
-        if (errorMessage) {
-            trackingData.errorMessage = errorMessage;
-        }
-        
-        this.sendAnalyticsData(trackingData);
-    },
-    
-    /**
-     * Show booking confirmation message
-     */
-    showBookingConfirmation: function() {
-        // Store appointment details in localStorage for potential future reference
+    showBookingConfirmation: function(formData, calendarEventId) {
+        // Store appointment details in localStorage for future reference
         localStorage.setItem('wbdc_has_booking', 'true');
         localStorage.setItem('wbdc_appointment_details', JSON.stringify({
             name: this.elements.summaryName.textContent,
             service: this.elements.summaryService.textContent,
             dentist: this.elements.summaryDentist.textContent,
-            datetime: this.elements.summaryDatetime.textContent
+            datetime: this.elements.summaryDatetime.textContent,
+            calendarEventId: calendarEventId || ''
         }));
         
         // Replace form with confirmation message
@@ -1381,7 +1148,7 @@ if (this.elements.calendarGrid && this.elements.calendarGrid.querySelectorAll('.
                     <p><strong>Dentist:</strong> ${this.elements.summaryDentist.textContent}</p>
                     <p><strong>Date & Time:</strong> ${this.elements.summaryDatetime.textContent}</p>
                 </div>
-                <p>We've sent a confirmation email to your inbox with these details. If you need to make any changes to your appointment, please contact us at (555) 123-4567.</p>
+                <p>We've sent a confirmation email to your inbox with these details. Your appointment has been added to our calendar. If you need to make any changes, please contact us.</p>
                 <div class="confirmation-actions">
                     <a href="directions.html" class="btn btn-primary">Get Directions</a>
                     <a href="index.html" class="btn btn-outline">Return to Home</a>
@@ -1396,28 +1163,7 @@ if (this.elements.calendarGrid && this.elements.calendarGrid.querySelectorAll('.
                 behavior: 'smooth',
                 block: 'start'
             });
-            
-            // Track confirmation view
-            this.trackConfirmationView();
         }
-    },
-    
-    /**
-     * Track confirmation view for analytics
-     */
-    trackConfirmationView: function() {
-        const trackingData = {
-            event: 'confirmation_view',
-            sessionId: this.state.sessionId,
-            appointmentDetails: {
-                date: this.state.selectedDate,
-                time: this.state.selectedTime,
-                service: this.elements.summaryService.textContent,
-            },
-            timestamp: new Date().toISOString()
-        };
-        
-        this.sendAnalyticsData(trackingData);
     },
     
     /**
@@ -1448,7 +1194,6 @@ if (this.elements.calendarGrid && this.elements.calendarGrid.querySelectorAll('.
             // If category is found, select it
             if (category && this.elements.serviceCategory.querySelector(`option[value="${category}"]`)) {
                 this.elements.serviceCategory.value = category;
-                this.state.serviceCategory = category;
                 
                 // Trigger change event to update specific service dropdown
                 const event = new Event('change', { bubbles: true });
@@ -1463,70 +1208,9 @@ if (this.elements.calendarGrid && this.elements.calendarGrid.querySelectorAll('.
                         
                         if (serviceOption) {
                             this.elements.specificService.value = serviceParam;
-                            this.state.specificService = serviceParam;
                         }
                     }
                 }, 100);
-                
-                // Track parameter usage
-                this.trackUrlParameterUsage(serviceParam, category);
             }
         }
-    },
-    
-    /**
-     * Track URL parameter usage for analytics
-     */
-    trackUrlParameterUsage: function(serviceParam, category) {
-        const trackingData = {
-            event: 'url_param_usage',
-            sessionId: this.state.sessionId,
-            serviceParam: serviceParam,
-            mappedCategory: category,
-            timestamp: new Date().toISOString(),
-            referrer: document.referrer || 'direct'
-        };
-        
-        this.sendAnalyticsData(trackingData);
-    },
-    
-    /**
-     * Select a date on the calendar
-     */
-    selectDate: function(dayElement, dateString) {
-        console.log('Date selected:', dateString);
-        
-        // Clear previous selection
-        const prevSelected = this.elements.calendarGrid.querySelectorAll('.calendar-day.selected');
-        prevSelected.forEach(day => {
-            day.classList.remove('selected');
-        });
-        
-        // Select this day
-        dayElement.classList.add('selected');
-        
-        // Update state and inputs
-        this.state.selectedDate = dateString;
-        this.elements.selectedDateInput.value = dateString;
-        
-        // Make sure we also update the appointment date input if it exists
-        if (this.elements.appointmentDateInput) {
-            this.elements.appointmentDateInput.value = dateString;
-        }
-        
-        // Update time slots
-        this.updateTimeSlots(dateString);
-        
-        // Clear selected time
-        this.state.selectedTime = '';
-        this.elements.selectedTimeInput.value = '';
-        
-        // Track date selection for analytics
-        this.trackDateSelection(dateString);
-    }
-};
-
-// Initialize booking system when DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
-    EnhancedBookingSystem.init();
-});
+    }}
