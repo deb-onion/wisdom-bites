@@ -1203,100 +1203,105 @@ const WisdomBites = {
         });
         
         // Date and time selection
-        const dateInput = form.querySelector('#appointment-date');
-        const timeSlotContainer = form.querySelector('.time-slots');
-        
-        if (dateInput && timeSlotContainer) {
-            dateInput.addEventListener('change', () => {
-                // This would typically be an AJAX request to get available time slots
-                // For demo purposes, we'll just generate some sample time slots
-                const date = new Date(dateInput.value);
-                const dayOfWeek = date.getDay();
-                
-                // Clear existing time slots
-                timeSlotContainer.innerHTML = '';
-                
-                // Check if the selected date is valid
-                if (isNaN(date.getTime())) {
-                    timeSlotContainer.innerHTML = '<p class="no-slots-message">Please select a valid date.</p>';
-                    return;
-                }
-                
-                // Check if date is in the past
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                
-                if (date < today) {
-                    timeSlotContainer.innerHTML = '<p class="no-slots-message">Please select a date in the future.</p>';
-                    return;
-                }
-                
-                // Check if it's a Sunday (closed)
-                if (dayOfWeek === 0) {
-                    timeSlotContainer.innerHTML = '<p class="no-slots-message">We are closed on Sundays. Please select another day.</p>';
-                    return;
-                }
-                
-                // Generate time slots based on day of week
-                const startHour = dayOfWeek === 6 ? 10 : 9; // 10 AM on Saturday, 9 AM on other days
-                const endHour = dayOfWeek === 6 ? 15 : 18; // 3 PM on Saturday, 6 PM on other days
-                
-                for (let hour = startHour; hour < endHour; hour++) {
-                    // Generate slots at :00 and :30
-                    [0, 30].forEach(minute => {
-                        const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-                        
-                        const timeSlot = document.createElement('div');
-                        timeSlot.className = 'time-slot';
-                        timeSlot.dataset.time = timeString;
-                        timeSlot.textContent = timeString;
-                        
-                        // Randomly mark some slots as unavailable for demo purposes
-                        if (Math.random() < 0.3) {
-                            timeSlot.classList.add('unavailable');
-                            timeSlot.setAttribute('disabled', 'disabled');
-                        } else {
-                            timeSlot.addEventListener('click', () => {
-                                // Deselect all other slots
-                                document.querySelectorAll('.time-slot.selected').forEach(slot => {
-                                    slot.classList.remove('selected');
+        let dateInput;  // Declare the variable at a higher scope
+
+        // Wait for the DOM to be fully loaded before trying to access the dateInput
+        document.addEventListener('DOMContentLoaded', function() {
+            dateInput = document.querySelector('#appointment-date');
+            const timeSlotContainer = document.querySelector('.time-slots');
+            
+            if (dateInput && timeSlotContainer) {
+                dateInput.addEventListener('change', () => {
+                    // This would typically be an AJAX request to get available time slots
+                    // For demo purposes, we'll just generate some sample time slots
+                    const date = new Date(dateInput.value);
+                    const dayOfWeek = date.getDay();
+                    
+                    // Clear existing time slots
+                    timeSlotContainer.innerHTML = '';
+                    
+                    // Check if the selected date is valid
+                    if (isNaN(date.getTime())) {
+                        timeSlotContainer.innerHTML = '<p class="no-slots-message">Please select a valid date.</p>';
+                        return;
+                    }
+                    
+                    // Check if date is in the past
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    
+                    if (date < today) {
+                        timeSlotContainer.innerHTML = '<p class="no-slots-message">Please select a date in the future.</p>';
+                        return;
+                    }
+                    
+                    // Check if it's a Sunday (closed)
+                    if (dayOfWeek === 0) {
+                        timeSlotContainer.innerHTML = '<p class="no-slots-message">We are closed on Sundays. Please select another day.</p>';
+                        return;
+                    }
+                    
+                    // Generate time slots based on day of week
+                    const startHour = dayOfWeek === 6 ? 10 : 9; // 10 AM on Saturday, 9 AM on other days
+                    const endHour = dayOfWeek === 6 ? 15 : 18; // 3 PM on Saturday, 6 PM on other days
+                    
+                    for (let hour = startHour; hour < endHour; hour++) {
+                        // Generate slots at :00 and :30
+                        [0, 30].forEach(minute => {
+                            const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+                            
+                            const timeSlot = document.createElement('div');
+                            timeSlot.className = 'time-slot';
+                            timeSlot.dataset.time = timeString;
+                            timeSlot.textContent = timeString;
+                            
+                            // Randomly mark some slots as unavailable for demo purposes
+                            if (Math.random() < 0.3) {
+                                timeSlot.classList.add('unavailable');
+                                timeSlot.setAttribute('disabled', 'disabled');
+                            } else {
+                                timeSlot.addEventListener('click', () => {
+                                    // Deselect all other slots
+                                    document.querySelectorAll('.time-slot.selected').forEach(slot => {
+                                        slot.classList.remove('selected');
+                                    });
+                                    
+                                    // Select this slot
+                                    timeSlot.classList.add('selected');
+                                    
+                                    // Update hidden input
+                                    const timeInput = form.querySelector('#selected-time');
+                                    if (timeInput) {
+                                        timeInput.value = timeString;
+                                    }
+                                    
+                                    // Enable next button
+                                    const nextButton = form.querySelector('.form-step[data-step="3"] .next-step');
+                                    if (nextButton) {
+                                        nextButton.disabled = false;
+                                    }
                                 });
-                                
-                                // Select this slot
-                                timeSlot.classList.add('selected');
-                                
-                                // Update hidden input
-                                const timeInput = form.querySelector('#selected-time');
-                                if (timeInput) {
-                                    timeInput.value = timeString;
-                                }
-                                
-                                // Enable next button
-                                const nextButton = form.querySelector('.form-step[data-step="3"] .next-step');
-                                if (nextButton) {
-                                    nextButton.disabled = false;
-                                }
-                            });
-                        }
-                        
-                        timeSlotContainer.appendChild(timeSlot);
-                    });
-                }
-                
-                // Update selected date display
-                const selectedDateElement = form.querySelector('.selected-date');
-                if (selectedDateElement) {
-                    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                    selectedDateElement.textContent = date.toLocaleDateString('en-US', options);
-                }
-                
-                // Update hidden input
-                const dateInput = form.querySelector('#selected-date');
-                if (dateInput) {
-                    dateInput.value = dateInput.value;
-                }
-            });
-        }
+                            }
+                            
+                            timeSlotContainer.appendChild(timeSlot);
+                        });
+                    }
+                    
+                    // Update selected date display
+                    const selectedDateElement = form.querySelector('.selected-date');
+                    if (selectedDateElement) {
+                        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                        selectedDateElement.textContent = date.toLocaleDateString('en-US', options);
+                    }
+                    
+                    // Update hidden input
+                    const dateInput = form.querySelector('#selected-date');
+                    if (dateInput) {
+                        dateInput.value = dateInput.value;
+                    }
+                });
+            }
+        });
         
         // Service selection
         const serviceCategory = form.querySelector('#service-category');
@@ -1499,14 +1504,30 @@ const WisdomBites = {
                         // Select this date
                         dayElement.classList.add('selected');
                         
-                        // Update the date input
+                        // Update the date input using a safer approach
                         const dateInput = document.getElementById('appointment-date');
+                        
                         if (dateInput) {
-                            dateInput.value = dayElement.dataset.date;
-                            
-                            // Trigger change event to update time slots
-                            const event = new Event('change', { bubbles: true });
-                            dateInput.dispatchEvent(event);
+                            try {
+                                // Set the value and trigger change event
+                                dateInput.value = dayElement.dataset.date;
+                                
+                                // Dispatch the event safely
+                                try {
+                                    const event = new Event('change', { bubbles: true });
+                                    dateInput.dispatchEvent(event);
+                                } catch (eventError) {
+                                    console.log('Error dispatching change event:', eventError);
+                                    // Alternative method to trigger change handler
+                                    if (typeof jQuery !== 'undefined') {
+                                        jQuery(dateInput).trigger('change');
+                                    }
+                                }
+                            } catch (error) {
+                                console.error('Error updating date input:', error);
+                            }
+                        } else {
+                            console.error('Date input not found in the DOM');
                         }
                     });
                 }

@@ -1,6 +1,12 @@
 # Wisdom Bites Dental Clinic - Changelog
 
 
+## [4.3.5] - 2025-03-06
+
+### Patch Update:
+- Fixed booking form issues with negative maxlength values and calendar functionality
+
+
 ## [4.3.4] - 2025-03-06
 
 ### Patch Update:

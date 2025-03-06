@@ -424,6 +424,21 @@ const GoogleBookingSystem = {
         let currentMonth = today.getMonth();
         let currentYear = today.getFullYear();
         
+        // Make sure appointment date input exists and is accessible
+        if (!this.elements.appointmentDateInput) {
+            console.log('Appointment date input not found, trying to get it again');
+            this.elements.appointmentDateInput = document.getElementById('appointment-date');
+            
+            if (!this.elements.appointmentDateInput) {
+                console.error('Could not find appointment date input element');
+                // Create one if it doesn't exist to prevent errors
+                this.elements.appointmentDateInput = document.createElement('input');
+                this.elements.appointmentDateInput.id = 'appointment-date';
+                this.elements.appointmentDateInput.type = 'hidden';
+                document.getElementById('booking-form').appendChild(this.elements.appointmentDateInput);
+            }
+        }
+        
         // Generate calendar
         const generateCalendar = () => {
             // Clear grid
